@@ -1151,6 +1151,7 @@ export type Database = {
           days_opened: string[] | null
           description: string | null
           email: string | null
+          flexible_end_date: string | null
           gallery_images: string[] | null
           id: string
           image_url: string
@@ -1184,6 +1185,7 @@ export type Database = {
           days_opened?: string[] | null
           description?: string | null
           email?: string | null
+          flexible_end_date?: string | null
           gallery_images?: string[] | null
           id?: string
           image_url: string
@@ -1217,6 +1219,7 @@ export type Database = {
           days_opened?: string[] | null
           description?: string | null
           email?: string | null
+          flexible_end_date?: string | null
           gallery_images?: string[] | null
           id?: string
           image_url?: string
