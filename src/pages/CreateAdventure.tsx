@@ -25,6 +25,7 @@ import { OperatingHoursSection } from "@/components/creation/OperatingHoursSecti
 import { ReviewStep } from "@/components/creation/ReviewStep";
 import { GeneralFacilitiesSelector } from "@/components/creation/GeneralFacilitiesSelector";
 import { cn } from "@/lib/utils";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 

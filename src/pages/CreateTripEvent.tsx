@@ -19,6 +19,7 @@ import { approvalStatusSchema } from "@/lib/validation";
 import { ReviewStep } from "@/components/creation/ReviewStep";
 import { compressImages } from "@/lib/imageCompression";
 import { OperatingHoursSection } from "@/components/creation/OperatingHoursSection";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 const COLORS = { TEAL: "#008080", CORAL: "#FF7F50", CORAL_LIGHT: "#FF9E7A", SOFT_GRAY: "#F8F9FA" };
 
