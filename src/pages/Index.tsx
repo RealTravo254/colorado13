@@ -431,7 +431,7 @@ const Index = () => {
                 Discover • Book • Experience
               </p>
               <h1 className="text-primary-foreground text-3xl md:text-5xl font-extrabold text-center mb-5 md:mb-7 leading-tight tracking-tight">
-                Find Your Next<br className="md:hidden" /> Adventure
+                Discover Your Next<br className="md:hidden" /> Experience
               </h1>
               <SearchBarWithSuggestions
                 value={searchQuery} onChange={setSearchQuery}
