@@ -493,7 +493,7 @@ const Index = () => {
               </div>
             ) : sortedListings.length === 0 ? (
               <div className="text-center py-16">
-                <p className="text-muted-foreground text-sm">No results found. Try a different search.</p>
+                <p className="text-muted-foreground text-sm">{t('sections.noResults')}</p>
               </div>
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-5">
