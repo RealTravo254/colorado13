@@ -430,10 +430,10 @@ const Index = () => {
           <div className="absolute inset-0 flex flex-col items-center justify-center pb-28 md:pb-20 px-4">
             <div className="container max-w-2xl">
               <p className="text-primary-foreground/70 text-xs md:text-sm font-semibold uppercase tracking-widest text-center mb-2">
-                Discover • Book • Experience
+                {t('hero.tagline')}
               </p>
               <h1 className="text-primary-foreground text-3xl md:text-5xl font-extrabold text-center mb-5 md:mb-7 leading-tight tracking-tight">
-                Discover Your Next<br className="md:hidden" /> Experience
+                {t('hero.title')}
               </h1>
               <SearchBarWithSuggestions
                 value={searchQuery} onChange={setSearchQuery}
