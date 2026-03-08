@@ -370,7 +370,7 @@ const EventDetail = () => {
                 </div>
                 <div className="flex justify-between text-xs font-bold uppercase tracking-tight">
                   <span className="text-slate-400">Child (Under 12)</span>
-                  <span className="text-slate-700">KSh {event.price_child || 0}</span>
+                  <span className="text-slate-700">{formatPrice(event.price_child || 0)}</span>
                 </div>
               </div>
 

@@ -565,7 +565,7 @@ z
                   <p className="text-xs font-black uppercase text-slate-400 mb-1">Starting from/Fee</p>
                   {startingPrice > 0 ? (
                     <div className="space-y-1">
-                      <h3 className="text-xl font-bold text-destructive">KSh {startingPrice.toLocaleString()}</h3>
+                      <h3 className="text-xl font-bold text-destructive">{formatPrice(startingPrice)}</h3>
                       <p className="text-[10px] font-bold text-slate-400 uppercase">per adult</p>
                     </div>
                   ) : (
