@@ -125,7 +125,7 @@ export const NavigationDrawer = ({ onClose }: NavigationDrawerProps) => {
               className="flex items-center justify-center w-full py-3 rounded-xl border-2 border-[#008080] text-[#008080] hover:bg-[#008080] hover:text-white transition-all"
             >
               <LogIn className="h-4 w-4 mr-2" />
-              <span className="text-[10px] font-black uppercase tracking-widest">Login / Register</span>
+              <span className="text-[10px] font-black uppercase tracking-widest">{t('nav.loginRegister')}</span>
             </Link>
           )}
         </div>
