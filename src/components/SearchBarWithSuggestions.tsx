@@ -400,4 +400,5 @@ export const SearchBarWithSuggestions = React.forwardRef<HTMLDivElement, SearchB
       </div>
     </div>
   );
-};
+});
+SearchBarWithSuggestions.displayName = "SearchBarWithSuggestions";
