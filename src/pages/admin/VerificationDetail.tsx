@@ -219,7 +219,7 @@ const VerificationDetail = () => {
         </div>
       </div>
 
-      <main className="container max-w-6xl mx-auto px-4 -mt-6">
+      <main className="container mx-auto px-4 -mt-6">
         <div className="grid lg:grid-cols-[1fr,350px] gap-8">
           
           {/* Documents Section */}

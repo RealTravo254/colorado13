@@ -210,7 +210,7 @@ const ApprovedItems = () => {
         </div>
       </div>
 
-      <main className="max-w-4xl mx-auto px-4 -mt-10 relative z-10">
+      <main className="mx-auto px-4 -mt-10 relative z-10 container">
         {/* Styled Search Bar */}
         <div className="relative mb-8 shadow-2xl rounded-2xl">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />

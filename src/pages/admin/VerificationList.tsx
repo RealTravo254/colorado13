@@ -167,7 +167,7 @@ const VerificationList = () => {
     <div className="min-h-screen bg-[#F8F9FA] pb-24">
       <Header className="hidden md:block" />
 
-      <main className="container px-4 max-w-4xl mx-auto pt-8">
+      <main className="container px-4 mx-auto pt-8">
         {/* Header Section */}
         <div className="flex flex-col gap-6 mb-8">
           <div className="flex items-center gap-4">

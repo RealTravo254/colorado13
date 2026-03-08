@@ -125,7 +125,7 @@ const RejectedItems = () => {
     <div className="min-h-screen bg-[#F8F9FA] pb-24">
       <Header className="hidden md:block" />
 
-      <main className="container px-4 py-8 max-w-4xl mx-auto relative z-10">
+      <main className="container px-4 py-8 mx-auto relative z-10">
         {/* Header Section */}
         <div className="flex flex-col space-y-4 mb-8">
           <Button
