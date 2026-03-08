@@ -28,6 +28,7 @@ const BookingPage = () => {
   const [item, setItem] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
   const [searchParams] = useSearchParams();
   
