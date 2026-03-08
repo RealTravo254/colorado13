@@ -63,6 +63,11 @@ const CURRENCIES = [
   { code: "TZS", symbol: "TSh", name: "Tanzanian Shilling" },
   { code: "UGX", symbol: "USh", name: "Ugandan Shilling" },
   { code: "ZAR", symbol: "R", name: "South African Rand" },
+  { code: "AED", symbol: "د.إ", name: "UAE Dirham" },
+  { code: "SAR", symbol: "﷼", name: "Saudi Riyal" },
+  { code: "NGN", symbol: "₦", name: "Nigerian Naira" },
+  { code: "INR", symbol: "₹", name: "Indian Rupee" },
+  { code: "EGP", symbol: "E£", name: "Egyptian Pound" },
 ];
 
 const LANGUAGES = [
@@ -70,7 +75,17 @@ const LANGUAGES = [
   { code: "sw", name: "Kiswahili" },
   { code: "fr", name: "Français" },
   { code: "es", name: "Español" },
+  { code: "ar", name: "العربية" },
+  { code: "he", name: "עברית" },
 ];
+
+// Map country codes to local currencies
+const COUNTRY_CURRENCY_MAP: Record<string, string> = {
+  KE: "KES", TZ: "TZS", UG: "UGX", ZA: "ZAR", NG: "NGN",
+  AE: "AED", SA: "SAR", EG: "EGP", IN: "INR",
+  GB: "GBP", DE: "EUR", FR: "EUR", ES: "EUR", IT: "EUR",
+  US: "USD",
+};
 
 const CurrencyConverter = () => {
   const [rates, setRates] = useState<Record<string, number>>({});
