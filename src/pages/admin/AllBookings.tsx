@@ -29,6 +29,7 @@ const COLORS = {
 };
 
 const AllBookings = () => {
+  const { formatPrice } = useCurrency();
   const { user } = useAuth(); 
   const navigate = useNavigate();
   const { toast } = useToast();
