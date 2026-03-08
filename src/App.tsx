@@ -69,6 +69,7 @@ const PublicManualBooking = lazy(() => import("./pages/PublicManualBooking"));
 const CompleteProfile = lazy(() => import("./pages/CompleteProfile"));
 const BookingPage = lazy(() => import("./pages/BookingPage"));
 const PaymentVerify = lazy(() => import("./pages/PaymentVerify"));
+const TripEventGuide = lazy(() => import("./pages/TripEventGuide"));
 
 
 const queryClient = new QueryClient({
