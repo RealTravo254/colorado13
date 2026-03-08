@@ -276,7 +276,7 @@ const BookingPage = () => {
   return (
     <div className="min-h-screen bg-[#F8F9FA]">
       {/* Header */}
-      {!isCompleted && (
+      {!isCompleted && !isVerifying && (
         <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-slate-100">
           <div className="container max-w-2xl mx-auto px-4 py-4 flex items-center gap-4">
             <Button
@@ -297,8 +297,28 @@ const BookingPage = () => {
         </div>
       )}
 
+      {/* Verifying / Processing Payment Screen */}
+      {isVerifying && !isCompleted && (
+        <div className="flex flex-col items-center justify-center min-h-[80vh] px-6">
+          <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-6 animate-pulse">
+            <Loader2 className="h-10 w-10 animate-spin text-primary" />
+          </div>
+          <h2 className="text-xl font-black uppercase tracking-tight text-foreground mb-2 text-center">
+            Processing Your Booking
+          </h2>
+          <p className="text-sm text-muted-foreground text-center max-w-xs">
+            Please wait while we verify your payment and confirm your booking...
+          </p>
+          <div className="mt-6 flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0ms' }} />
+            <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '150ms' }} />
+            <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '300ms' }} />
+          </div>
+        </div>
+      )}
+
       {/* Full Page Booking Form */}
-      {!isCompleted && (
+      {!isCompleted && !isVerifying && (
         <div className="container max-w-2xl mx-auto px-4 py-6 pb-24">
           <div className="bg-white rounded-[32px] shadow-xl border border-slate-100">
             <MultiStepBooking {...getMultiStepProps()} />
