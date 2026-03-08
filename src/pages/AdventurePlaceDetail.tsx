@@ -18,7 +18,7 @@ import { useSavedItems } from "@/hooks/useSavedItems";
 import { extractIdFromSlug } from "@/lib/slugUtils";
 import { useGeolocation, calculateDistance } from "@/hooks/useGeolocation";
 import { trackReferralClick, generateReferralLink } from "@/lib/referralUtils";
-import { Header } from "@/components/Header";
+import { DetailNavBar } from "@/components/detail/DetailNavBar";
 import { ImageGalleryModal } from "@/components/detail/ImageGalleryModal";
 import { QuickNavigationBar } from "@/components/detail/QuickNavigationBar";
 import { GeneralFacilitiesDisplay } from "@/components/detail/GeneralFacilitiesDisplay";
