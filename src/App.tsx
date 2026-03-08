@@ -71,6 +71,7 @@ const BookingPage = lazy(() => import("./pages/BookingPage"));
 const PaymentVerify = lazy(() => import("./pages/PaymentVerify"));
 const TripEventGuide = lazy(() => import("./pages/TripEventGuide"));
 const CampsiteGuide = lazy(() => import("./pages/CampsiteGuide"));
+const HotelGuide = lazy(() => import("./pages/HotelGuide"));
 
 
 const queryClient = new QueryClient({
@@ -172,6 +173,7 @@ const App = () => {
                     <Route path="/booking/:type/:id" element={<BookingPage />} />
                     <Route path="/trip-event-guide" element={<TripEventGuide />} />
                     <Route path="/campsite-guide" element={<CampsiteGuide />} />
+                    <Route path="/hotel-guide" element={<HotelGuide />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </div>
