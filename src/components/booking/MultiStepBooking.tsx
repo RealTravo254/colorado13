@@ -631,7 +631,7 @@ import { useSearchParams } from "react-router-dom";
                          <div>
                            <p className="font-medium">{activity.name}</p>
                            <p className="text-sm text-muted-foreground">
-                             KES {activity.price.toLocaleString()} per person
+                             {formatPrice(activity.price)} per person
                            </p>
                          </div>
                          {isSelected && (
