@@ -450,11 +450,11 @@ const Index = () => {
                   <button
                     key={cat.title}
                     onClick={() => navigate(cat.path)}
-                    className="flex items-center gap-1.5 px-3.5 py-2 rounded-full backdrop-blur-md border border-white/20 transition-all hover:scale-105 active:scale-95"
-                    style={{ backgroundColor: `${cat.color}CC` }}
+                    className="flex items-center gap-2 px-5 py-2.5 rounded-full border-2 border-white/30 transition-all hover:scale-105 active:scale-95 shadow-lg"
+                    style={{ backgroundColor: `${cat.color}E6` }}
                   >
-                    <cat.icon className="h-3.5 w-3.5 text-white" />
-                    <span className="text-[11px] md:text-xs font-bold text-white">{cat.title}</span>
+                    <cat.icon className="h-4 w-4 text-white" />
+                    <span className="text-xs md:text-sm font-extrabold text-white tracking-wide">{cat.title}</span>
                   </button>
                 ))}
               </div>

@@ -138,9 +138,7 @@ export const SimilarItems = ({ currentItemId, itemType, location, country }: Sim
                     {item.price ? (
                       <div className="flex flex-col">
                         <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Starting from</span>
-                        <span className="text-md font-black" style={{ color: COLORS.CORAL }}>
-                          KSh {item.price}
-                        </span>
+                        <PriceDisplay price={item.price} />
                       </div>
                     ) : (
                       <span className="text-[10px] font-black text-[#008080] uppercase tracking-widest bg-[#008080]/10 px-3 py-1 rounded-full">

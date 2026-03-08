@@ -111,6 +111,7 @@ const App = () => {
         <Sonner />
         <BrowserRouter>
           <AuthProvider>
+            <CurrencyProvider>
             <SmallScreenInstallBanner />
             <PageLayout>
               <Suspense fallback={<SuspenseFallback />}>
