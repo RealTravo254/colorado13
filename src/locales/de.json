@@ -1,0 +1,151 @@
+{
+  "nav": {
+    "home": "Startseite",
+    "bookings": "Buchungen",
+    "myBookings": "Meine Buchungen",
+    "saved": "Gespeichert",
+    "savedItems": "Gespeicherte Artikel",
+    "wishlist": "Wunschliste",
+    "profile": "Profil",
+    "login": "Anmelden",
+    "loginRegister": "Anmelden / Registrieren",
+    "logout": "Abmelden",
+    "account": "Konto"
+  },
+  "hero": {
+    "tagline": "Entdecken • Buchen • Erleben",
+    "title": "Entdecke Dein Nächstes Erlebnis",
+    "searchPlaceholder": "Reiseziele, Reisen, Hotels suchen..."
+  },
+  "categories": {
+    "adventures": "Abenteuer",
+    "hotels": "Hotels",
+    "trips": "Reisen",
+    "events": "Veranstaltungen",
+    "stays": "Unterkünfte"
+  },
+  "sections": {
+    "placesToAdventure": "Orte für Abenteuer",
+    "hotelsAccommodations": "Hotels & Unterkünfte",
+    "tripsAndTours": "Reisen & Touren",
+    "sportsAndEvents": "Sport & Veranstaltungen",
+    "nearestToYou": "In Deiner Nähe",
+    "topDestinations": "Top-Reiseziele",
+    "nearMe": "In der Nähe",
+    "finding": "Suche...",
+    "viewAll": "Alle anzeigen →",
+    "searchResults": "Suchergebnisse",
+    "allListings": "Alle Einträge",
+    "noResults": "Keine Ergebnisse gefunden. Versuche eine andere Suche."
+  },
+  "drawer": {
+    "mainMenu": "Hauptmenü",
+    "exploreCategories": "Kategorien erkunden",
+    "supportLegal": "Support & Rechtliches",
+    "eventsAndSports": "Events & Sport",
+    "tripsAndTours": "Reisen & Touren",
+    "adventurePlaces": "Abenteuerorte",
+    "accommodationOnly": "Nur Unterkunft",
+    "hotel": "Hotel",
+    "contact": "Kontakt",
+    "about": "Über uns",
+    "terms": "AGB",
+    "privacy": "Datenschutz",
+    "transparency": "TRANSPARENZ:",
+    "transparencyText": "RealTravo kann eine Provision für einige Buchungen erhalten. Diese wird von der Unterkunft bezahlt und",
+    "transparencyHighlight": "wird niemals zu Ihren Endkosten hinzugefügt",
+    "traveler": "Reisender"
+  },
+  "auth": {
+    "signIn": "Anmelden",
+    "signUp": "Registrieren",
+    "discover": "Entdecken.",
+    "book": "Buchen.",
+    "experience": "Erleben.",
+    "subtitle": "Dein Tor zu kuratierten Abenteuern, Hotels und unvergesslichen Reisen durch Afrika.",
+    "featureHandpicked": "Handverlesene Unterkünfte, Reisen & Abenteuer",
+    "featureSecure": "Sichere & sofortige Buchung",
+    "featureTrusted": "Vertraut von echten Reisenden"
+  },
+  "footer": {
+    "tagline": "Dein Tor zu authentischen Erlebnissen. Erkunde, buche und teile deine Reise mit der Welt.",
+    "explore": "Erkunden",
+    "destinations": "Reiseziele",
+    "localEvents": "Lokale Events",
+    "hotels": "Hotels",
+    "support": "Support",
+    "aboutUs": "Über Uns",
+    "contact": "Kontakt",
+    "becomeHost": "Gastgeber werden",
+    "legal": "Rechtliches",
+    "privacyPolicy": "Datenschutzrichtlinie",
+    "termsOfService": "Nutzungsbedingungen",
+    "tripEventGuide": "Reise- & Eventguide",
+    "campsiteGuide": "Campingplatz-Guide",
+    "hotelGuide": "Hotel- & Lodge-Guide",
+    "followJourney": "Folge Unserer Reise",
+    "liveCurrency": "Live-Wechselkurs",
+    "language": "Sprache",
+    "moreLangSoon": "Weitere Sprachen folgen bald",
+    "mobile": "Mobil",
+    "comingSoon": "Bald in beiden Stores verfügbar",
+    "getItOn": "Jetzt bei",
+    "googlePlay": "Google Play",
+    "downloadOn": "Laden im",
+    "appStore": "App Store",
+    "transparency": "Transparenz:",
+    "transparencyText": "RealTravo kann eine Provision für einige Unterkunftsbuchungen erhalten. Diese Provision wird von der Unterkunft bezahlt und",
+    "transparencyHighlight": "wird niemals zu Ihren endgültigen Buchungskosten hinzugefügt",
+    "transparencyEnd": "Dies ermöglicht es uns, unsere Plattform für Reisende kostenlos zu halten.",
+    "allRights": "© 2026 RealTravo. Alle Rechte vorbehalten.",
+    "madeFor": "Gemacht für Moderne Reisende",
+    "ratesFrom": "Kurse von Open Exchange • Aktualisiert"
+  },
+  "location": {
+    "turnOn": "Standort aktivieren",
+    "description": "Aktiviere den Standortzugriff, um Orte in deiner Nähe zu sehen und die besten lokalen Erlebnisse zu erhalten.",
+    "tryAgain": "Erneut versuchen",
+    "continueWithout": "Ohne Standort fortfahren"
+  },
+  "pages": {
+    "about": {
+      "title": "Über RealTravo",
+      "subtitle": "Dein Tor zum Abenteuer",
+      "p1": "RealTravo ist dein ultimativer Begleiter zum Entdecken und Buchen erstaunlicher Reiseerlebnisse auf der ganzen Welt.",
+      "p2": "Ob du aufregende Abenteuer, kulturelle Events, Luxushotels oder versteckte Schätze suchst – unsere Plattform macht es einfach zu erkunden, zu speichern und deinen perfekten Urlaub zu buchen.",
+      "cta": "Beginne noch heute zu erkunden und schaffe Erinnerungen, die ein Leben lang halten!"
+    },
+    "contact": {
+      "title": "Kontakt",
+      "email": "E-Mail",
+      "phone": "Telefon",
+      "address": "Adresse"
+    },
+    "saved": { "title": "Gespeicherte Artikel" },
+    "bookings": { "title": "Meine Buchungen" },
+    "becomeHost": { "title": "Gastgeber werden" },
+    "notFound": {
+      "title": "Seite nicht gefunden",
+      "description": "Entschuldigung, wir konnten die gesuchte Seite nicht finden."
+    }
+  },
+  "common": {
+    "back": "Zurück",
+    "loading": "Laden...",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "confirm": "Bestätigen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "submit": "Absenden",
+    "close": "Schließen",
+    "search": "Suchen",
+    "filter": "Filtern",
+    "sort": "Sortieren",
+    "more": "Mehr",
+    "less": "Weniger",
+    "showAll": "Alle anzeigen",
+    "yes": "Ja",
+    "no": "Nein"
+  }
+}

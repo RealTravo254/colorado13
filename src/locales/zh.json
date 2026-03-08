@@ -1,0 +1,151 @@
+{
+  "nav": {
+    "home": "首页",
+    "bookings": "预订",
+    "myBookings": "我的预订",
+    "saved": "已收藏",
+    "savedItems": "收藏项目",
+    "wishlist": "心愿单",
+    "profile": "个人资料",
+    "login": "登录",
+    "loginRegister": "登录 / 注册",
+    "logout": "退出",
+    "account": "账户"
+  },
+  "hero": {
+    "tagline": "发现 • 预订 • 体验",
+    "title": "发现你的下一次体验",
+    "searchPlaceholder": "搜索目的地、旅行、酒店..."
+  },
+  "categories": {
+    "adventures": "冒险",
+    "hotels": "酒店",
+    "trips": "旅行",
+    "events": "活动",
+    "stays": "住宿"
+  },
+  "sections": {
+    "placesToAdventure": "冒险之地",
+    "hotelsAccommodations": "酒店与住宿",
+    "tripsAndTours": "旅行与游览",
+    "sportsAndEvents": "体育与活动",
+    "nearestToYou": "你附近",
+    "topDestinations": "热门目的地",
+    "nearMe": "附近",
+    "finding": "搜索中...",
+    "viewAll": "查看全部 →",
+    "searchResults": "搜索结果",
+    "allListings": "所有列表",
+    "noResults": "未找到结果。请尝试其他搜索。"
+  },
+  "drawer": {
+    "mainMenu": "主菜单",
+    "exploreCategories": "浏览分类",
+    "supportLegal": "支持与法律",
+    "eventsAndSports": "活动与体育",
+    "tripsAndTours": "旅行与游览",
+    "adventurePlaces": "冒险地点",
+    "accommodationOnly": "仅住宿",
+    "hotel": "酒店",
+    "contact": "联系我们",
+    "about": "关于",
+    "terms": "条款",
+    "privacy": "隐私",
+    "transparency": "透明度：",
+    "transparencyText": "RealTravo可能会从部分预订中获得佣金。此费用由酒店支付，",
+    "transparencyHighlight": "绝不会增加到您的最终费用中",
+    "traveler": "旅行者"
+  },
+  "auth": {
+    "signIn": "登录",
+    "signUp": "注册",
+    "discover": "发现。",
+    "book": "预订。",
+    "experience": "体验。",
+    "subtitle": "您通往非洲精选冒险、酒店和难忘旅行的门户。",
+    "featureHandpicked": "精选住宿、旅行和冒险",
+    "featureSecure": "安全即时预订",
+    "featureTrusted": "深受真实旅行者信赖"
+  },
+  "footer": {
+    "tagline": "您通往真实体验的门户。探索、预订并与世界分享您的旅程。",
+    "explore": "探索",
+    "destinations": "目的地",
+    "localEvents": "本地活动",
+    "hotels": "酒店",
+    "support": "支持",
+    "aboutUs": "关于我们",
+    "contact": "联系",
+    "becomeHost": "成为房东",
+    "legal": "法律",
+    "privacyPolicy": "隐私政策",
+    "termsOfService": "服务条款",
+    "tripEventGuide": "旅行与活动指南",
+    "campsiteGuide": "露营指南",
+    "hotelGuide": "酒店与旅馆指南",
+    "followJourney": "关注我们的旅程",
+    "liveCurrency": "实时汇率",
+    "language": "语言",
+    "moreLangSoon": "更多语言即将推出",
+    "mobile": "移动端",
+    "comingSoon": "即将登陆两大应用商店",
+    "getItOn": "下载于",
+    "googlePlay": "Google Play",
+    "downloadOn": "下载于",
+    "appStore": "App Store",
+    "transparency": "透明度：",
+    "transparencyText": "RealTravo可能会从部分住宿预订中获得佣金。此佣金由酒店支付，",
+    "transparencyHighlight": "绝不会增加到您的最终预订费用中",
+    "transparencyEnd": "这使我们能够为旅行者保持平台免费。",
+    "allRights": "© 2026 RealTravo. 保留所有权利。",
+    "madeFor": "为现代旅行者打造",
+    "ratesFrom": "汇率来自 Open Exchange • 已更新"
+  },
+  "location": {
+    "turnOn": "开启定位",
+    "description": "启用位置访问以查看您附近的地点并获得最佳本地体验。",
+    "tryAgain": "重试",
+    "continueWithout": "不使用定位继续"
+  },
+  "pages": {
+    "about": {
+      "title": "关于 RealTravo",
+      "subtitle": "您的冒险之门",
+      "p1": "RealTravo是您发现和预订世界各地精彩旅行体验的终极伴侣。",
+      "p2": "无论您是寻找刺激冒险、文化活动、豪华酒店还是隐藏的宝石，我们的平台都能让您轻松探索、收藏和预订完美的度假之旅。",
+      "cta": "今天就开始探索，创造终生难忘的回忆！"
+    },
+    "contact": {
+      "title": "联系我们",
+      "email": "电子邮件",
+      "phone": "电话",
+      "address": "地址"
+    },
+    "saved": { "title": "收藏项目" },
+    "bookings": { "title": "我的预订" },
+    "becomeHost": { "title": "成为房东" },
+    "notFound": {
+      "title": "页面未找到",
+      "description": "抱歉，我们找不到您要查找的页面。"
+    }
+  },
+  "common": {
+    "back": "返回",
+    "loading": "加载中...",
+    "save": "保存",
+    "cancel": "取消",
+    "confirm": "确认",
+    "delete": "删除",
+    "edit": "编辑",
+    "submit": "提交",
+    "close": "关闭",
+    "search": "搜索",
+    "filter": "筛选",
+    "sort": "排序",
+    "more": "更多",
+    "less": "收起",
+    "showAll": "显示全部",
+    "yes": "是",
+    "no": "否"
+  }
+}
