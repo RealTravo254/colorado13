@@ -3,6 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { MapPin, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { SimilarItemsSkeleton } from "@/components/detail/SimilarItemsSkeleton";
+import { useCurrency } from "@/contexts/CurrencyContext";
 
 const COLORS = {
   TEAL: "#008080",
