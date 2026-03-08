@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Compass,
@@ -8,7 +8,6 @@ import {
   Linkedin,
   Info,
   Facebook,
-  Globe,
   Globe,
 } from "lucide-react";
 
