@@ -684,7 +684,7 @@ z
           <SimilarItems currentItemId={hotel.id} itemType="hotel" country={hotel.country} />
         </div>
       </main>
-
+      <Footer />
       {/* External booking now opens in new tab with loading spinner */}
     </div>
   );
