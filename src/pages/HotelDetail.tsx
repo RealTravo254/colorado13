@@ -413,7 +413,7 @@ z
           <div className="space-y-4">
             {/* Description */}
             <section className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
-              <h2 className="text-[11px] font-black uppercase tracking-widest mb-3 text-slate-400">About this property</h2>
+              <h2 className="text-[11px] font-black uppercase tracking-widest mb-3 text-slate-900">About this property</h2>
               {hotel.description ? (
                 <p className="text-foreground text-sm leading-relaxed whitespace-pre-line">{hotel.description}</p>
               ) : (

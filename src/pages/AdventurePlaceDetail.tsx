@@ -327,7 +327,7 @@ const AdventurePlaceDetail = () => {
         <div className="grid grid-cols-1 lg:grid-cols-[1.8fr,1fr] gap-4">
           <div className="space-y-4">
             <section className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
-              <h2 className="text-[11px] font-black uppercase tracking-widest mb-3 text-slate-400">About This Property</h2>
+              <h2 className="text-[11px] font-black uppercase tracking-widest mb-3 text-slate-900">About This Property</h2>
               {place.description ? (
                 <p className="text-foreground text-sm leading-relaxed whitespace-pre-line">{place.description}</p>
               ) : (
