@@ -90,6 +90,12 @@ const queryClient = new QueryClient({
 });
 
 /** Suspense fallback that shows offline screen when not connected */
+const SuspenseFallback = () => {
+  const isOnline = useOnlineStatus();
+  if (!isOnline) return <OfflineFullScreen />;
+  return <TealLoader />;
+};
+
 /** Forces light theme when not running as PWA */
 const PwaThemeEnforcer = () => {
   const isPwa = useIsPwa();
