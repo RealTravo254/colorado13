@@ -1,0 +1,151 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "bookings": "Reservas",
+    "myBookings": "Mis Reservas",
+    "saved": "Guardados",
+    "savedItems": "Elementos Guardados",
+    "wishlist": "Favoritos",
+    "profile": "Perfil",
+    "login": "Iniciar Sesión",
+    "loginRegister": "Iniciar Sesión / Registrarse",
+    "logout": "Cerrar Sesión",
+    "account": "Cuenta"
+  },
+  "hero": {
+    "tagline": "Descubrir • Reservar • Vivir",
+    "title": "Descubre Tu Próxima Experiencia",
+    "searchPlaceholder": "Buscar destinos, viajes, hoteles..."
+  },
+  "categories": {
+    "adventures": "Aventuras",
+    "hotels": "Hoteles",
+    "trips": "Viajes",
+    "events": "Eventos",
+    "stays": "Estancias"
+  },
+  "sections": {
+    "placesToAdventure": "Lugares de Aventura",
+    "hotelsAccommodations": "Hoteles y Alojamientos",
+    "tripsAndTours": "Viajes y Tours",
+    "sportsAndEvents": "Deportes y Eventos",
+    "nearestToYou": "Más Cercanos",
+    "topDestinations": "Mejores Destinos",
+    "nearMe": "Cerca de Mí",
+    "finding": "Buscando...",
+    "viewAll": "Ver todo →",
+    "searchResults": "Resultados de Búsqueda",
+    "allListings": "Todos los Listados",
+    "noResults": "No se encontraron resultados. Intenta otra búsqueda."
+  },
+  "drawer": {
+    "mainMenu": "Menú Principal",
+    "exploreCategories": "Explorar Categorías",
+    "supportLegal": "Soporte y Legal",
+    "eventsAndSports": "Eventos y Deportes",
+    "tripsAndTours": "Viajes y Tours",
+    "adventurePlaces": "Lugares de Aventura",
+    "accommodationOnly": "Solo Alojamiento",
+    "hotel": "Hotel",
+    "contact": "Contacto",
+    "about": "Acerca de",
+    "terms": "Términos",
+    "privacy": "Privacidad",
+    "transparency": "TRANSPARENCIA:",
+    "transparencyText": "RealTravo puede recibir una comisión por algunas reservas. Es pagada por el establecimiento y",
+    "transparencyHighlight": "nunca se agrega a tu costo final",
+    "traveler": "Viajero"
+  },
+  "auth": {
+    "signIn": "Iniciar Sesión",
+    "signUp": "Registrarse",
+    "discover": "Descubrir.",
+    "book": "Reservar.",
+    "experience": "Vivir.",
+    "subtitle": "Tu puerta a aventuras, hoteles y viajes inolvidables por África.",
+    "featureHandpicked": "Estancias, viajes y aventuras seleccionadas",
+    "featureSecure": "Reserva segura e instantánea",
+    "featureTrusted": "Confiado por viajeros reales"
+  },
+  "footer": {
+    "tagline": "Tu puerta a experiencias auténticas. Explora, reserva y comparte tu viaje con el mundo.",
+    "explore": "Explorar",
+    "destinations": "Destinos",
+    "localEvents": "Eventos Locales",
+    "hotels": "Hoteles",
+    "support": "Soporte",
+    "aboutUs": "Sobre Nosotros",
+    "contact": "Contacto",
+    "becomeHost": "Ser Anfitrión",
+    "legal": "Legal",
+    "privacyPolicy": "Política de Privacidad",
+    "termsOfService": "Términos de Servicio",
+    "tripEventGuide": "Guía de Viajes y Eventos",
+    "campsiteGuide": "Guía de Campamentos",
+    "hotelGuide": "Guía de Hoteles y Lodges",
+    "followJourney": "Sigue Nuestro Viaje",
+    "liveCurrency": "Moneda en Vivo",
+    "language": "Idioma",
+    "moreLangSoon": "Más idiomas próximamente",
+    "mobile": "Móvil",
+    "comingSoon": "Próximamente en ambas tiendas",
+    "getItOn": "Obtener en",
+    "googlePlay": "Google Play",
+    "downloadOn": "Descargar en",
+    "appStore": "App Store",
+    "transparency": "Transparencia:",
+    "transparencyText": "RealTravo puede recibir una comisión por algunas reservas de alojamiento. Esta comisión es pagada por el establecimiento y",
+    "transparencyHighlight": "nunca se agrega a tu costo final de reserva",
+    "transparencyEnd": "Esto nos permite mantener nuestra plataforma gratuita para los viajeros.",
+    "allRights": "© 2026 RealTravo. Todos los derechos reservados.",
+    "madeFor": "Hecho para Viajeros Modernos",
+    "ratesFrom": "Tasas de Open Exchange • Actualizado"
+  },
+  "location": {
+    "turnOn": "Activar Ubicación",
+    "description": "Habilita el acceso a la ubicación para ver lugares cercanos y obtener las mejores experiencias locales.",
+    "tryAgain": "Intentar de Nuevo",
+    "continueWithout": "Continuar Sin Ubicación"
+  },
+  "pages": {
+    "about": {
+      "title": "Acerca de RealTravo",
+      "subtitle": "Tu Puerta a la Aventura",
+      "p1": "RealTravo es tu compañero definitivo para descubrir y reservar experiencias de viaje increíbles en todo el mundo.",
+      "p2": "Ya sea que busques aventuras emocionantes, eventos culturales, hoteles de lujo o joyas ocultas, nuestra plataforma lo hace fácil.",
+      "cta": "¡Empieza a explorar hoy y crea recuerdos que duran toda la vida!"
+    },
+    "contact": {
+      "title": "Contáctanos",
+      "email": "Correo",
+      "phone": "Teléfono",
+      "address": "Dirección"
+    },
+    "saved": { "title": "Elementos Guardados" },
+    "bookings": { "title": "Mis Reservas" },
+    "becomeHost": { "title": "Ser Anfitrión" },
+    "notFound": {
+      "title": "Página No Encontrada",
+      "description": "Lo sentimos, no pudimos encontrar la página que buscas."
+    }
+  },
+  "common": {
+    "back": "Volver",
+    "loading": "Cargando...",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "submit": "Enviar",
+    "close": "Cerrar",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "sort": "Ordenar",
+    "more": "Más",
+    "less": "Menos",
+    "showAll": "Mostrar Todo",
+    "yes": "Sí",
+    "no": "No"
+  }
+}

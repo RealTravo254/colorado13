@@ -1,0 +1,151 @@
+{
+  "nav": {
+    "home": "דף הבית",
+    "bookings": "הזמנות",
+    "myBookings": "ההזמנות שלי",
+    "saved": "שמורים",
+    "savedItems": "פריטים שמורים",
+    "wishlist": "מועדפים",
+    "profile": "פרופיל",
+    "login": "התחברות",
+    "loginRegister": "התחברות / הרשמה",
+    "logout": "התנתקות",
+    "account": "חשבון"
+  },
+  "hero": {
+    "tagline": "גלה • הזמן • חווה",
+    "title": "גלה את החוויה הבאה שלך",
+    "searchPlaceholder": "חפש יעדים, טיולים, מלונות..."
+  },
+  "categories": {
+    "adventures": "הרפתקאות",
+    "hotels": "מלונות",
+    "trips": "טיולים",
+    "events": "אירועים",
+    "stays": "שהייה"
+  },
+  "sections": {
+    "placesToAdventure": "מקומות להרפתקה",
+    "hotelsAccommodations": "מלונות ולינה",
+    "tripsAndTours": "טיולים וסיורים",
+    "sportsAndEvents": "ספורט ואירועים",
+    "nearestToYou": "הקרובים אליך",
+    "topDestinations": "יעדים מובילים",
+    "nearMe": "בקרבתי",
+    "finding": "מחפש...",
+    "viewAll": "הצג הכל ←",
+    "searchResults": "תוצאות חיפוש",
+    "allListings": "כל הרשימות",
+    "noResults": "לא נמצאו תוצאות. נסה חיפוש אחר."
+  },
+  "drawer": {
+    "mainMenu": "תפריט ראשי",
+    "exploreCategories": "חקור קטגוריות",
+    "supportLegal": "תמיכה ומשפטי",
+    "eventsAndSports": "אירועים וספורט",
+    "tripsAndTours": "טיולים וסיורים",
+    "adventurePlaces": "מקומות הרפתקה",
+    "accommodationOnly": "לינה בלבד",
+    "hotel": "מלון",
+    "contact": "צור קשר",
+    "about": "אודות",
+    "terms": "תנאים",
+    "privacy": "פרטיות",
+    "transparency": "שקיפות:",
+    "transparencyText": "RealTravo עשוי לקבל עמלה עבור חלק מההזמנות. היא משולמת על ידי הנכס ו",
+    "transparencyHighlight": "לעולם לא מתווספת לעלות הסופית שלך",
+    "traveler": "מטייל"
+  },
+  "auth": {
+    "signIn": "התחברות",
+    "signUp": "הרשמה",
+    "discover": "גלה.",
+    "book": "הזמן.",
+    "experience": "חווה.",
+    "subtitle": "השער שלך להרפתקאות, מלונות וטיולים בלתי נשכחים ברחבי אפריקה.",
+    "featureHandpicked": "שהייה, טיולים והרפתקאות נבחרים",
+    "featureSecure": "הזמנה מאובטחת ומיידית",
+    "featureTrusted": "מהימן על ידי מטיילים אמיתיים"
+  },
+  "footer": {
+    "tagline": "השער שלך לחוויות אותנטיות. חקור, הזמן ושתף את המסע שלך עם העולם.",
+    "explore": "חקור",
+    "destinations": "יעדים",
+    "localEvents": "אירועים מקומיים",
+    "hotels": "מלונות",
+    "support": "תמיכה",
+    "aboutUs": "אודותינו",
+    "contact": "צור קשר",
+    "becomeHost": "הפוך למארח",
+    "legal": "משפטי",
+    "privacyPolicy": "מדיניות פרטיות",
+    "termsOfService": "תנאי שירות",
+    "tripEventGuide": "מדריך טיולים ואירועים",
+    "campsiteGuide": "מדריך קמפינג",
+    "hotelGuide": "מדריך מלונות ולודג'ים",
+    "followJourney": "עקוב אחר המסע שלנו",
+    "liveCurrency": "מטבע חי",
+    "language": "שפה",
+    "moreLangSoon": "עוד שפות בקרוב",
+    "mobile": "נייד",
+    "comingSoon": "בקרוב בשני החנויות",
+    "getItOn": "השג ב",
+    "googlePlay": "Google Play",
+    "downloadOn": "הורד מ",
+    "appStore": "App Store",
+    "transparency": "שקיפות:",
+    "transparencyText": "RealTravo עשוי לקבל עמלה עבור חלק מהזמנות הלינה. עמלה זו משולמת על ידי הנכס ו",
+    "transparencyHighlight": "לעולם לא מתווספת לעלות ההזמנה הסופית שלך",
+    "transparencyEnd": "זה מאפשר לנו לשמור על הפלטפורמה שלנו חינמית למטיילים.",
+    "allRights": "© 2026 RealTravo. כל הזכויות שמורות.",
+    "madeFor": "נוצר למטיילים מודרניים",
+    "ratesFrom": "שערים מ-Open Exchange • עודכן"
+  },
+  "location": {
+    "turnOn": "הפעל מיקום",
+    "description": "אפשר גישה למיקום כדי לראות מקומות קרובים ולקבל את החוויות המקומיות הטובות ביותר.",
+    "tryAgain": "נסה שוב",
+    "continueWithout": "המשך ללא מיקום"
+  },
+  "pages": {
+    "about": {
+      "title": "אודות RealTravo",
+      "subtitle": "השער שלך להרפתקה",
+      "p1": "RealTravo הוא המלווה האולטימטיבי שלך לגילוי והזמנת חוויות נסיעה מדהימות ברחבי העולם.",
+      "p2": "בין אם אתה מחפש הרפתקאות מרגשות, אירועים תרבותיים, מלונות יוקרה או אבני חן נסתרות, הפלטפורמה שלנו מקלה.",
+      "cta": "התחל לחקור היום וצור זכרונות שנמשכים לנצח!"
+    },
+    "contact": {
+      "title": "צור קשר",
+      "email": "דוא\"ל",
+      "phone": "טלפון",
+      "address": "כתובת"
+    },
+    "saved": { "title": "פריטים שמורים" },
+    "bookings": { "title": "ההזמנות שלי" },
+    "becomeHost": { "title": "הפוך למארח" },
+    "notFound": {
+      "title": "הדף לא נמצא",
+      "description": "מצטערים, לא הצלחנו למצוא את הדף שאתה מחפש."
+    }
+  },
+  "common": {
+    "back": "חזרה",
+    "loading": "טוען...",
+    "save": "שמור",
+    "cancel": "ביטול",
+    "confirm": "אישור",
+    "delete": "מחק",
+    "edit": "ערוך",
+    "submit": "שלח",
+    "close": "סגור",
+    "search": "חיפוש",
+    "filter": "סינון",
+    "sort": "מיון",
+    "more": "עוד",
+    "less": "פחות",
+    "showAll": "הצג הכל",
+    "yes": "כן",
+    "no": "לא"
+  }
+}

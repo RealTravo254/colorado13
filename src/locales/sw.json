@@ -1,0 +1,157 @@
+{
+  "nav": {
+    "home": "Nyumbani",
+    "bookings": "Nafasi",
+    "myBookings": "Nafasi Zangu",
+    "saved": "Zilizohifadhiwa",
+    "savedItems": "Vitu Vilivyohifadhiwa",
+    "wishlist": "Orodha ya Matakwa",
+    "profile": "Wasifu",
+    "login": "Ingia",
+    "loginRegister": "Ingia / Jisajili",
+    "logout": "Toka",
+    "account": "Akaunti"
+  },
+  "hero": {
+    "tagline": "Gundua • Hifadhi • Furahia",
+    "title": "Gundua Tajriba Yako Ijayo",
+    "searchPlaceholder": "Tafuta maeneo, safari, hoteli..."
+  },
+  "categories": {
+    "adventures": "Matukio",
+    "hotels": "Hoteli",
+    "trips": "Safari",
+    "events": "Matukio",
+    "stays": "Makazi"
+  },
+  "sections": {
+    "placesToAdventure": "Maeneo ya Kutembelea",
+    "hotelsAccommodations": "Hoteli na Makazi",
+    "tripsAndTours": "Safari na Ziara",
+    "sportsAndEvents": "Michezo na Matukio",
+    "nearestToYou": "Karibu Nawe",
+    "topDestinations": "Maeneo Bora",
+    "nearMe": "Karibu Nami",
+    "finding": "Inatafuta...",
+    "viewAll": "Tazama zote →",
+    "searchResults": "Matokeo ya Utafutaji",
+    "allListings": "Orodha Zote",
+    "noResults": "Hakuna matokeo. Jaribu utafutaji tofauti."
+  },
+  "drawer": {
+    "mainMenu": "Menyu Kuu",
+    "exploreCategories": "Chunguza Makundi",
+    "supportLegal": "Msaada na Kisheria",
+    "eventsAndSports": "Matukio na Michezo",
+    "tripsAndTours": "Safari na Ziara",
+    "adventurePlaces": "Maeneo ya Matukio",
+    "accommodationOnly": "Makazi Pekee",
+    "hotel": "Hoteli",
+    "contact": "Wasiliana",
+    "about": "Kuhusu",
+    "terms": "Masharti",
+    "privacy": "Faragha",
+    "transparency": "UWAZI:",
+    "transparencyText": "RealTravo inaweza kupata kamisheni kwa baadhi ya nafasi. Hii inalipwa na mali na",
+    "transparencyHighlight": "haiongezwi kamwe kwenye gharama yako ya mwisho",
+    "traveler": "Msafiri"
+  },
+  "auth": {
+    "signIn": "Ingia",
+    "signUp": "Jisajili",
+    "discover": "Gundua.",
+    "book": "Hifadhi.",
+    "experience": "Furahia.",
+    "subtitle": "Lango lako kwa safari zilizochaguliwa, hoteli, na matukio yasiyosahaulika barani Afrika.",
+    "featureHandpicked": "Makazi, safari na matukio yaliyochaguliwa",
+    "featureSecure": "Uhifadhi salama na wa papo hapo",
+    "featureTrusted": "Kuaminiwa na wasafiri wa kweli"
+  },
+  "footer": {
+    "tagline": "Lango lako kwa uzoefu halisi. Chunguza, hifadhi, na shiriki safari yako na ulimwengu.",
+    "explore": "Chunguza",
+    "destinations": "Maeneo",
+    "localEvents": "Matukio ya Karibu",
+    "hotels": "Hoteli",
+    "support": "Msaada",
+    "aboutUs": "Kuhusu Sisi",
+    "contact": "Wasiliana",
+    "becomeHost": "Kuwa Mwenyeji",
+    "legal": "Kisheria",
+    "privacyPolicy": "Sera ya Faragha",
+    "termsOfService": "Masharti ya Huduma",
+    "tripEventGuide": "Mwongozo wa Safari na Matukio",
+    "campsiteGuide": "Mwongozo wa Kambi",
+    "hotelGuide": "Mwongozo wa Hoteli na Loji",
+    "followJourney": "Fuata Safari Yetu",
+    "liveCurrency": "Ubadilishaji wa Sarafu",
+    "language": "Lugha",
+    "moreLangSoon": "Lugha zaidi zinakuja hivi karibuni",
+    "mobile": "Simu",
+    "comingSoon": "Inakuja hivi karibuni kwenye duka zote",
+    "getItOn": "Pata kwenye",
+    "googlePlay": "Google Play",
+    "downloadOn": "Pakua kwenye",
+    "appStore": "App Store",
+    "transparency": "Uwazi:",
+    "transparencyText": "RealTravo inaweza kupata kamisheni kwa baadhi ya nafasi za malazi. Kamisheni hii inalipwa na mali na",
+    "transparencyHighlight": "haiongezwi kamwe kwenye gharama yako ya mwisho",
+    "transparencyEnd": "Hii inatuwezesha kuweka jukwaa letu bure kwa wasafiri.",
+    "allRights": "© 2026 RealTravo. Haki zote zimehifadhiwa.",
+    "madeFor": "Imetengenezwa kwa Wasafiri wa Kisasa",
+    "ratesFrom": "Viwango kutoka Open Exchange • Imesasishwa"
+  },
+  "location": {
+    "turnOn": "Washa Eneo",
+    "description": "Wezesha ufikiaji wa eneo kuona maeneo karibu nawe na kupata uzoefu bora wa ndani.",
+    "tryAgain": "Jaribu Tena",
+    "continueWithout": "Endelea Bila Eneo"
+  },
+  "pages": {
+    "about": {
+      "title": "Kuhusu RealTravo",
+      "subtitle": "Lango Lako kwa Matukio",
+      "p1": "RealTravo ni mwandani wako wa kugunduzia na kuhifadhi uzoefu wa kusafiri duniani kote. Tunaunganisha roho za matukio na safari, matukio, makazi, na maeneo yasiyosahaulika.",
+      "p2": "Iwe unatafuta matukio ya kusisimua, matukio ya kitamaduni, hoteli za kifahari, au vito vilivyofichwa, jukwaa letu linafanya iwe rahisi kuchunguza, kuhifadhi, na kuhifadhi mapumziko yako kamili.",
+      "cta": "Anza kuchunguza leo na uunde kumbukumbu zinazodumu milele!"
+    },
+    "contact": {
+      "title": "Wasiliana Nasi",
+      "email": "Barua pepe",
+      "phone": "Simu",
+      "address": "Anwani"
+    },
+    "saved": {
+      "title": "Vitu Vilivyohifadhiwa"
+    },
+    "bookings": {
+      "title": "Nafasi Zangu"
+    },
+    "becomeHost": {
+      "title": "Kuwa Mwenyeji"
+    },
+    "notFound": {
+      "title": "Ukurasa Haujapatikana",
+      "description": "Samahani, hatukuweza kupata ukurasa unaoutafuta."
+    }
+  },
+  "common": {
+    "back": "Rudi",
+    "loading": "Inapakia...",
+    "save": "Hifadhi",
+    "cancel": "Ghairi",
+    "confirm": "Thibitisha",
+    "delete": "Futa",
+    "edit": "Hariri",
+    "submit": "Wasilisha",
+    "close": "Funga",
+    "search": "Tafuta",
+    "filter": "Chuja",
+    "sort": "Panga",
+    "more": "Zaidi",
+    "less": "Kidogo",
+    "showAll": "Onyesha Zote",
+    "yes": "Ndiyo",
+    "no": "Hapana"
+  }
+}

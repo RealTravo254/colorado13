@@ -1,0 +1,151 @@
+{
+  "nav": {
+    "home": "الرئيسية",
+    "bookings": "الحجوزات",
+    "myBookings": "حجوزاتي",
+    "saved": "المحفوظات",
+    "savedItems": "العناصر المحفوظة",
+    "wishlist": "المفضلة",
+    "profile": "الملف الشخصي",
+    "login": "تسجيل الدخول",
+    "loginRegister": "تسجيل الدخول / التسجيل",
+    "logout": "تسجيل الخروج",
+    "account": "الحساب"
+  },
+  "hero": {
+    "tagline": "اكتشف • احجز • عش التجربة",
+    "title": "اكتشف تجربتك القادمة",
+    "searchPlaceholder": "ابحث عن وجهات، رحلات، فنادق..."
+  },
+  "categories": {
+    "adventures": "مغامرات",
+    "hotels": "فنادق",
+    "trips": "رحلات",
+    "events": "فعاليات",
+    "stays": "إقامات"
+  },
+  "sections": {
+    "placesToAdventure": "أماكن للمغامرة",
+    "hotelsAccommodations": "فنادق وإقامات",
+    "tripsAndTours": "رحلات وجولات",
+    "sportsAndEvents": "رياضة وفعاليات",
+    "nearestToYou": "الأقرب إليك",
+    "topDestinations": "أفضل الوجهات",
+    "nearMe": "بالقرب مني",
+    "finding": "جاري البحث...",
+    "viewAll": "عرض الكل ←",
+    "searchResults": "نتائج البحث",
+    "allListings": "جميع القوائم",
+    "noResults": "لم يتم العثور على نتائج. جرب بحثاً مختلفاً."
+  },
+  "drawer": {
+    "mainMenu": "القائمة الرئيسية",
+    "exploreCategories": "استكشف الفئات",
+    "supportLegal": "الدعم والقانون",
+    "eventsAndSports": "فعاليات ورياضة",
+    "tripsAndTours": "رحلات وجولات",
+    "adventurePlaces": "أماكن المغامرة",
+    "accommodationOnly": "إقامة فقط",
+    "hotel": "فندق",
+    "contact": "اتصل بنا",
+    "about": "من نحن",
+    "terms": "الشروط",
+    "privacy": "الخصوصية",
+    "transparency": "الشفافية:",
+    "transparencyText": "قد تحصل RealTravo على عمولة مقابل بعض الحجوزات. يتم دفعها من قبل المنشأة و",
+    "transparencyHighlight": "لا تُضاف أبداً إلى تكلفتك النهائية",
+    "traveler": "مسافر"
+  },
+  "auth": {
+    "signIn": "تسجيل الدخول",
+    "signUp": "إنشاء حساب",
+    "discover": "اكتشف.",
+    "book": "احجز.",
+    "experience": "عش التجربة.",
+    "subtitle": "بوابتك إلى المغامرات والفنادق والرحلات التي لا تُنسى عبر أفريقيا.",
+    "featureHandpicked": "إقامات ورحلات ومغامرات مختارة",
+    "featureSecure": "حجز آمن وفوري",
+    "featureTrusted": "موثوق من مسافرين حقيقيين"
+  },
+  "footer": {
+    "tagline": "بوابتك إلى تجارب أصيلة. استكشف واحجز وشارك رحلتك مع العالم.",
+    "explore": "استكشف",
+    "destinations": "الوجهات",
+    "localEvents": "الفعاليات المحلية",
+    "hotels": "الفنادق",
+    "support": "الدعم",
+    "aboutUs": "من نحن",
+    "contact": "اتصل بنا",
+    "becomeHost": "كن مضيفاً",
+    "legal": "قانوني",
+    "privacyPolicy": "سياسة الخصوصية",
+    "termsOfService": "شروط الخدمة",
+    "tripEventGuide": "دليل الرحلات والفعاليات",
+    "campsiteGuide": "دليل المخيمات",
+    "hotelGuide": "دليل الفنادق والنزل",
+    "followJourney": "تابع رحلتنا",
+    "liveCurrency": "العملة المباشرة",
+    "language": "اللغة",
+    "moreLangSoon": "المزيد من اللغات قريباً",
+    "mobile": "الجوال",
+    "comingSoon": "قريباً على كلا المتجرين",
+    "getItOn": "احصل عليه من",
+    "googlePlay": "Google Play",
+    "downloadOn": "حمّل من",
+    "appStore": "App Store",
+    "transparency": "الشفافية:",
+    "transparencyText": "قد تحصل RealTravo على عمولة مقابل بعض حجوزات الإقامة. يتم دفع هذه العمولة من قبل المنشأة و",
+    "transparencyHighlight": "لا تُضاف أبداً إلى تكلفة حجزك النهائية",
+    "transparencyEnd": "هذا يتيح لنا الحفاظ على منصتنا مجانية للمسافرين.",
+    "allRights": "© 2026 RealTravo. جميع الحقوق محفوظة.",
+    "madeFor": "صُنع للمسافرين العصريين",
+    "ratesFrom": "الأسعار من Open Exchange • تم التحديث"
+  },
+  "location": {
+    "turnOn": "تفعيل الموقع",
+    "description": "فعّل الوصول إلى الموقع لرؤية الأماكن القريبة والحصول على أفضل التجارب المحلية.",
+    "tryAgain": "حاول مرة أخرى",
+    "continueWithout": "متابعة بدون موقع"
+  },
+  "pages": {
+    "about": {
+      "title": "حول RealTravo",
+      "subtitle": "بوابتك إلى المغامرة",
+      "p1": "RealTravo هو رفيقك المثالي لاكتشاف وحجز تجارب سفر مذهلة حول العالم.",
+      "p2": "سواء كنت تبحث عن مغامرات مثيرة أو فعاليات ثقافية أو فنادق فاخرة أو جواهر مخفية، منصتنا تسهل ذلك.",
+      "cta": "ابدأ الاستكشاف اليوم واصنع ذكريات تدوم مدى الحياة!"
+    },
+    "contact": {
+      "title": "اتصل بنا",
+      "email": "البريد الإلكتروني",
+      "phone": "الهاتف",
+      "address": "العنوان"
+    },
+    "saved": { "title": "العناصر المحفوظة" },
+    "bookings": { "title": "حجوزاتي" },
+    "becomeHost": { "title": "كن مضيفاً" },
+    "notFound": {
+      "title": "الصفحة غير موجودة",
+      "description": "عذراً، لم نتمكن من العثور على الصفحة التي تبحث عنها."
+    }
+  },
+  "common": {
+    "back": "رجوع",
+    "loading": "جاري التحميل...",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "confirm": "تأكيد",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "submit": "إرسال",
+    "close": "إغلاق",
+    "search": "بحث",
+    "filter": "تصفية",
+    "sort": "ترتيب",
+    "more": "المزيد",
+    "less": "أقل",
+    "showAll": "عرض الكل",
+    "yes": "نعم",
+    "no": "لا"
+  }
+}

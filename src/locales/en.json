@@ -1,0 +1,157 @@
+{
+  "nav": {
+    "home": "Home",
+    "bookings": "Bookings",
+    "myBookings": "My Bookings",
+    "saved": "Saved",
+    "savedItems": "Saved Items",
+    "wishlist": "Wishlist",
+    "profile": "Profile",
+    "login": "Login",
+    "loginRegister": "Login / Register",
+    "logout": "Logout",
+    "account": "Account"
+  },
+  "hero": {
+    "tagline": "Discover • Book • Experience",
+    "title": "Discover Your Next Experience",
+    "searchPlaceholder": "Search destinations, trips, hotels..."
+  },
+  "categories": {
+    "adventures": "Adventures",
+    "hotels": "Hotels",
+    "trips": "Trips",
+    "events": "Events",
+    "stays": "Stays"
+  },
+  "sections": {
+    "placesToAdventure": "Places to Adventure",
+    "hotelsAccommodations": "Hotels & Accommodations",
+    "tripsAndTours": "Trips & Tours",
+    "sportsAndEvents": "Sports & Events",
+    "nearestToYou": "Nearest to You",
+    "topDestinations": "Top Destinations",
+    "nearMe": "Near Me",
+    "finding": "Finding...",
+    "viewAll": "View all →",
+    "searchResults": "Search Results",
+    "allListings": "All Listings",
+    "noResults": "No results found. Try a different search."
+  },
+  "drawer": {
+    "mainMenu": "Main Menu",
+    "exploreCategories": "Explore Categories",
+    "supportLegal": "Support & Legal",
+    "eventsAndSports": "Events & Sports",
+    "tripsAndTours": "Trips & Tours",
+    "adventurePlaces": "Adventure Places",
+    "accommodationOnly": "Accommodation Only",
+    "hotel": "Hotel",
+    "contact": "Contact",
+    "about": "About",
+    "terms": "Terms",
+    "privacy": "Privacy",
+    "transparency": "TRANSPARENCY:",
+    "transparencyText": "RealTravo may earn a commission for some bookings. This is paid by the property and",
+    "transparencyHighlight": "is never added to your final cost",
+    "traveler": "Traveler"
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "discover": "Discover.",
+    "book": "Book.",
+    "experience": "Experience.",
+    "subtitle": "Your gateway to curated adventures, hotels, and unforgettable trips across Africa.",
+    "featureHandpicked": "Handpicked stays, trips & adventures",
+    "featureSecure": "Secure & instant booking",
+    "featureTrusted": "Trusted by real travelers"
+  },
+  "footer": {
+    "tagline": "Your gateway to authentic experiences. Explore, book, and share your journey with the world.",
+    "explore": "Explore",
+    "destinations": "Destinations",
+    "localEvents": "Local Events",
+    "hotels": "Hotels",
+    "support": "Support",
+    "aboutUs": "About Us",
+    "contact": "Contact",
+    "becomeHost": "Become a Host",
+    "legal": "Legal",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "tripEventGuide": "Trip & Event Guide",
+    "campsiteGuide": "Campsite Guide",
+    "hotelGuide": "Hotel & Lodge Guide",
+    "followJourney": "Follow Our Journey",
+    "liveCurrency": "Live Currency",
+    "language": "Language",
+    "moreLangSoon": "More languages coming soon",
+    "mobile": "Mobile",
+    "comingSoon": "Coming soon to both stores",
+    "getItOn": "Get it on",
+    "googlePlay": "Google Play",
+    "downloadOn": "Download on the",
+    "appStore": "App Store",
+    "transparency": "Transparency:",
+    "transparencyText": "RealTravo may earn a commission for some accommodation bookings. This commission is paid by the property and",
+    "transparencyHighlight": "is never added to your final booking cost",
+    "transparencyEnd": "This allows us to keep our platform free for travelers.",
+    "allRights": "© 2026 RealTravo. All rights reserved.",
+    "madeFor": "Made for Modern Travelers",
+    "ratesFrom": "Rates from Open Exchange • Updated"
+  },
+  "location": {
+    "turnOn": "Turn On Location",
+    "description": "Enable location access to see places near you and get the best local experiences.",
+    "tryAgain": "Try Again",
+    "continueWithout": "Continue Without Location"
+  },
+  "pages": {
+    "about": {
+      "title": "About RealTravo",
+      "subtitle": "Your Gateway to Adventure",
+      "p1": "RealTravo is your ultimate companion for discovering and booking amazing travel experiences around the world. We connect adventurous souls with unforgettable trips, events, accommodations, and destinations.",
+      "p2": "Whether you're seeking thrilling adventures, cultural events, luxury hotels, or hidden gems, our platform makes it easy to explore, save, and book your perfect getaway.",
+      "cta": "Start exploring today and create memories that last a lifetime!"
+    },
+    "contact": {
+      "title": "Contact Us",
+      "email": "Email",
+      "phone": "Phone",
+      "address": "Address"
+    },
+    "saved": {
+      "title": "Saved Items"
+    },
+    "bookings": {
+      "title": "My Bookings"
+    },
+    "becomeHost": {
+      "title": "Become a Host"
+    },
+    "notFound": {
+      "title": "Page Not Found",
+      "description": "Sorry, we couldn't find the page you're looking for."
+    }
+  },
+  "common": {
+    "back": "Back",
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "edit": "Edit",
+    "submit": "Submit",
+    "close": "Close",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "more": "More",
+    "less": "Less",
+    "showAll": "Show All",
+    "yes": "Yes",
+    "no": "No"
+  }
+}
