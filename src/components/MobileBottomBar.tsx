@@ -135,7 +135,7 @@ export const MobileBottomBar = () => {
                   <User className="h-5 w-5 transition-colors duration-300 text-slate-400" strokeWidth={2} />
                 </div>
                 <span className="text-[10px] font-black uppercase tracking-[0.1em] transition-colors duration-300 text-slate-400">
-                  Profile
+                  {t('nav.profile')}
                 </span>
               </button>
             </AccountSheet>
