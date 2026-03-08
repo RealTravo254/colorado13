@@ -79,8 +79,8 @@ export const Header = ({ onSearchClick, showSearchIcon = true, className, __from
           </Link>
         </div>
         <nav className="hidden lg:flex items-center gap-8">
-          {[{ to: "/", icon: <Home className="h-4 w-4" />, label: "Home" }, { to: "/bookings", icon: <Ticket className="h-4 w-4" />, label: "Bookings" }, { to: "/saved", icon: <Heart className="h-4 w-4" />, label: "Wishlist" }].map(item => (
-            <Link key={item.label} to={item.to} className="flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-slate-500 hover:text-slate-900 transition-colors">
+          {[{ to: "/", icon: <Home className="h-4 w-4" />, label: t('nav.home') }, { to: "/bookings", icon: <Ticket className="h-4 w-4" />, label: t('nav.bookings') }, { to: "/saved", icon: <Heart className="h-4 w-4" />, label: t('nav.wishlist') }].map(item => (
+            <Link key={item.to} to={item.to} className="flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-slate-500 hover:text-slate-900 transition-colors">
               {item.icon}<span>{item.label}</span>
             </Link>
           ))}
