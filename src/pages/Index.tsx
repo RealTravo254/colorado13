@@ -1280,7 +1280,7 @@ const Index = () => {
                         const ratingData = ratings.get(item.id);
                         return (
                           <div key={item.id} className="flex-shrink-0 w-[75vw] sm:w-[320px] md:w-[380px]">
-                            <MemoizedListingCard
+                            <ListingCard
                               id={item.id}
                               type={itemAny.type || itemAny.table === 'hotels' ? 'HOTEL' : 'ADVENTURE PLACE'}
                               name={item.name}
