@@ -54,8 +54,8 @@ export const Header = ({ onSearchClick, showSearchIcon = true, className, __from
   // Skip rendering if this is a page-level Header (PageLayout already renders one)
   if (!__fromLayout) return null;
 
-  const mobileHeaderClasses = "relative md:fixed md:top-0 left-0 right-0 flex bg-white/60 backdrop-blur-sm md:bg-background md:border-b md:border-border md:shadow-sm py-2";
-  const headerIconStyles = "h-10 w-10 rounded-xl flex items-center justify-center transition-all duration-200 active:scale-90 text-foreground hover:bg-muted";
+  const mobileHeaderClasses = "relative md:fixed md:top-0 left-0 right-0 flex bg-transparent md:bg-background md:border-b md:border-border md:shadow-sm py-2";
+  const headerIconStyles = "h-10 w-10 rounded-xl flex items-center justify-center transition-all duration-200 active:scale-90 text-white md:text-foreground hover:bg-white/20 md:hover:bg-muted";
 
   return (
     <header className={`z-[100] items-center ${mobileHeaderClasses} ${className || ''}`}>
@@ -73,8 +73,9 @@ export const Header = ({ onSearchClick, showSearchIcon = true, className, __from
           </Sheet>
           <Link to="/" className="flex items-center gap-2 group ml-1">
             <LogoWithFallback />
-            <span className="font-bold text-lg tracking-tight italic leading-none" style={{ background: "linear-gradient(to right, #1a365d, #2b6cb0, #4fd1c5)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-              RealTravo
+            <span className="font-bold text-lg tracking-tight italic leading-none text-white md:text-transparent md:bg-clip-text" style={{ WebkitBackgroundClip: "text", WebkitTextFillColor: undefined, background: undefined } as any}>
+              <span className="md:hidden text-white font-bold text-lg tracking-tight italic">RealTravo</span>
+              <span className="hidden md:inline font-bold text-lg tracking-tight italic" style={{ background: "linear-gradient(to right, #1a365d, #2b6cb0, #4fd1c5)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>RealTravo</span>
             </span>
           </Link>
         </div>
@@ -86,7 +87,9 @@ export const Header = ({ onSearchClick, showSearchIcon = true, className, __from
           ))}
         </nav>
         <div className="flex items-center gap-1 sm:gap-2">
-          <NotificationBell />
+          <div className="[&_button]:text-white md:[&_button]:text-foreground">
+            <NotificationBell />
+          </div>
           {user ? (
             <AccountSheet>
               <button className="hidden sm:flex h-10 px-4 rounded-xl items-center gap-2 transition-all font-semibold text-xs text-primary-foreground bg-primary hover:brightness-110">
