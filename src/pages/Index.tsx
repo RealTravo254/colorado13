@@ -187,13 +187,13 @@ const Index = () => {
     const fetchLimit = Math.max(limit * 3, 30);
     try {
       const [tripsData, hotelsData, campsitesData, eventsData] = await Promise.all([
-        supabase.from("trips").select("id,name,location,place,country,image_url,date,is_custom_date,is_flexible_date,available_tickets,activities,type,created_at,price,price_child")
+        supabase.from("trips").select("id,name,location,place,country,image_url,date,is_custom_date,is_flexible_date,available_tickets,activities,type,created_at,price,price_child,description")
           .eq("approval_status", "approved").eq("is_hidden", false).eq("type", "trip").order("date", { ascending: true }).limit(fetchLimit),
-        supabase.from("hotels").select("id,name,location,place,country,image_url,activities,latitude,longitude,created_at,establishment_type")
+        supabase.from("hotels").select("id,name,location,place,country,image_url,activities,latitude,longitude,created_at,establishment_type,description")
           .eq("approval_status", "approved").eq("is_hidden", false).limit(fetchLimit),
-        supabase.from("adventure_places").select("id,name,location,place,country,image_url,entry_fee,activities,latitude,longitude,created_at")
+        supabase.from("adventure_places").select("id,name,location,place,country,image_url,entry_fee,activities,latitude,longitude,created_at,description")
           .eq("approval_status", "approved").eq("is_hidden", false).limit(fetchLimit),
-        supabase.from("trips").select("id,name,location,place,country,image_url,date,is_custom_date,is_flexible_date,available_tickets,activities,type,created_at,price,price_child")
+        supabase.from("trips").select("id,name,location,place,country,image_url,date,is_custom_date,is_flexible_date,available_tickets,activities,type,created_at,price,price_child,description")
           .eq("approval_status", "approved").eq("is_hidden", false).eq("type", "event").order("date", { ascending: true }).limit(fetchLimit),
       ]);
       setScrollableRows({
@@ -212,9 +212,9 @@ const Index = () => {
     setLoadingNearby(true);
     if (!position) return;
     const [placesData, hotelsData] = await Promise.all([
-      supabase.from("adventure_places").select("id,name,location,place,country,image_url,entry_fee,activities,latitude,longitude,created_at")
+      supabase.from("adventure_places").select("id,name,location,place,country,image_url,entry_fee,activities,latitude,longitude,created_at,description")
         .eq("approval_status", "approved").eq("is_hidden", false).limit(12),
-      supabase.from("hotels").select("id,name,location,place,country,image_url,activities,latitude,longitude,created_at")
+      supabase.from("hotels").select("id,name,location,place,country,image_url,activities,latitude,longitude,created_at,description")
         .eq("approval_status", "approved").eq("is_hidden", false).limit(12),
     ]);
     const combined = [
@@ -240,7 +240,7 @@ const Index = () => {
     setLoading(true);
     const today = new Date().toISOString().split('T')[0];
     const fetchEvents = async () => {
-      let dbQuery = supabase.from("trips").select("id,name,location,place,country,image_url,date,is_custom_date,is_flexible_date,available_tickets,activities,type,created_at,price,price_child")
+      let dbQuery = supabase.from("trips").select("id,name,location,place,country,image_url,date,is_custom_date,is_flexible_date,available_tickets,activities,type,created_at,price,price_child,description")
         .eq("approval_status", "approved").eq("is_hidden", false).eq("type", "event").or(`date.gte.${today},is_flexible_date.eq.true`);
       if (query) { const p = `%${query}%`; dbQuery = dbQuery.or(`name.ilike.${p},location.ilike.${p},country.ilike.${p}`); }
       dbQuery = dbQuery.order('date', { ascending: true }).range(offset, offset + limit - 1);
@@ -249,8 +249,8 @@ const Index = () => {
     };
     const fetchTable = async (table: "hotels" | "adventure_places", type: string) => {
       let dbQuery = supabase.from(table).select(table === "hotels"
-        ? "id,name,location,place,country,image_url,activities,latitude,longitude,created_at"
-        : "id,name,location,place,country,image_url,entry_fee,activities,latitude,longitude,created_at")
+        ? "id,name,location,place,country,image_url,activities,latitude,longitude,created_at,description"
+        : "id,name,location,place,country,image_url,entry_fee,activities,latitude,longitude,created_at,description")
         .eq("approval_status", "approved").eq("is_hidden", false);
       if (query) { const p = `%${query}%`; dbQuery = dbQuery.or(`name.ilike.${p},location.ilike.${p},country.ilike.${p}`); }
       dbQuery = dbQuery.order('created_at', { ascending: false }).range(offset, offset + limit - 1);
@@ -258,7 +258,7 @@ const Index = () => {
       return (data || []).map((item: any) => ({ ...item, type }));
     };
     const fetchTrips = async () => {
-      let dbQuery = supabase.from("trips").select("id,name,location,place,country,image_url,date,is_custom_date,is_flexible_date,available_tickets,activities,type,created_at,price,price_child")
+      let dbQuery = supabase.from("trips").select("id,name,location,place,country,image_url,date,is_custom_date,is_flexible_date,available_tickets,activities,type,created_at,price,price_child,description")
         .eq("approval_status", "approved").eq("is_hidden", false).eq("type", "trip");
       if (query) { const p = `%${query}%`; dbQuery = dbQuery.or(`name.ilike.${p},location.ilike.${p},country.ilike.${p}`); }
       dbQuery = dbQuery.order('date', { ascending: true }).range(offset, offset + limit - 1);
@@ -392,6 +392,7 @@ const Index = () => {
           place={item.place}
           availableTickets={opts.isTrip ? item.available_tickets : undefined}
           bookedTickets={opts.isTrip ? bookingStats[item.id] || 0 : undefined}
+          description={item.description}
         />
       </div>
     );
@@ -522,6 +523,7 @@ const Index = () => {
                       hidePrice={listing.type === "HOTEL" || listing.type === "ADVENTURE PLACE"}
                       activities={listing.activities} distance={itemDistance}
                       avgRating={ratingData?.avgRating} reviewCount={ratingData?.reviewCount}
+                      description={listing.description}
                     />
                   );
                 })}
@@ -629,6 +631,7 @@ const Index = () => {
                           isSaved={savedItems.has(item.id)} hidePrice={true} showBadge={true}
                           priority={index === 0} activities={a.activities} distance={dist}
                           avgRating={rd?.avgRating} reviewCount={rd?.reviewCount} place={a.place}
+                          description={a.description}
                         />
                       </div>
                     );

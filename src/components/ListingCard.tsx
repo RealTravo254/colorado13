@@ -2,23 +2,24 @@ import React, { useState, memo, useCallback, useMemo, useEffect } from "react";
 import { MapPin, Heart, Star, Calendar, Ticket } from "lucide-react";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn, optimizeSupabaseImage } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { createDetailPath } from "@/lib/slugUtils";
 import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
 
-const PriceText = ({ price, isUnavailable }: { price: number; isUnavailable: boolean }) => {
+const PriceText = ({ price, isUnavailable, type }: { price: number; isUnavailable: boolean; type: string }) => {
   const { formatPrice } = useCurrency();
+  const label = ['HOTEL', 'ACCOMMODATION'].includes(type) ? '/night' : '/person';
   return (
-    <span className={cn("text-sm font-bold text-foreground", isUnavailable && "text-muted-foreground line-through")}>
-      {formatPrice(price)}
+    <span className={cn("text-foreground", isUnavailable && "text-muted-foreground line-through")}>
+      <span className="text-base font-bold">{formatPrice(price)}</span>
+      <span className="text-[11px] text-muted-foreground font-medium">{label}</span>
     </span>
   );
 };
 
-interface ListingCardProps {
+export interface ListingCardProps {
   id: string;
   type: 'TRIP' | 'EVENT' | 'SPORT' | 'HOTEL' | 'ADVENTURE PLACE' | 'ACCOMMODATION' | 'ATTRACTION';
   name: string;
@@ -47,47 +48,56 @@ interface ListingCardProps {
   reviewCount?: number;
   place?: string;
   showFlexibleDate?: boolean;
+  description?: string;
 }
 
 const ListingCardComponent = ({
   id, type, name, imageUrl, location, price, date,
-  isOutdated = false, onSave, isSaved = false, activities, 
-  availableTickets = 0, bookedTickets = 0, 
-  priority = false, compact = false, avgRating, place,
-  isFlexibleDate = false, hidePrice = false
+  isOutdated = false, onSave, isSaved = false, activities,
+  availableTickets = 0, bookedTickets = 0,
+  priority = false, compact = false, avgRating, reviewCount, place,
+  isFlexibleDate = false, hidePrice = false, description
 }: ListingCardProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [isSavedLocal, setIsSavedLocal] = useState(isSaved);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    setIsSavedLocal(isSaved);
-  }, [isSaved]);
+  useEffect(() => { setIsSavedLocal(isSaved); }, [isSaved]);
 
-  const { ref: imageContainerRef, isIntersecting } = useIntersectionObserver({
-    rootMargin: '300px',
-    triggerOnce: true
-  });
-
+  const { ref: imageContainerRef, isIntersecting } = useIntersectionObserver({ rootMargin: '300px', triggerOnce: true });
   const shouldLoadImage = priority || isIntersecting;
+
   const isEventOrSport = useMemo(() => type === "EVENT" || type === "SPORT", [type]);
   const isTrip = useMemo(() => type === "TRIP", [type]);
   const tracksAvailability = useMemo(() => isEventOrSport || isTrip, [isEventOrSport, isTrip]);
-  
+
   const remainingTickets = useMemo(() => availableTickets - bookedTickets, [availableTickets, bookedTickets]);
   const isSoldOut = useMemo(() => tracksAvailability && availableTickets > 0 && remainingTickets <= 0, [tracksAvailability, availableTickets, remainingTickets]);
   const fewSlotsRemaining = useMemo(() => tracksAvailability && remainingTickets > 0 && remainingTickets <= 10, [tracksAvailability, remainingTickets]);
   const isUnavailable = useMemo(() => isOutdated || isSoldOut, [isOutdated, isSoldOut]);
 
   const optimizedImageUrl = useMemo(() => optimizeSupabaseImage(imageUrl, { width: 600, height: 450, quality: 85 }), [imageUrl]);
-  const displayType = useMemo(() => isEventOrSport ? "Event & Sports" : type.replace('_', ' '), [isEventOrSport, type]);
-  
-  const formattedName = useMemo(() => {
-    return name.toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
-  }, [name]);
-  
+  const displayType = useMemo(() => {
+    if (isEventOrSport) return "Event & Sports";
+    if (type === "ADVENTURE PLACE") return "Attraction";
+    if (type === "HOTEL") return "Hotel";
+    if (type === "TRIP") return "Trip";
+    return type.replace('_', ' ');
+  }, [isEventOrSport, type]);
+
+  const formattedName = useMemo(() => name.toLowerCase().replace(/\b\w/g, c => c.toUpperCase()), [name]);
   const locationString = useMemo(() => [place, location].filter(Boolean).join(', '), [place, location]);
+
+  // Subtitle: activities or description fallback
+  const subtitle = useMemo(() => {
+    if (activities && activities.length > 0) {
+      const names = activities.slice(0, 3).map((a: any) => typeof a === 'string' ? a : a.name);
+      return names.join(' • ');
+    }
+    if (description) return description;
+    return null;
+  }, [activities, description]);
 
   const handleCardClick = useCallback(() => {
     const typeMap: Record<string, string> = {
@@ -103,152 +113,142 @@ const ListingCardComponent = ({
     onSave?.(id, type);
   };
 
+  // Urgency badge
+  const urgencyBadge = useMemo(() => {
+    if (isSoldOut) return { text: "Sold out", color: "bg-destructive/10 text-destructive border-destructive/20" };
+    if (isOutdated) return { text: "Passed", color: "bg-muted text-muted-foreground border-border" };
+    if (fewSlotsRemaining) return { text: `🔥 Only ${remainingTickets} left!`, color: "bg-orange-50 text-orange-700 border-orange-200" };
+    return null;
+  }, [isSoldOut, isOutdated, fewSlotsRemaining, remainingTickets]);
+
   return (
-    <Card 
-      onClick={handleCardClick} 
+    <Card
+      onClick={handleCardClick}
       className={cn(
-        // Core Layout & Background
-        "group relative flex flex-col overflow-hidden cursor-pointer bg-white transition-all duration-500",
-        "rounded-[32px] border border-slate-200/80 shadow-[0_8px_30px_rgb(0,0,0,0.04)]",
-        
-        // Hover States: Movement, Deeper Shadow, and Border Color Shift
-        "hover:-translate-y-2 hover:shadow-[0_20px_50px_rgba(0,0,0,0.12)] hover:border-teal-100",
-        
+        "group relative flex flex-row overflow-hidden cursor-pointer bg-card transition-all duration-300",
+        "rounded-xl border border-border shadow-sm",
+        "hover:shadow-md hover:border-primary/20",
         compact ? "h-auto" : "h-full",
-        isUnavailable && "opacity-90"
+        isUnavailable && "opacity-80"
       )}
     >
-      {/* Image Container */}
-      <div 
-        ref={imageContainerRef} 
-        className="relative aspect-[4/3] w-full overflow-hidden bg-slate-100"
+      {/* Image */}
+      <div
+        ref={imageContainerRef}
+        className="relative w-[130px] sm:w-[160px] md:w-[200px] flex-shrink-0 overflow-hidden"
       >
         {!imageLoaded && !imageError && (
           <Skeleton className="absolute inset-0 h-full w-full rounded-none" />
         )}
-        
         {shouldLoadImage && !imageError && (
-          <img 
-            src={optimizedImageUrl} 
+          <img
+            src={optimizedImageUrl}
             alt={name}
             onLoad={() => setImageLoaded(true)}
+            onError={() => setImageError(true)}
             className={cn(
-                "absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110", 
-                imageLoaded ? "opacity-100" : "opacity-0",
-                isUnavailable && "grayscale-[0.5]"
-            )} 
+              "absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105",
+              imageLoaded ? "opacity-100" : "opacity-0",
+              isUnavailable && "grayscale-[0.5]"
+            )}
           />
         )}
 
-        {/* Floating Category & Rating */}
-        <div className="absolute left-4 top-4 z-20 flex flex-col gap-2">
-          <Badge className="w-fit border-none bg-white/90 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-slate-900 backdrop-blur-md shadow-sm">
-            {displayType}
-          </Badge>
-          {avgRating && (
-            <div className="flex w-fit items-center gap-1 rounded-full bg-black/40 px-2 py-0.5 text-white backdrop-blur-md">
-              <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-              <span className="text-[11px] font-bold">{avgRating.toFixed(1)}</span>
-            </div>
-          )}
-        </div>
-
-        {/* Heart Save Button */}
+        {/* Heart */}
         {onSave && (
-          <button 
+          <button
             onClick={handleSaveClick}
             className={cn(
-                "absolute right-4 top-4 z-20 flex h-10 w-10 items-center justify-center rounded-full transition-all active:scale-90 shadow-xl", 
-                isSavedLocal ? "bg-white" : "bg-white/20 backdrop-blur-xl border border-white/30 hover:bg-white"
+              "absolute right-2 top-2 z-20 flex h-8 w-8 items-center justify-center rounded-full transition-all active:scale-90",
+              isSavedLocal ? "bg-card shadow-sm" : "bg-black/20 backdrop-blur-sm hover:bg-card/80"
             )}
           >
-            <Heart className={cn("h-5 w-5 transition-colors", isSavedLocal ? "fill-rose-500 text-rose-500" : "text-white group-hover:text-slate-900")} />
+            <Heart className={cn("h-4 w-4 transition-colors", isSavedLocal ? "fill-rose-500 text-rose-500" : "text-white")} />
           </button>
         )}
 
-        {/* Status Overlay */}
+        {/* Sold out overlay */}
         {isUnavailable && (
-          <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/30 backdrop-blur-[1px]">
-            <span className="rotate-[-10deg] rounded-lg border-2 border-white/80 px-4 py-1 text-xs font-black uppercase text-white shadow-2xl">
-               {isSoldOut ? 'Sold Out' : 'Unavailable'}
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/30 backdrop-blur-[1px]">
+            <span className="rounded-md border border-white/60 px-3 py-0.5 text-[10px] font-black uppercase text-white">
+              {isSoldOut ? 'Sold Out' : 'Unavailable'}
             </span>
           </div>
         )}
       </div>
-      
-      {/* Content Section */}
-      <div className="flex flex-1 flex-col p-6"> 
-        <h3 className="line-clamp-2 text-lg font-bold leading-tight tracking-tight text-slate-800 transition-colors group-hover:text-teal-600">
+
+      {/* Content */}
+      <div className="flex flex-1 flex-col justify-between p-3 sm:p-4 min-w-0 gap-1.5">
+        {/* Top: Category + Urgency */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-primary">
+            {displayType}
+          </span>
+          {urgencyBadge && (
+            <span className={cn("text-[10px] font-bold px-2 py-0.5 rounded-full border", urgencyBadge.color)}>
+              {urgencyBadge.text}
+            </span>
+          )}
+        </div>
+
+        {/* Title */}
+        <h3 className="line-clamp-2 text-sm sm:text-[15px] font-bold leading-snug text-foreground group-hover:text-primary transition-colors">
           {formattedName}
         </h3>
-        
-        <div className="mt-2 flex items-center gap-1.5 text-slate-500">
-            <MapPin className="h-3.5 w-3.5 text-teal-500/70" />
-            <p className="text-xs font-medium truncate capitalize">
-                {locationString.toLowerCase()}
-            </p>
+
+        {/* Subtitle: activities or description */}
+        {subtitle && (
+          <p className="line-clamp-1 sm:line-clamp-2 text-xs text-muted-foreground leading-relaxed">
+            {subtitle}
+          </p>
+        )}
+
+        {/* Location */}
+        <div className="flex items-center gap-1 text-muted-foreground">
+          <MapPin className="h-3 w-3 flex-shrink-0 text-primary/60" />
+          <span className="text-[11px] font-medium truncate capitalize">{locationString.toLowerCase()}</span>
         </div>
 
-        {/* Tags */}
-        {activities && activities.length > 0 && (
-          <div className="mt-4 flex flex-wrap gap-2">
-            {activities.slice(0, 2).map((act, i) => (
-              <span key={i} className="rounded-lg bg-slate-50 border border-slate-100 px-2.5 py-1 text-[10px] font-bold text-slate-600">
-                #{typeof act === 'string' ? act : act.name}
-              </span>
-            ))}
-          </div>
-        )}
-        
-        {/* Footer Info */}
-        <div className="mt-auto flex items-end justify-between border-t border-slate-100 pt-5">
-            <div className="flex flex-col">
-                {!hidePrice && price != null && (
-                  <>
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
-                      {['HOTEL', 'ACCOMMODATION'].includes(type) ? 'Per Night' : 'From'}
-                    </span>
-                        <PriceText price={price} isUnavailable={isUnavailable} />
-                  </>
+        {/* Bottom row: Rating + Date + Price */}
+        <div className="flex items-end justify-between gap-2 pt-1 mt-auto border-t border-border/50">
+          <div className="flex items-center gap-3 flex-wrap">
+            {/* Rating */}
+            {avgRating && (
+              <div className="flex items-center gap-1">
+                <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+                <span className="text-xs font-bold text-foreground">{avgRating.toFixed(1)}</span>
+                {reviewCount && reviewCount > 0 && (
+                  <span className="text-[10px] text-muted-foreground">({reviewCount})</span>
                 )}
-            </div>
+              </div>
+            )}
 
-            <div className="flex flex-col items-end gap-2">
-                {/* Date Badge */}
-                {(date || isFlexibleDate) && (
-                  <div className={cn(
-                    "flex items-center gap-1.5 rounded-full px-3 py-1 border shadow-sm",
-                    isFlexibleDate ? "bg-emerald-50 border-emerald-100 text-emerald-700" : "bg-slate-50 border-slate-100 text-slate-600"
-                  )}>
-                      <Calendar className="h-3 w-3" />
-                      <span className="text-[10px] font-bold uppercase">
-                          {isFlexibleDate ? 'Flexible' : new Date(date!).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
-                      </span>
-                  </div>
-                )}
-                
-                {/* Availability Labels */}
-                <div className="h-4 flex items-center">
-                  {isOutdated ? (
-                    <span className="text-[10px] font-bold text-slate-400 uppercase">Passed</span>
-                  ) : isSoldOut ? (
-                    <span className="text-[10px] font-bold text-rose-500 uppercase">Sold Out</span>
-                  ) : fewSlotsRemaining ? (
-                    <span className="flex items-center gap-1 text-[10px] font-black text-orange-600 uppercase animate-pulse">
-                        <Ticket className="h-3 w-3" /> {remainingTickets} left!
-                    </span>
-                  ) : (tracksAvailability && availableTickets > 0) && (
-                    <span className="text-[10px] font-bold text-teal-600 uppercase">
-                        {remainingTickets} Spots
-                    </span>
-                  )}
-                </div>
+            {/* Date */}
+            {(date || isFlexibleDate) && (
+              <div className="flex items-center gap-1 text-muted-foreground">
+                <Calendar className="h-3 w-3" />
+                <span className="text-[10px] font-semibold">
+                  {isFlexibleDate ? 'Flexible' : new Date(date!).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
+                </span>
+              </div>
+            )}
+
+            {/* Slots */}
+            {tracksAvailability && availableTickets > 0 && !isUnavailable && !fewSlotsRemaining && (
+              <span className="text-[10px] font-semibold text-primary">
+                <Ticket className="inline h-3 w-3 mr-0.5" />{remainingTickets} spots
+              </span>
+            )}
+          </div>
+
+          {/* Price */}
+          {!hidePrice && price != null && price > 0 && (
+            <div className="flex-shrink-0 text-right">
+              <PriceText price={price} isUnavailable={isUnavailable} type={type} />
             </div>
+          )}
         </div>
       </div>
-
-      {/* Hover Progress Bar */}
-      <div className="absolute bottom-0 h-1.5 w-0 bg-teal-500 transition-all duration-700 group-hover:w-full" />
     </Card>
   );
 };
