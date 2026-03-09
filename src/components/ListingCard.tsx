@@ -135,7 +135,7 @@ const ListingCardComponent = ({
       {/* Image */}
       <div
         ref={imageContainerRef}
-        className="relative w-[130px] sm:w-[160px] md:w-[220px] lg:w-[280px] flex-shrink-0 overflow-hidden min-h-[120px] md:min-h-[160px] lg:min-h-[200px]"
+        className="relative w-[100px] sm:w-[120px] md:w-[140px] lg:w-[180px] flex-shrink-0 overflow-hidden min-h-[120px] md:min-h-[150px] lg:min-h-[180px]"
       >
         {!imageLoaded && !imageError && (
           <Skeleton className="absolute inset-0 h-full w-full rounded-none" />
