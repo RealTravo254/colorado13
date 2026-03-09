@@ -54,7 +54,7 @@ export const Header = ({ onSearchClick, showSearchIcon = true, className, __from
   // Skip rendering if this is a page-level Header (PageLayout already renders one)
   if (!__fromLayout) return null;
 
-  const mobileHeaderClasses = "relative md:fixed md:top-0 left-0 right-0 flex bg-transparent md:bg-background md:border-b md:border-border md:shadow-sm py-2";
+  const mobileHeaderClasses = "absolute top-0 md:fixed md:top-0 left-0 right-0 flex bg-transparent md:bg-background md:border-b md:border-border md:shadow-sm py-3";
   const headerIconStyles = "h-10 w-10 rounded-xl flex items-center justify-center transition-all duration-200 active:scale-90 text-white md:text-foreground hover:bg-white/20 md:hover:bg-muted";
 
   return (
@@ -86,18 +86,18 @@ export const Header = ({ onSearchClick, showSearchIcon = true, className, __from
             </Link>
           ))}
         </nav>
-        <div className="flex items-center gap-1 sm:gap-2">
-          <div className="[&_button]:text-white md:[&_button]:text-foreground">
+        <div className="flex items-center gap-2 sm:gap-2">
+          <div className="[&_button]:text-white md:[&_button]:text-foreground [&_button]:h-10 [&_button]:w-10">
             <NotificationBell />
           </div>
           {user ? (
             <AccountSheet>
-              <button className="hidden sm:flex h-10 px-4 rounded-xl items-center gap-2 transition-all font-semibold text-xs text-primary-foreground bg-primary hover:brightness-110">
+              <button className="hidden md:flex h-10 px-4 rounded-xl items-center gap-2 transition-all font-semibold text-xs text-primary-foreground bg-primary hover:brightness-110">
                 <User className="h-4 w-4" /><span>{t('nav.profile')}</span>
               </button>
             </AccountSheet>
           ) : (
-            <button onClick={() => navigate('/auth')} className="hidden sm:flex h-10 px-4 rounded-xl items-center gap-2 transition-all font-semibold text-xs text-primary-foreground bg-primary hover:brightness-110">
+            <button onClick={() => navigate('/auth')} className="hidden md:flex h-10 px-4 rounded-xl items-center gap-2 transition-all font-semibold text-xs text-primary-foreground bg-primary hover:brightness-110">
               <User className="h-4 w-4" /><span>{t('nav.login')}</span>
             </button>
           )}

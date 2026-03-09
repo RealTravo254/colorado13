@@ -43,13 +43,13 @@ export const NavigationDrawer = ({ onClose }: NavigationDrawerProps) => {
     <li>
       <button
         onClick={() => isProtected ? handleProtectedNavigation(path) : (window.location.href = path, onClose())}
-        className="w-full flex items-center justify-between px-4 py-3 rounded-xl hover:bg-slate-50 dark:hover:bg-gray-800 transition-all group"
+        className="w-full flex items-center justify-between px-4 py-3 rounded-xl hover:bg-slate-50 transition-all group"
       >
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-slate-100 dark:bg-gray-800 group-hover:bg-[#008080] transition-colors">
-            <Icon className="h-4 w-4 text-slate-600 dark:text-slate-300 group-hover:text-white" />
+          <div className="p-2 rounded-lg bg-slate-100 group-hover:bg-[#008080] transition-colors">
+            <Icon className="h-4 w-4 text-slate-600 group-hover:text-white" />
           </div>
-          <span className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white">
+          <span className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-600 group-hover:text-slate-900">
             {label}
           </span>
         </div>
@@ -60,9 +60,9 @@ export const NavigationDrawer = ({ onClose }: NavigationDrawerProps) => {
   );
 
   return (
-    <div className="flex flex-col h-full bg-white dark:bg-gray-950">
+    <div className="flex flex-col h-full bg-white">
       {/* Brand Header */}
-      <div className="p-6 bg-white dark:bg-gray-950 border-b border-slate-100 dark:border-gray-800">
+      <div className="p-6 bg-white border-b border-slate-100">
         <div className="flex items-center gap-4">
           <img 
             src="/fulllogo.png" 
@@ -89,10 +89,10 @@ export const NavigationDrawer = ({ onClose }: NavigationDrawerProps) => {
         {/* User Account Section */}
         <div className="mb-6">
           {user ? (
-            <div className="p-4 rounded-2xl border border-slate-100 dark:border-gray-800 bg-slate-50/50 dark:bg-gray-900/50">
+            <div className="p-4 rounded-2xl border border-slate-100 bg-slate-50/50">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-full bg-slate-200 dark:bg-gray-800 flex items-center justify-center text-slate-600 dark:text-slate-400 overflow-hidden">
+                  <div className="h-10 w-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 overflow-hidden">
                     {userAvatar ? (
                       <img src={userAvatar} alt={userName} className="h-full w-full object-cover" referrerPolicy="no-referrer" />
                     ) : (
@@ -100,7 +100,7 @@ export const NavigationDrawer = ({ onClose }: NavigationDrawerProps) => {
                     )}
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-slate-700 dark:text-slate-300 truncate max-w-[140px]">
+                    <p className="text-xs font-bold text-slate-700 truncate max-w-[140px]">
                       {userName || t('drawer.traveler')}
                     </p>
                     <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">
@@ -153,9 +153,9 @@ export const NavigationDrawer = ({ onClose }: NavigationDrawerProps) => {
       </nav>
       
       {/* Footer & Transparency Note */}
-      <div className="p-6 border-t border-slate-50 dark:border-gray-900 bg-slate-50/30 dark:bg-gray-900/30">
-        <p className="text-[10px] leading-relaxed text-slate-400 dark:text-slate-500 mb-4 text-center">
-          <span className="font-black text-slate-500 dark:text-slate-400">{t('drawer.transparency')}</span> {t('drawer.transparencyText')} <span className="text-[#008080] font-bold">{t('drawer.transparencyHighlight')}</span>.
+      <div className="p-6 border-t border-slate-50 bg-slate-50/30">
+        <p className="text-[10px] leading-relaxed text-slate-400 mb-4 text-center">
+          <span className="font-black text-slate-500">{t('drawer.transparency')}</span> {t('drawer.transparencyText')} <span className="text-[#008080] font-bold">{t('drawer.transparencyHighlight')}</span>.
         </p>
         <div className="text-center">
           <span className="text-[9px] font-bold text-slate-300 uppercase tracking-[0.3em]">
