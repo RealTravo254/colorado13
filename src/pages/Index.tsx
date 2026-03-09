@@ -580,7 +580,7 @@ const Index = () => {
               onScroll={handleScroll('featuredHotels')}
               hasItems={displayHotels.length > 0} loading={loadingScrollable}
             >
-              {displayHotels.map((hotel, i) => renderCard(hotel, "HOTEL", i, { hidePrice: true }))}
+              {displayHotels.map((hotel, i) => renderCard(hotel, "HOTEL", i, { hidePrice: true, categoryColor: "hsl(220, 70%, 50%)" }))}
             </ScrollSection>
 
             {/* Trips */}
