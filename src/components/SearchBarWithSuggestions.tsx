@@ -270,7 +270,7 @@ export const SearchBarWithSuggestions = React.forwardRef<HTMLDivElement, SearchB
                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Most Popular</p>
                       </div>
                       <div className="space-y-1">
-                        {mostPopular.slice(0, 4).map((item) => (
+                        {mostPopular.slice(0, 5).map((item) => (
                           <button
                             key={item.id}
                             onClick={() => handleSuggestionClick(item)}
