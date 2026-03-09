@@ -87,7 +87,9 @@ export const Header = ({ onSearchClick, showSearchIcon = true, className, __from
           ))}
         </nav>
         <div className="flex items-center gap-1 sm:gap-2">
-          <NotificationBell />
+          <div className="[&_button]:text-white md:[&_button]:text-foreground">
+            <NotificationBell />
+          </div>
           {user ? (
             <AccountSheet>
               <button className="hidden sm:flex h-10 px-4 rounded-xl items-center gap-2 transition-all font-semibold text-xs text-primary-foreground bg-primary hover:brightness-110">
