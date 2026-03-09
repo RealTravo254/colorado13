@@ -60,9 +60,9 @@ export const NavigationDrawer = ({ onClose }: NavigationDrawerProps) => {
   );
 
   return (
-    <div className="flex flex-col h-full bg-white dark:bg-gray-950">
+    <div className="flex flex-col h-full bg-white">
       {/* Brand Header */}
-      <div className="p-6 bg-white dark:bg-gray-950 border-b border-slate-100 dark:border-gray-800">
+      <div className="p-6 bg-white border-b border-slate-100">
         <div className="flex items-center gap-4">
           <img 
             src="/fulllogo.png" 
