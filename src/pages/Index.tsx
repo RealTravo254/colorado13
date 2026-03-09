@@ -496,7 +496,8 @@ const Index = () => {
               {searchQuery ? t('sections.searchResults') : t('sections.allListings')}
             </h2>
             {loading ? (
-              <div className="flex flex-col gap-4 max-w-3xl mx-auto">
+              // ── FIXED: grid layout on large screens ──
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {[...Array(6)].map((_, i) => <ListingSkeleton key={i} />)}
               </div>
             ) : sortedListings.length === 0 ? (
@@ -504,7 +505,8 @@ const Index = () => {
                 <p className="text-muted-foreground text-sm">{t('sections.noResults')}</p>
               </div>
             ) : (
-              <div className="flex flex-col gap-4 max-w-3xl mx-auto">
+              // ── FIXED: grid layout on large screens ──
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {sortedListings.map((listing, index) => {
                   const itemDistance = position && listing.latitude && listing.longitude ? calculateDistance(position.latitude, position.longitude, listing.latitude, listing.longitude) : undefined;
                   const ratingData = ratings.get(listing.id);
