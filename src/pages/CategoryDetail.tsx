@@ -286,6 +286,7 @@ const CategoryDetail = () => {
                     activities={item.activities}
                     avgRating={ratingData?.avgRating}
                     reviewCount={ratingData?.reviewCount}
+                    description={item.description}
                   />
                 </div>
               );
