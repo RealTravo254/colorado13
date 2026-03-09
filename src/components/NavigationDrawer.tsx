@@ -89,10 +89,10 @@ export const NavigationDrawer = ({ onClose }: NavigationDrawerProps) => {
         {/* User Account Section */}
         <div className="mb-6">
           {user ? (
-            <div className="p-4 rounded-2xl border border-slate-100 dark:border-gray-800 bg-slate-50/50 dark:bg-gray-900/50">
+            <div className="p-4 rounded-2xl border border-slate-100 bg-slate-50/50">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-full bg-slate-200 dark:bg-gray-800 flex items-center justify-center text-slate-600 dark:text-slate-400 overflow-hidden">
+                  <div className="h-10 w-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 overflow-hidden">
                     {userAvatar ? (
                       <img src={userAvatar} alt={userName} className="h-full w-full object-cover" referrerPolicy="no-referrer" />
                     ) : (
