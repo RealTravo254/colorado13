@@ -49,6 +49,7 @@ export interface ListingCardProps {
   place?: string;
   showFlexibleDate?: boolean;
   description?: string;
+  categoryColor?: string;
 }
 
 const ListingCardComponent = ({
@@ -56,7 +57,7 @@ const ListingCardComponent = ({
   isOutdated = false, onSave, isSaved = false, activities,
   availableTickets = 0, bookedTickets = 0,
   priority = false, compact = false, avgRating, reviewCount, place,
-  isFlexibleDate = false, hidePrice = false, description
+  isFlexibleDate = false, hidePrice = false, description, categoryColor
 }: ListingCardProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
@@ -180,7 +181,10 @@ const ListingCardComponent = ({
       <div className="flex flex-1 flex-col justify-between p-3 sm:p-4 min-w-0 gap-1.5">
         {/* Top: Category + Urgency */}
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-primary">
+          <span
+            className={cn("text-[10px] font-bold uppercase tracking-wider", !categoryColor && "text-primary")}
+            style={categoryColor ? { color: categoryColor } : undefined}
+          >
             {displayType}
           </span>
           {urgencyBadge && (

@@ -371,7 +371,7 @@ const Index = () => {
   const displayEvents = useMemo(() => getDisplayItems(scrollableRows.events, sortedEvents, true), [scrollableRows.events, sortedEvents, getDisplayItems]);
 
   // ─── Render helpers ────────────────────────────────────────────────────────
-  const renderCard = useCallback((item: any, type: string, index: number, opts: { hidePrice?: boolean; isTrip?: boolean } = {}) => {
+  const renderCard = useCallback((item: any, type: string, index: number, opts: { hidePrice?: boolean; isTrip?: boolean; categoryColor?: string } = {}) => {
     const itemDistance = position && item.latitude && item.longitude ? calculateDistance(position.latitude, position.longitude, item.latitude, item.longitude) : undefined;
     const ratingData = ratings.get(item.id);
     const today = new Date().toISOString().split('T')[0];
@@ -393,6 +393,7 @@ const Index = () => {
           availableTickets={opts.isTrip ? item.available_tickets : undefined}
           bookedTickets={opts.isTrip ? bookingStats[item.id] || 0 : undefined}
           description={item.description}
+          categoryColor={opts.categoryColor}
         />
       </div>
     );
@@ -569,7 +570,7 @@ const Index = () => {
               onScroll={handleScroll('featuredCampsites')}
               hasItems={displayCampsites.length > 0} loading={loadingScrollable}
             >
-              {displayCampsites.map((place, i) => renderCard(place, "ADVENTURE PLACE", i, { hidePrice: true }))}
+              {displayCampsites.map((place, i) => renderCard(place, "ADVENTURE PLACE", i, { hidePrice: true, categoryColor: "hsl(142, 70%, 35%)" }))}
             </ScrollSection>
 
             {/* Hotels */}
@@ -579,7 +580,7 @@ const Index = () => {
               onScroll={handleScroll('featuredHotels')}
               hasItems={displayHotels.length > 0} loading={loadingScrollable}
             >
-              {displayHotels.map((hotel, i) => renderCard(hotel, "HOTEL", i, { hidePrice: true }))}
+              {displayHotels.map((hotel, i) => renderCard(hotel, "HOTEL", i, { hidePrice: true, categoryColor: "hsl(220, 70%, 50%)" }))}
             </ScrollSection>
 
             {/* Trips */}
@@ -589,7 +590,7 @@ const Index = () => {
               onScroll={handleScroll('featuredTrips')}
               hasItems={displayTrips.length > 0} loading={loadingScrollable}
             >
-              {displayTrips.map((trip, i) => renderCard(trip, trip.type === "event" ? "EVENT" : "TRIP", i, { isTrip: true }))}
+              {displayTrips.map((trip, i) => renderCard(trip, trip.type === "event" ? "EVENT" : "TRIP", i, { isTrip: true, categoryColor: "hsl(25, 90%, 50%)" }))}
             </ScrollSection>
 
             {/* Events */}
@@ -599,7 +600,7 @@ const Index = () => {
               onScroll={handleScroll('featuredEvents')}
               hasItems={displayEvents.length > 0} loading={loadingScrollable}
             >
-              {displayEvents.map((event, i) => renderCard(event, "EVENT", i, { isTrip: true }))}
+              {displayEvents.map((event, i) => renderCard(event, "EVENT", i, { isTrip: true, categoryColor: "hsl(340, 75%, 50%)" }))}
             </ScrollSection>
 
             {/* Nearest */}
