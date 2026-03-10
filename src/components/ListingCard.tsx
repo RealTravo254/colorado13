@@ -219,9 +219,9 @@ const ListingCardComponent = ({
           {formattedName}
         </h3>
 
-        {/* Subtitle: activities */}
+        {/* Subtitle: activities - only show if they fit */}
         {subtitle && (
-          <p className="line-clamp-1 text-[11px] text-muted-foreground">
+          <p className="line-clamp-1 text-[11px] text-muted-foreground overflow-hidden text-ellipsis whitespace-nowrap">
             {subtitle}
           </p>
         )}

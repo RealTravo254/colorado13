@@ -309,6 +309,12 @@ const Index = () => {
       setScrollableRows({ trips: c.trips || [], hotels: c.hotels || [], attractions: c.attractions || [], campsites: c.campsites || [], events: c.events || [], accommodations: c.accommodations || [] });
       setNearbyPlacesHotels(cachedData.nearbyPlacesHotels || []);
       setLoading(false); setLoadingScrollable(false); setLoadingNearby(false);
+      // Don't re-fetch if cache is fresh (less than 5 minutes old)
+      const cacheAge = Date.now() - (cachedData.timestamp || 0);
+      if (cacheAge < 5 * 60 * 1000) {
+        getUserId().then(setUserId);
+        return;
+      }
     }
     fetchAllData();
     fetchScrollableRows(cardLimit);
