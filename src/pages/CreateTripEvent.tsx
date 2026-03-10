@@ -23,16 +23,7 @@ import { useCurrency } from "@/contexts/CurrencyContext";
 
 const COLORS = { TEAL: "#008080", CORAL: "#FF7F50", CORAL_LIGHT: "#FF9E7A", SOFT_GRAY: "#F8F9FA" };
 
-const generateUUID = (): string => {
-  if (typeof crypto !== "undefined" && crypto.randomUUID) {
-    return crypto.randomUUID();
-  }
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
-    const r = (Math.random() * 16) | 0;
-    const v = c === "x" ? r : (r & 0x3) | 0x8;
-    return v.toString(16);
-  });
-};
+// ✅ generateUUID removed — friendlySlug is now used as the primary id
 
 const generateFriendlySlug = (name: string): string => {
   const cleanName = name
@@ -70,7 +61,7 @@ const CreateTripEvent = () => {
     latitude: null as number | null, longitude: null as number | null,
     opening_hours: "00:00",
     closing_hours: "23:59",
-    flexible_duration_months: "3", // How many months from publish the flexible trip stays active
+    flexible_duration_months: "3",
   });
 
   const [workingDays, setWorkingDays] = useState<WorkingDays>({ Mon: true, Tue: true, Wed: true, Thu: true, Fri: true, Sat: true, Sun: true });
@@ -134,7 +125,7 @@ const CreateTripEvent = () => {
 
     setLoading(true);
     try {
-      const dbId = generateUUID();
+      // ✅ KEY CHANGE: friendlySlug is used as BOTH id and slug
       const friendlySlug = generateFriendlySlug(formData.name);
 
       const uploadedUrls: string[] = [];
@@ -148,7 +139,6 @@ const CreateTripEvent = () => {
 
       const daysOpened = (Object.keys(workingDays) as (keyof WorkingDays)[]).filter(day => workingDays[day]);
 
-      // Calculate flexible_end_date
       let flexibleEndDate: string | null = null;
       if (formData.is_custom_date) {
         const months = parseInt(formData.flexible_duration_months) || 3;
@@ -158,7 +148,8 @@ const CreateTripEvent = () => {
       }
 
       const { error } = await supabase.from("trips").insert([{
-        id: dbId,
+        // ✅ id is now the friendly slug (text), NOT a UUID
+        id: friendlySlug,
         slug: friendlySlug,
         name: formData.name,
         description: formData.description,
@@ -328,7 +319,9 @@ const CreateTripEvent = () => {
             </div>
             {/* Gallery */}
             <div className="pt-6 border-t border-slate-100">
-              <h3 className="text-xs font-black uppercase tracking-widest mb-4" style={{ color: COLORS.TEAL }}>Gallery (Min 5, Max 5) {galleryImages.length < 5 && <span className="text-destructive ml-1">— need {5 - galleryImages.length} more</span>}</h3>
+              <h3 className="text-xs font-black uppercase tracking-widest mb-4" style={{ color: COLORS.TEAL }}>
+                Gallery (Min 5, Max 5) {galleryImages.length < 5 && <span className="text-destructive ml-1">— need {5 - galleryImages.length} more</span>}
+              </h3>
               <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                 {galleryImages.map((file, index) => (
                   <div key={index} className="relative aspect-square rounded-[20px] overflow-hidden border-2 border-slate-100">

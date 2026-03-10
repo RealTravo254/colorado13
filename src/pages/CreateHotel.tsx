@@ -38,16 +38,7 @@ const COLORS = {
 let _idCounter = 0;
 const makeId = () => `item-${Date.now()}-${++_idCounter}`;
 
-const generateUUID = (): string => {
-  if (typeof crypto !== "undefined" && crypto.randomUUID) {
-    return crypto.randomUUID();
-  }
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
-    const r = (Math.random() * 16) | 0;
-    const v = c === "x" ? r : (r & 0x3) | 0x8;
-    return v.toString(16);
-  });
-};
+// ✅ generateUUID removed — friendlySlug is now used as the primary id
 
 const generateFriendlySlug = (name: string): string => {
   const cleanName = name
@@ -541,7 +532,6 @@ const CreateHotel = () => {
     registrationName: "", registrationNumber: "", place: "", country: "",
     description: "", email: "", phoneNumber: "", establishmentType: "hotel",
     latitude: null as number | null, longitude: null as number | null,
-    // ✅ Default to 24h — OperatingHoursSection reads "00:00"/"23:59" and shows toggle as ON
     openingHours: "00:00",
     closingHours: "23:59",
     generalBookingLink: "",
@@ -652,7 +642,7 @@ const CreateHotel = () => {
 
     setLoading(true);
     try {
-      const dbId = generateUUID();
+      // ✅ KEY CHANGE: friendlySlug is used as BOTH id and slug
       const friendlySlug = generateFriendlySlug(formData.registrationName);
 
       const compressedImages = await compressImages(galleryImages);
@@ -681,7 +671,8 @@ const CreateHotel = () => {
       const selectedDays = Object.entries(workingDays).filter(([, v]) => v).map(([k]) => k);
 
       const { error } = await supabase.from("hotels").insert([{
-        id: dbId,
+        // ✅ id is now the friendly slug (text), NOT a UUID
+        id: friendlySlug,
         slug: friendlySlug,
         created_by: user.id,
         name: formData.registrationName,
@@ -880,7 +871,6 @@ const CreateHotel = () => {
           </h2>
           <div className="space-y-8">
             <GeneralFacilitiesSelector selected={generalFacilities} onChange={setGeneralFacilities} accentColor={COLORS.TEAL} />
-
             <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-3">
               <p className="text-[10px] font-bold text-orange-500 uppercase tracking-widest">
                 Each facility must have name, capacity, price, amenities, and at least 2 photos.
@@ -894,7 +884,6 @@ const CreateHotel = () => {
                 showBookingLink={isAccommodationOnly}
               />
             </div>
-
             {!isAccommodationOnly && (
               <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100">
                 <ActivityBuilder
@@ -912,7 +901,8 @@ const CreateHotel = () => {
         <Card className={cn("bg-white rounded-[28px] p-8 shadow-sm border-none", errors.galleryImages && "ring-2 ring-red-500")}
           data-error={errors.galleryImages ? "true" : undefined}>
           <h2 className="text-xl font-black uppercase tracking-tight mb-6 flex items-center gap-2" style={{ color: COLORS.TEAL }}>
-            <Camera className="h-5 w-5" /> Property Photos * <span className="text-sm font-bold text-muted-foreground">(min 5)</span> {galleryImages.length < 5 && <span className="text-sm text-destructive">— need {5 - galleryImages.length} more</span>}
+            <Camera className="h-5 w-5" /> Property Photos * <span className="text-sm font-bold text-muted-foreground">(min 5)</span>
+            {galleryImages.length < 5 && <span className="text-sm text-destructive">— need {5 - galleryImages.length} more</span>}
           </h2>
           <div className="space-y-6">
             <div className={cn("p-6 rounded-[24px] border-2 border-dashed transition-colors",
@@ -1000,7 +990,7 @@ const CreateHotel = () => {
                 return;
               }
               setShowReview(true);
-              window.scrollTo({ top: 0, behavior: 'smooth' });
+              window.scrollTo({ top: 0, behavior: "smooth" });
             }}
               className="w-full py-6 rounded-2xl font-black uppercase text-sm text-white"
               style={{ background: COLORS.TEAL }}>
