@@ -96,7 +96,7 @@ const ListingCardComponent = ({
 
   const subtitle = useMemo(() => {
     if (activities && activities.length > 0) {
-      const names = activities.slice(0, 3).map((a: any) => typeof a === 'string' ? a : a.name);
+      const names = activities.slice(0, 2).map((a: any) => typeof a === 'string' ? a : a.name).filter(Boolean);
       return names.join(' • ');
     }
     return null;
