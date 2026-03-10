@@ -53,8 +53,8 @@ const ReviewHeader = ({ event }: { event: any }) => (
 const SELECT_FIELDS = "id,name,location,place,country,image_url,gallery_images,images,date,is_custom_date,price,price_child,available_tickets,description,activities,phone_number,email,created_by,type,opening_hours,closing_hours,days_opened,map_link,is_flexible_date";
 
 const TripDetail = () => {
-  const { slug } = useParams();
-  const id = slug ? extractIdFromSlug(slug) : null;
+  const { slug: rawSlug } = useParams();
+  const id = rawSlug ? extractIdFromSlug(rawSlug) : null;
   const navigate = useNavigate();
   const goBack = useSafeBack();
   const { user } = useAuth();
