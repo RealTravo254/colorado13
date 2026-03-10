@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { MapPin, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SimilarItemsSkeleton } from "@/components/detail/SimilarItemsSkeleton";
+import { createDetailPath } from "@/lib/slugUtils";
 import { useCurrency } from "@/contexts/CurrencyContext";
 
 const COLORS = {
