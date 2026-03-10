@@ -5,7 +5,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { SearchBarWithSuggestions } from "@/components/SearchBarWithSuggestions";
 import { useSearchFocus } from "@/components/PageLayout";
 import { ListingCard } from "@/components/ListingCard";
-import { Calendar, Hotel, Tent, Compass, MapPin, ChevronLeft, ChevronRight, Loader2, Navigation, Home } from "lucide-react";
+import { Calendar, Hotel, Tent, Compass, MapPin, ChevronLeft, ChevronRight, Loader2, Navigation, Home, Heart, Ticket, Trophy } from "lucide-react";
 import {
   AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription,
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
@@ -102,6 +102,16 @@ const CATEGORIES = [
   { icon: Calendar, title: "Trips", path: "/category/trips", color: "hsl(25, 90%, 50%)", bgClass: "bg-orange-500" },
   { icon: Compass, title: "Events", path: "/category/events", color: "hsl(340, 75%, 50%)", bgClass: "bg-rose-600" },
   { icon: Home, title: "Stays", path: "/category/accommodation", color: "hsl(270, 60%, 50%)", bgClass: "bg-purple-600" },
+];
+
+// ─── Quick navigation cards below hero ──────────────────────────────────────
+const QUICK_NAV = [
+  { icon: Calendar, title: "Trips", path: "/category/trips", color: "hsl(25, 90%, 50%)" },
+  { icon: Hotel, title: "Hotels", path: "/category/hotels", color: "hsl(220, 70%, 50%)" },
+  { icon: Trophy, title: "Events & Sports", path: "/category/events", color: "hsl(340, 75%, 50%)" },
+  { icon: Tent, title: "Adventure Places", path: "/category/campsite", color: "hsl(142, 70%, 35%)" },
+  { icon: Ticket, title: "Bookings", path: "/bookings", color: "hsl(200, 70%, 45%)" },
+  { icon: Heart, title: "Saved", path: "/saved", color: "hsl(350, 80%, 55%)" },
 ];
 
 // ─── Main component ──────────────────────────────────────────────────────────
@@ -544,8 +554,29 @@ const Index = () => {
 
         {/* ─── Browse sections ───────────────────────────────────────────── */}
         <div className={`w-full ${isSearchFocused ? 'hidden' : ''}`}>
+          {/* Quick Navigation Cards */}
+          <div className="container mx-auto px-4 md:px-6 pt-4 pb-2">
+            <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+              {QUICK_NAV.map((nav) => (
+                <button
+                  key={nav.title}
+                  onClick={() => navigate(nav.path)}
+                  className="flex flex-col items-center gap-1.5 py-3 px-2 rounded-2xl bg-card border border-border hover:shadow-md transition-all active:scale-95"
+                >
+                  <div
+                    className="h-9 w-9 rounded-xl flex items-center justify-center"
+                    style={{ backgroundColor: `${nav.color}15` }}
+                  >
+                    <nav.icon className="h-4.5 w-4.5" style={{ color: nav.color, width: 18, height: 18 }} />
+                  </div>
+                  <span className="text-[10px] font-bold text-foreground leading-tight text-center">{nav.title}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* View toggle */}
-          <div className="container mx-auto px-4 md:px-6 pt-4 pb-2 md:pt-5 md:pb-3">
+          <div className="container mx-auto px-4 md:px-6 pt-2 pb-2 md:pt-5 md:pb-3">
             <div className="flex items-center gap-1 bg-muted rounded-full p-1 w-fit">
               <button
                 onClick={() => setListingViewMode('top_destinations')}
