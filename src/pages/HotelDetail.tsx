@@ -309,13 +309,9 @@ const HotelDetail = () => {
                         <Badge className="bg-purple-500 text-white border-none px-3 py-1 text-[10px] font-black uppercase rounded-full shadow-lg">Accommodation</Badge>
                       ) : (
                         <Badge className="bg-amber-400 text-black border-none px-3 py-1 text-[10px] font-black uppercase rounded-full flex items-center gap-1.5 shadow-lg">
-                          <Star className="h-3.5 w-3.5 fill-current" />{liveRating.avg > 0 ? liveRating.avg : "New"}
+                          <Star className="h-3.5 w-3.5 fill-current" />{liveRating.avg > 0 ? liveRating.avg : "—"}
                         </Badge>
                       )}
-                      <Badge className={`${isOpenNow ? "bg-emerald-500" : "bg-red-500"} text-white border-none px-3 py-1 text-[10px] font-black uppercase rounded-full flex items-center gap-1.5`}>
-                        <Circle className={`h-2.5 w-2.5 fill-current ${isOpenNow ? "animate-pulse" : ""}`} />
-                        {isOpenNow ? "open now" : "closed"}
-                      </Badge>
                     </div>
                     <h1 className="text-3xl font-black text-white uppercase tracking-tighter leading-none">{hotel.name}</h1>
                     <div className="flex items-center gap-2 text-white">
