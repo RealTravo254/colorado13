@@ -578,4 +578,4 @@ const UtilityButton = ({ icon, label, onClick }: { icon: React.ReactNode; label:
   </Button>
 );
 
-export default AdventurePlaceDetail;
+export default AdventurePlaceDetail; 
