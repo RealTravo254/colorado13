@@ -121,44 +121,42 @@ const AdventurePlaceDetail = () => {
     try {
       let data: any = null;
 
-      // 1. Try extracted ID as UUID
-      if (id) {
+      // adventure_places uses text IDs (friendly slugs), so try multiple lookups
+      const candidates = [...new Set([id, rawSlug].filter(Boolean))] as string[];
+
+      for (const candidate of candidates) {
+        if (data) break;
+
+        // Try as id (text field - could be friendly slug like "place-name-XXXX")
         const { data: byId } = await supabase
           .from("adventure_places")
           .select("*")
-          .eq("id", id)
+          .eq("id", candidate)
           .maybeSingle();
-        if (byId) data = byId;
-      }
+        if (byId) { data = byId; break; }
 
-      // 2. Try rawSlug as UUID id (in case extractIdFromSlug strips too much)
-      if (!data && rawSlug !== id) {
-        const { data: byRawId } = await supabase
-          .from("adventure_places")
-          .select("*")
-          .eq("id", rawSlug)
-          .maybeSingle();
-        if (byRawId) data = byRawId;
-      }
-
-      // 3. Try rawSlug as slug column
-      if (!data) {
+        // Try as slug column
         const { data: bySlug } = await supabase
           .from("adventure_places")
           .select("*")
-          .eq("slug", rawSlug)
+          .eq("slug", candidate)
           .maybeSingle();
-        if (bySlug) data = bySlug;
+        if (bySlug) { data = bySlug; break; }
       }
 
-      // 4. Try extracted id as slug column
-      if (!data && id && id !== rawSlug) {
-        const { data: byExtractedSlug } = await supabase
+      // 5. Last resort: the URL slug may contain the text ID embedded
+      // e.g., URL is "place-name-location-place-name-XXXX" where actual id is "place-name-XXXX"
+      // Try partial match using ilike on id
+      if (!data && rawSlug) {
+        const { data: byPartial } = await supabase
           .from("adventure_places")
           .select("*")
-          .eq("slug", id)
-          .maybeSingle();
-        if (byExtractedSlug) data = byExtractedSlug;
+          .filter("id", "neq", "")
+          .limit(100);
+        if (byPartial) {
+          // Find an item whose id is contained within the rawSlug
+          data = byPartial.find(item => rawSlug.endsWith(item.id) || rawSlug.includes(item.id)) || null;
+        }
       }
 
       if (!data) throw new Error("Not found");
@@ -166,7 +164,6 @@ const AdventurePlaceDetail = () => {
     } catch (error) {
       console.error("AdventurePlaceDetail fetch error:", error, { rawSlug, id });
       toast({ title: "Place not found", variant: "destructive" });
-      // Removed navigate("/") so the error is visible and not immediately redirected
     } finally {
       setLoading(false);
     }

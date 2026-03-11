@@ -170,7 +170,7 @@ const TripDetail = () => {
   const eventDate = event.date ? new Date(event.date) : null;
   const isExpired = !event.is_custom_date && eventDate && eventDate < today;
   const canBook = !isExpired && !isSoldOut;
-  const allImages = [event?.image_url, ...(event?.images || [])].filter(Boolean);
+  const allImages = [event?.image_url, ...(event?.gallery_images || []), ...(event?.images || [])].filter((v, i, a) => Boolean(v) && a.indexOf(v) === i);
 
   return (
     <div className="min-h-screen bg-background pb-24">
