@@ -1,5 +1,4 @@
 // Fallback type declarations for packages whose types may not be resolved
-// Only declare modules that don't already have types installed
 
 declare module 'leaflet/dist/images/marker-icon-2x.png' {
   const src: string;
@@ -28,13 +27,8 @@ declare module 'i18next-browser-languagedetector' {
   export default LanguageDetector;
 }
 declare module 'mapbox-gl' {
-  namespace mapboxgl {
-    class Map { constructor(options: any); remove(): void; on(event: string, handler: any): void; resize(): void; fitBounds(bounds: any, options?: any): void; }
-    class Marker { constructor(options?: any); setLngLat(lnglat: any): Marker; addTo(map: Map): Marker; remove(): void; getElement(): HTMLElement; }
-    class LngLatBounds { constructor(); extend(lnglat: any): LngLatBounds; }
-    let accessToken: string;
-  }
-  export = mapboxgl;
+  const mapboxgl: any;
+  export default mapboxgl;
   export as namespace mapboxgl;
 }
 declare module 'qrcode.react' {
@@ -43,18 +37,8 @@ declare module 'qrcode.react' {
   export const QRCodeSVG: any;
 }
 declare module 'leaflet' {
-  namespace L {
-    class Map { remove(): void; setView(center: any, zoom: number): Map; }
-    class Icon { static Default: any; }
-    function map(element: any, options?: any): Map;
-    function tileLayer(url: string, options?: any): any;
-    function marker(latlng: any, options?: any): any;
-    function icon(options: any): any;
-    function divIcon(options: any): any;
-    function latLng(lat: number, lng: number): any;
-    function latLngBounds(corner1: any, corner2: any): any;
-  }
-  export = L;
+  const L: any;
+  export default L;
   export as namespace L;
 }
 declare module '@capacitor/core' {
