@@ -271,7 +271,7 @@ const HotelDetail = () => {
                   <Badge className="bg-purple-500 text-white border-none px-2 py-0.5 text-[9px] font-black uppercase rounded-full shadow-lg">Accommodation</Badge>
                 ) : (
                   <Badge className="bg-amber-400 text-black border-none px-2 py-0.5 text-[9px] font-black uppercase rounded-full flex items-center gap-1 shadow-lg">
-                    <Star className="h-3 w-3 fill-current" />{liveRating.avg > 0 ? liveRating.avg : "New"}
+                    <Star className="h-3 w-3 fill-current" />{liveRating.avg > 0 ? liveRating.avg : "—"}
                   </Badge>
                 )}
               </div>
