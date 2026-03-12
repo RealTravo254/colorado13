@@ -11,7 +11,7 @@ import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { Calendar, MapPin, DollarSign, Users, Navigation, ArrowLeft, Camera, CheckCircle2, X, Loader2 } from "lucide-react";
+import { Calendar, MapPin, DollarSign, Users, Navigation, ArrowLeft, Camera, CheckCircle2, X, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CountrySelector } from "@/components/creation/CountrySelector";
 import { PhoneInput } from "@/components/creation/PhoneInput";
@@ -19,17 +19,13 @@ import { approvalStatusSchema } from "@/lib/validation";
 import { ReviewStep } from "@/components/creation/ReviewStep";
 import { compressImages } from "@/lib/imageCompression";
 import { OperatingHoursSection } from "@/components/creation/OperatingHoursSection";
+import { CreateFormStepper } from "@/components/creation/CreateFormStepper";
 import { useCurrency } from "@/contexts/CurrencyContext";
 
 const COLORS = { TEAL: "#008080", CORAL: "#FF7F50", CORAL_LIGHT: "#FF9E7A", SOFT_GRAY: "#F8F9FA" };
 
 const generateFriendlySlug = (name: string): string => {
-  const cleanName = name
-    .toLowerCase().trim()
-    .replace(/[^a-z0-9\s-]/g, "")
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-")
-    .substring(0, 30);
+  const cleanName = name.toLowerCase().trim().replace(/[^a-z0-9\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-").substring(0, 30);
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   let code = "";
   for (let i = 0; i < 4; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
@@ -42,6 +38,8 @@ const StyledInput = ({ className = "", isInvalid = false, ...props }: React.Comp
 
 interface WorkingDays { Mon: boolean; Tue: boolean; Wed: boolean; Thu: boolean; Fri: boolean; Sat: boolean; Sun: boolean; }
 
+const STEP_NAMES = ["Basic Info", "Date & Pricing", "Contact & Photos", "Schedule", "Review"];
+
 const CreateTripEvent = () => {
   const navigate = useNavigate();
   const goBack = useSafeBack("/become-host");
@@ -50,43 +48,14 @@ const CreateTripEvent = () => {
   const { usdHint } = useCurrency();
   const [loading, setLoading] = useState(false);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
-  const [showReview, setShowReview] = useState(false);
-
-  // ✅ Refs for scrolling to error fields
-  const refs = {
-    name: useRef<HTMLDivElement>(null),
-    country: useRef<HTMLDivElement>(null),
-    place: useRef<HTMLDivElement>(null),
-    location: useRef<HTMLDivElement>(null),
-    date: useRef<HTMLDivElement>(null),
-    price: useRef<HTMLDivElement>(null),
-    available_tickets: useRef<HTMLDivElement>(null),
-    phone_number: useRef<HTMLDivElement>(null),
-    description: useRef<HTMLDivElement>(null),
-    gallery: useRef<HTMLDivElement>(null),
-  };
-
-  const scrollToFirstError = (errors: string[]) => {
-    const order = ["name", "country", "place", "location", "date", "price", "available_tickets", "phone_number", "gallery", "description"];
-    for (const field of order) {
-      if (errors.includes(field)) {
-        const ref = refs[field as keyof typeof refs];
-        if (ref?.current) {
-          ref.current.scrollIntoView({ behavior: "smooth", block: "center" });
-          break;
-        }
-      }
-    }
-  };
+  const [currentStep, setCurrentStep] = useState(1);
 
   const [formData, setFormData] = useState({
     name: "", description: "", location: "", place: "", country: "", date: "",
     price: "0", price_child: "0", available_tickets: "0", email: "", phone_number: "",
     map_link: "", is_custom_date: false, type: "trip" as "trip" | "event",
     latitude: null as number | null, longitude: null as number | null,
-    opening_hours: "00:00",
-    closing_hours: "23:59",
-    flexible_duration_months: "3",
+    opening_hours: "00:00", closing_hours: "23:59", flexible_duration_months: "3",
   });
 
   const [workingDays, setWorkingDays] = useState<WorkingDays>({ Mon: true, Tue: true, Wed: true, Thu: true, Fri: true, Sat: true, Sun: true });
@@ -103,13 +72,63 @@ const CreateTripEvent = () => {
     fetchUserProfile();
   }, [user]);
 
+  // Step validation
+  const isStep1Complete = !!formData.name.trim() && !!formData.country && !!formData.place.trim() && !!formData.location.trim();
+  const isStep2Complete = (formData.is_custom_date || !!formData.date) && parseFloat(formData.price) >= 0 && parseInt(formData.available_tickets) > 0;
+  const isStep3Complete = !!formData.phone_number && galleryImages.length >= 5;
+  const isStep4Complete = !!formData.description.trim();
+
+  const steps = [
+    { name: STEP_NAMES[0], isComplete: isStep1Complete },
+    { name: STEP_NAMES[1], isComplete: isStep2Complete },
+    { name: STEP_NAMES[2], isComplete: isStep3Complete },
+    { name: STEP_NAMES[3], isComplete: isStep4Complete },
+    { name: STEP_NAMES[4], isComplete: isStep1Complete && isStep2Complete && isStep3Complete && isStep4Complete },
+  ];
+
+  const validateCurrentStep = (): string[] => {
+    const errors: string[] = [];
+    if (currentStep === 1) {
+      if (!formData.name.trim()) errors.push("name");
+      if (!formData.country) errors.push("country");
+      if (!formData.place.trim()) errors.push("place");
+      if (!formData.location.trim()) errors.push("location");
+    } else if (currentStep === 2) {
+      if (!formData.is_custom_date && !formData.date) errors.push("date");
+      if (!formData.price || parseFloat(formData.price) < 0) errors.push("price");
+      if (!formData.available_tickets || parseInt(formData.available_tickets) <= 0) errors.push("available_tickets");
+    } else if (currentStep === 3) {
+      if (!formData.phone_number) errors.push("phone_number");
+      if (galleryImages.length < 5) errors.push("gallery");
+    } else if (currentStep === 4) {
+      if (!formData.description.trim()) errors.push("description");
+    }
+    return errors;
+  };
+
+  const handleNext = () => {
+    const errors = validateCurrentStep();
+    setValidationErrors(errors);
+    if (errors.length > 0) {
+      toast({ title: "Complete this step", description: `${errors.length} field(s) need attention`, variant: "destructive" });
+      return;
+    }
+    setCurrentStep(prev => Math.min(prev + 1, 5));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handlePrev = () => {
+    setValidationErrors([]);
+    setCurrentStep(prev => Math.max(prev - 1, 1));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const getCurrentLocation = () => {
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
           const mapUrl = `https://www.google.com/maps?q=${pos.coords.latitude},${pos.coords.longitude}`;
           setFormData(prev => ({ ...prev, map_link: mapUrl, latitude: pos.coords.latitude, longitude: pos.coords.longitude }));
-          setValidationErrors(prev => prev.filter(e => e !== 'map_link'));
           toast({ title: "Location Added", description: "Current location pinned." });
         },
         () => toast({ title: "Error", description: "Unable to get location.", variant: "destructive" })
@@ -124,7 +143,6 @@ const CreateTripEvent = () => {
       const compressed = await compressImages(newFiles);
       const updated = [...galleryImages, ...compressed.map(c => c.file)].slice(0, 5);
       setGalleryImages(updated);
-      // ✅ Clear gallery error as soon as 5 images are selected
       if (updated.length >= 5) setValidationErrors(prev => prev.filter(e => e !== "gallery"));
     } catch {
       const updated = [...galleryImages, ...newFiles].slice(0, 5);
@@ -135,53 +153,30 @@ const CreateTripEvent = () => {
 
   const removeImage = (index: number) => setGalleryImages(prev => prev.filter((_, i) => i !== index));
 
-  const validate = () => {
-    const errors: string[] = [];
-    if (!formData.name.trim()) errors.push("name");
-    if (!formData.country) errors.push("country");
-    if (!formData.place.trim()) errors.push("place");
-    if (!formData.location.trim()) errors.push("location");
-    if (!formData.is_custom_date && !formData.date) errors.push("date");
-    if (!formData.price || parseFloat(formData.price) < 0) errors.push("price");
-    if (!formData.available_tickets || parseInt(formData.available_tickets) <= 0) errors.push("available_tickets");
-    if (!formData.phone_number) errors.push("phone_number");
-    if (!formData.description.trim()) errors.push("description");
-    if (galleryImages.length < 5) errors.push("gallery");
-    return errors;
-  };
-
-  const handleReview = () => {
-    const errors = validate();
-    setValidationErrors(errors);
-    if (errors.length > 0) {
-      toast({
-        title: `${errors.length} field${errors.length > 1 ? "s" : ""} need${errors.length === 1 ? "s" : ""} attention`,
-        description: errors.includes("gallery")
-          ? `Upload ${5 - galleryImages.length} more photo${5 - galleryImages.length > 1 ? "s" : ""} + fill all marked fields.`
-          : "Please fill in all highlighted fields.",
-        variant: "destructive",
-      });
-      setTimeout(() => scrollToFirstError(errors), 100);
-      return;
-    }
-    setShowReview(true);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
   const handleSubmit = async () => {
     if (!user) { navigate("/auth"); return; }
-    const errors = validate();
-    setValidationErrors(errors);
-    if (errors.length > 0) {
-      toast({ title: "Required Fields", description: "Please fill in all marked fields.", variant: "destructive" });
-      setTimeout(() => scrollToFirstError(errors), 100);
+    // Validate all steps
+    const allErrors: string[] = [];
+    if (!formData.name.trim()) allErrors.push("name");
+    if (!formData.country) allErrors.push("country");
+    if (!formData.place.trim()) allErrors.push("place");
+    if (!formData.location.trim()) allErrors.push("location");
+    if (!formData.is_custom_date && !formData.date) allErrors.push("date");
+    if (!formData.price || parseFloat(formData.price) < 0) allErrors.push("price");
+    if (!formData.available_tickets || parseInt(formData.available_tickets) <= 0) allErrors.push("available_tickets");
+    if (!formData.phone_number) allErrors.push("phone_number");
+    if (!formData.description.trim()) allErrors.push("description");
+    if (galleryImages.length < 5) allErrors.push("gallery");
+
+    if (allErrors.length > 0) {
+      setValidationErrors(allErrors);
+      toast({ title: "Missing Fields", description: "Please complete all steps.", variant: "destructive" });
       return;
     }
 
     setLoading(true);
     try {
       const friendlySlug = generateFriendlySlug(formData.name);
-
       const uploadedUrls: string[] = [];
       for (const file of galleryImages) {
         const fileName = `${user.id}/${Math.random()}.${file.name.split('.').pop()}`;
@@ -192,7 +187,6 @@ const CreateTripEvent = () => {
       }
 
       const daysOpened = (Object.keys(workingDays) as (keyof WorkingDays)[]).filter(day => workingDays[day]);
-
       let flexibleEndDate: string | null = null;
       if (formData.is_custom_date) {
         const months = parseInt(formData.flexible_duration_months) || 3;
@@ -202,40 +196,23 @@ const CreateTripEvent = () => {
       }
 
       const { error } = await supabase.from("trips").insert([{
-        id: friendlySlug,
-        slug: friendlySlug,
-        name: formData.name,
-        description: formData.description,
-        location: formData.location,
-        place: formData.place,
-        country: formData.country,
+        id: friendlySlug, slug: friendlySlug,
+        name: formData.name, description: formData.description, location: formData.location,
+        place: formData.place, country: formData.country,
         date: formData.is_custom_date ? new Date().toISOString().split('T')[0] : formData.date,
-        is_custom_date: formData.is_custom_date,
-        is_flexible_date: formData.is_custom_date,
-        type: formData.type,
-        image_url: uploadedUrls[0] || "",
-        gallery_images: uploadedUrls,
-        price: parseFloat(formData.price),
-        price_child: parseFloat(formData.price_child) || 0,
+        is_custom_date: formData.is_custom_date, is_flexible_date: formData.is_custom_date,
+        type: formData.type, image_url: uploadedUrls[0] || "", gallery_images: uploadedUrls,
+        price: parseFloat(formData.price), price_child: parseFloat(formData.price_child) || 0,
         available_tickets: parseInt(formData.available_tickets) || 0,
-        email: formData.email,
-        phone_number: formData.phone_number,
-        map_link: formData.map_link,
-        opening_hours: formData.opening_hours || null,
-        closing_hours: formData.closing_hours || null,
+        email: formData.email, phone_number: formData.phone_number, map_link: formData.map_link,
+        opening_hours: formData.opening_hours || null, closing_hours: formData.closing_hours || null,
         days_opened: daysOpened.length > 0 ? daysOpened : null,
-        created_by: user.id,
-        approval_status: approvalStatusSchema.parse("pending"),
+        created_by: user.id, approval_status: approvalStatusSchema.parse("pending"),
         flexible_end_date: flexibleEndDate,
       }]);
 
       if (error) throw error;
-
-      toast({
-        title: "Success!",
-        description: `Ref: ${friendlySlug} — Submitted for approval.`,
-        duration: 5000,
-      });
+      toast({ title: "Success!", description: `Ref: ${friendlySlug} — Submitted for approval.`, duration: 5000 });
       navigate("/become-host");
     } catch (error: any) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
@@ -246,276 +223,272 @@ const CreateTripEvent = () => {
     <div className="min-h-screen bg-[#F8F9FA] pb-24">
       <Header />
       <main className="container px-4 py-8 mx-auto">
-        <div className="relative rounded-[40px] overflow-hidden mb-8 shadow-2xl h-[200px] md:h-[280px]">
+        {/* Hero */}
+        <div className="relative rounded-[40px] overflow-hidden mb-6 shadow-2xl h-[160px] md:h-[220px]">
           <img src="/images/category-trips.webp" className="w-full h-full object-cover" alt="Header" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-8">
-            <Button onClick={goBack} className="absolute top-6 left-6 rounded-full bg-white/20 backdrop-blur-md border-none w-10 h-10 p-0 text-white"><ArrowLeft className="h-5 w-5" /></Button>
-            <h1 className="text-3xl md:text-5xl font-black text-white uppercase tracking-tighter">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-6">
+            <Button onClick={goBack} className="absolute top-4 left-4 rounded-full bg-white/20 backdrop-blur-md border-none w-10 h-10 p-0 text-white"><ArrowLeft className="h-5 w-5" /></Button>
+            <h1 className="text-2xl md:text-4xl font-black text-white uppercase tracking-tighter">
               Create <span style={{ color: COLORS.TEAL }}>Experience</span>
             </h1>
+            <p className="text-white/70 text-xs font-bold mt-1">Step {currentStep} of {STEP_NAMES.length}</p>
           </div>
         </div>
 
+        {/* Step Indicator */}
+        <CreateFormStepper steps={steps} currentStep={currentStep} />
+
         <div className="space-y-6">
-          {/* Type Selection */}
-          <Card className="bg-white rounded-[32px] p-8 shadow-sm border border-slate-100">
-            <h2 className="text-xs font-black uppercase tracking-widest mb-6" style={{ color: COLORS.TEAL }}>Select Listing Type</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {[{ id: 'trip', label: 'Trip / Tour', sub: 'Flexible or fixed multi-day adventures' }, { id: 'event', label: 'Event / Sport', sub: 'Fixed date single sessions or matches' }].map((type) => (
-                <label key={type.id} className={`relative p-6 rounded-[24px] border-2 cursor-pointer transition-all ${formData.type === type.id ? 'border-[#008080] bg-[#008080]/5' : 'border-slate-100 bg-slate-50 hover:bg-white'}`}>
-                  <input type="radio" name="type" value={type.id} className="hidden" onChange={(e) => setFormData({...formData, type: e.target.value as any})} />
-                  <div className="flex justify-between items-start">
-                    <div><span className={`block font-black uppercase tracking-tight text-sm ${formData.type === type.id ? 'text-[#008080]' : 'text-slate-600'}`}>{type.label}</span><span className="text-[10px] font-bold text-slate-400 uppercase mt-1 block">{type.sub}</span></div>
-                    {formData.type === type.id && <CheckCircle2 className="h-5 w-5 text-[#008080]" />}
-                  </div>
-                </label>
-              ))}
-            </div>
-          </Card>
-
-          {/* Experience Details */}
-          <Card className="bg-white rounded-[32px] p-8 shadow-sm border border-slate-100 space-y-6">
-            <h2 className="text-xs font-black uppercase tracking-widest" style={{ color: COLORS.TEAL }}>Experience Details</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div ref={refs.name} className="space-y-2 md:col-span-2">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Experience Name *</Label>
-                <StyledInput isInvalid={validationErrors.includes("name")} value={formData.name} onChange={(e) => { setFormData({...formData, name: e.target.value}); if(e.target.value) setValidationErrors(prev => prev.filter(err => err !== "name")); }} placeholder="e.g. Hiking in the Clouds" />
-                {validationErrors.includes("name") && <p className="text-red-500 text-[10px] font-bold">⚠ Experience name is required</p>}
-              </div>
-              <div ref={refs.country} className="space-y-2">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Country *</Label>
-                <div className={validationErrors.includes("country") ? "rounded-xl ring-1 ring-red-500" : ""}><CountrySelector value={formData.country} onChange={(val) => { setFormData({...formData, country: val}); setValidationErrors(prev => prev.filter(err => err !== "country")); }} /></div>
-                {validationErrors.includes("country") && <p className="text-red-500 text-[10px] font-bold">⚠ Country is required</p>}
-              </div>
-              <div ref={refs.place} className="space-y-2">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Region / Place *</Label>
-                <div className="relative"><MapPin className="absolute left-4 top-3.5 h-4 w-4 text-slate-400" /><StyledInput isInvalid={validationErrors.includes("place")} className="pl-11" value={formData.place} onChange={(e) => { setFormData({...formData, place: e.target.value}); if(e.target.value) setValidationErrors(prev => prev.filter(err => err !== "place")); }} placeholder="e.g. Mt. Kenya Region" /></div>
-                {validationErrors.includes("place") && <p className="text-red-500 text-[10px] font-bold">⚠ Region/Place is required</p>}
-              </div>
-              <div ref={refs.location} className="space-y-2 md:col-span-2">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Specific Location *</Label>
-                <StyledInput isInvalid={validationErrors.includes("location")} value={formData.location} onChange={(e) => { setFormData({...formData, location: e.target.value}); if(e.target.value) setValidationErrors(prev => prev.filter(err => err !== "location")); }} placeholder="e.g. Nanyuki Main Gate" />
-                {validationErrors.includes("location") && <p className="text-red-500 text-[10px] font-bold">⚠ Specific location is required</p>}
-              </div>
-            </div>
-            <div ref={refs.date} className="space-y-4 pt-4 border-t border-slate-50">
-              <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Date Settings *</Label>
-              {formData.type === "trip" && (
-                <div className="flex items-center space-x-3 bg-slate-50 p-4 rounded-2xl">
-                  <Checkbox id="custom_date" checked={formData.is_custom_date} onCheckedChange={(checked) => setFormData({...formData, is_custom_date: checked as boolean})} />
-                  <label htmlFor="custom_date" className="text-[11px] font-black uppercase tracking-tight text-slate-500 cursor-pointer">Flexible dates - Open availability</label>
-                </div>
-              )}
-              {formData.is_custom_date && (
-                <div className="space-y-3 bg-slate-50 p-4 rounded-2xl">
-                  <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Listing Duration (from publish date) *</Label>
-                  <p className="text-[10px] text-slate-400">Choose how long this flexible trip will be available for booking. Maximum 12 months.</p>
-                  <div className="grid grid-cols-4 gap-2">
-                    {[1, 2, 3, 4, 5, 6, 9, 12].map((months) => (
-                      <button
-                        key={months}
-                        type="button"
-                        onClick={() => setFormData({...formData, flexible_duration_months: String(months)})}
-                        className={`p-3 rounded-xl text-center transition-all font-black text-xs uppercase tracking-tight ${
-                          formData.flexible_duration_months === String(months)
-                            ? 'bg-[#008080] text-white shadow-lg'
-                            : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'
-                        }`}
-                      >
-                        {months} {months === 1 ? 'Month' : 'Months'}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {!formData.is_custom_date && (
-                <>
-                  <div className="relative"><Calendar className="absolute left-4 top-3.5 h-4 w-4 text-slate-400" /><StyledInput isInvalid={validationErrors.includes("date")} type="date" className="pl-11" min={new Date().toISOString().split('T')[0]} value={formData.date} onChange={(e) => { setFormData({...formData, date: e.target.value}); if(e.target.value) setValidationErrors(prev => prev.filter(err => err !== "date")); }} /></div>
-                  {validationErrors.includes("date") && <p className="text-red-500 text-[10px] font-bold">⚠ Please select a date</p>}
-                </>
-              )}
-            </div>
-          </Card>
-
-          {/* Pricing */}
-          <Card className="bg-white rounded-[32px] p-8 shadow-sm border border-slate-100">
-            <h2 className="text-xs font-black uppercase tracking-widest mb-6" style={{ color: COLORS.TEAL }}>Pricing & Logistics</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div ref={refs.price} className="space-y-2">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Adult Price (KSh) *</Label>
-                <div className="relative"><DollarSign className="absolute left-4 top-3.5 h-4 w-4 text-slate-400" /><StyledInput isInvalid={validationErrors.includes("price")} type="number" className="pl-11" value={formData.price} onChange={(e) => { setFormData({...formData, price: e.target.value}); if(e.target.value && parseFloat(e.target.value) >= 0) setValidationErrors(prev => prev.filter(err => err !== "price")); }} /></div>
-                {parseFloat(formData.price) > 0 && <p className="text-[9px] text-blue-500 font-bold mt-0.5">{usdHint(parseFloat(formData.price))}</p>}
-                {validationErrors.includes("price") && <p className="text-red-500 text-[10px] font-bold">⚠ Enter a valid price</p>}
-              </div>
-              <div className="space-y-2">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Child Price (KSh)</Label>
-                <div className="relative"><DollarSign className="absolute left-4 top-3.5 h-4 w-4 text-slate-400" /><StyledInput type="number" className="pl-11" value={formData.price_child} onChange={(e) => setFormData({...formData, price_child: e.target.value})} /></div>
-                {parseFloat(formData.price_child) > 0 && <p className="text-[9px] text-blue-500 font-bold mt-0.5">{usdHint(parseFloat(formData.price_child))}</p>}
-              </div>
-              <div ref={refs.available_tickets} className="space-y-2">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Max Slots *</Label>
-                <div className="relative"><Users className="absolute left-4 top-3.5 h-4 w-4 text-slate-400" /><StyledInput isInvalid={validationErrors.includes("available_tickets")} type="number" className="pl-11" value={formData.available_tickets} onChange={(e) => { setFormData({...formData, available_tickets: e.target.value}); if(e.target.value && parseInt(e.target.value) > 0) setValidationErrors(prev => prev.filter(err => err !== "available_tickets")); }} /></div>
-                {validationErrors.includes("available_tickets") && <p className="text-red-500 text-[10px] font-bold">⚠ Enter number of slots (min 1)</p>}
-              </div>
-            </div>
-          </Card>
-
-          {/* Contact & GPS */}
-          <Card className="bg-white rounded-[32px] p-8 shadow-sm border border-slate-100 space-y-6">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2.5 rounded-xl" style={{ backgroundColor: `${COLORS.TEAL}15` }}>
-                <MapPin className="h-5 w-5" style={{ color: COLORS.TEAL }} />
-              </div>
-              <div>
-                <h2 className="text-sm font-black uppercase tracking-tight" style={{ color: COLORS.TEAL }}>Contact & GPS Location</h2>
-                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">How guests can reach you</p>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2 bg-slate-50/80 rounded-2xl p-4">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#008080]" /> Contact Email
-                </Label>
-                <StyledInput type="email" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} placeholder="contact@example.com" />
-              </div>
-              <div ref={refs.phone_number} className="space-y-2 bg-slate-50/80 rounded-2xl p-4">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#FF7F50]" /> Contact Phone *
-                </Label>
-                <div className={validationErrors.includes("phone_number") ? "rounded-xl ring-1 ring-red-500" : ""}><PhoneInput value={formData.phone_number} onChange={(val) => { setFormData({...formData, phone_number: val}); if(val) setValidationErrors(prev => prev.filter(err => err !== "phone_number")); }} country={formData.country} placeholder="712345678" /></div>
-                {validationErrors.includes("phone_number") && <p className="text-red-500 text-[10px] font-bold">⚠ Phone number is required</p>}
-              </div>
-            </div>
-            <div className="p-4 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/50">
-              <Button type="button" onClick={getCurrentLocation} className="w-full h-14 rounded-2xl shadow-lg font-black uppercase text-[11px] tracking-widest text-white active:scale-95 transition-all" style={{ background: formData.map_link ? COLORS.TEAL : COLORS.CORAL }}>
-                <Navigation className="h-5 w-5 mr-3" />{formData.map_link ? '✓ Location Captured' : 'Tap to Capture GPS Location'}
-              </Button>
-            </div>
-
-            {/* ✅ Gallery — now with visible error state and ref for scroll */}
-            <div ref={refs.gallery} className={`pt-6 border-t transition-all ${validationErrors.includes("gallery") ? "border-red-300" : "border-slate-100"}`}>
-              <h3 className={`text-xs font-black uppercase tracking-widest mb-2 ${validationErrors.includes("gallery") ? "text-red-500" : ""}`} style={validationErrors.includes("gallery") ? {} : { color: COLORS.TEAL }}>
-                Photos * — {galleryImages.length}/5 uploaded
-                {galleryImages.length < 5 && (
-                  <span className="text-red-500 ml-1">— {5 - galleryImages.length} more needed</span>
-                )}
-              </h3>
-
-              {validationErrors.includes("gallery") && (
-                <div className="mb-4 px-4 py-3 bg-red-50 border border-red-300 rounded-2xl flex items-center gap-2">
-                  <span className="text-red-500 text-lg">⚠</span>
-                  <p className="text-red-600 text-xs font-bold uppercase tracking-wide">
-                    You need exactly 5 photos. Please upload {5 - galleryImages.length} more photo{5 - galleryImages.length > 1 ? "s" : ""} to continue.
-                  </p>
-                </div>
-              )}
-
-              <div className={`grid grid-cols-2 md:grid-cols-5 gap-4 p-4 rounded-2xl transition-all ${validationErrors.includes("gallery") ? "ring-2 ring-red-400 bg-red-50/20" : "bg-slate-50/30"}`}>
-                {galleryImages.map((file, index) => (
-                  <div key={index} className="relative aspect-square rounded-[20px] overflow-hidden border-2 border-slate-100">
-                    <img src={URL.createObjectURL(file)} className="w-full h-full object-cover" alt="Preview" />
-                    <button type="button" onClick={() => removeImage(index)} className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full shadow-lg"><X className="h-3 w-3" /></button>
-                  </div>
-                ))}
-                {galleryImages.length < 5 && (
-                  <Label className={`aspect-square rounded-[20px] border-2 border-dashed flex flex-col items-center justify-center cursor-pointer hover:bg-white transition-all ${validationErrors.includes("gallery") ? "border-red-400 bg-red-50" : "border-slate-200 hover:bg-slate-50"}`}>
-                    <Camera className={`h-6 w-6 ${validationErrors.includes("gallery") ? "text-red-400" : "text-slate-400"}`} />
-                    <span className={`text-[9px] font-bold mt-1 uppercase tracking-wide ${validationErrors.includes("gallery") ? "text-red-400" : "text-slate-400"}`}>
-                      Add Photo
-                    </span>
-                    <Input type="file" multiple className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e.target.files)} />
-                  </Label>
-                )}
-              </div>
-            </div>
-          </Card>
-
-          {/* Operating Hours — always shown for all listing types */}
-          <Card className="bg-white rounded-[32px] p-8 shadow-sm border border-slate-100">
-            <h2 className="text-xs font-black uppercase tracking-widest mb-6" style={{ color: COLORS.TEAL }}>
-              {formData.type === "event" ? "Event Hours *" : "Operating Hours & Days *"}
-            </h2>
-            <OperatingHoursSection
-              openingHours={formData.opening_hours}
-              closingHours={formData.closing_hours}
-              workingDays={workingDays}
-              onOpeningChange={(v) => setFormData({...formData, opening_hours: v})}
-              onClosingChange={(v) => setFormData({...formData, closing_hours: v})}
-              onDaysChange={setWorkingDays}
-              accentColor={COLORS.TEAL}
-              hideDays={formData.type === "event"}
-              hide24HourToggle={true}
-            />
-          </Card>
-
-          {/* Description */}
-          <Card ref={refs.description} className="bg-white rounded-[32px] p-8 shadow-sm border border-slate-100">
-            <Label className="text-xs font-black uppercase tracking-widest mb-4 block" style={{ color: COLORS.TEAL }}>Experience Description *</Label>
-            <Textarea className={`rounded-[24px] border-slate-100 bg-slate-50 p-6 min-h-[200px] focus:ring-[#008080] text-sm ${validationErrors.includes("description") ? "border-red-500 ring-1 ring-red-500" : ""}`} value={formData.description} onChange={(e) => {
-              const words = e.target.value.trim().split(/\s+/);
-              if (e.target.value.trim() === "" || words.length <= 20) {
-                setFormData({...formData, description: e.target.value});
-              }
-              if (e.target.value.trim()) setValidationErrors(prev => prev.filter(err => err !== "description"));
-            }} placeholder="Describe in 20 words or less..." />
-            <p className="text-xs text-muted-foreground mt-1">
-              {formData.description.trim() ? formData.description.trim().split(/\s+/).length : 0}/20 words
-            </p>
-            {validationErrors.includes("description") && <p className="text-red-500 text-[10px] font-bold mt-1">⚠ Description is required</p>}
-          </Card>
-
-          {/* Review & Submit */}
-          {!showReview ? (
-            <div className="mb-8">
-              <Button type="button" onClick={handleReview}
-                className="w-full py-6 rounded-2xl font-black uppercase tracking-widest text-sm text-white"
-                style={{ background: `linear-gradient(135deg, ${COLORS.TEAL} 0%, #006666 100%)` }}>
-                <CheckCircle2 className="h-4 w-4 mr-2" /> Review Details
-              </Button>
-            </div>
-          ) : (
+          {/* ═══ STEP 1: Basic Info ═══ */}
+          {currentStep === 1 && (
             <>
-              <ReviewStep
-                type={formData.type as 'trip' | 'event'}
-                accentColor={COLORS.TEAL}
-                data={{
-                  name: formData.name,
-                  location: formData.location,
-                  place: formData.place,
-                  country: formData.country,
-                  description: formData.description,
-                  email: formData.email,
-                  phoneNumber: formData.phone_number,
-                  openingHours: formData.opening_hours,
-                  closingHours: formData.closing_hours,
-                  workingDays: (Object.keys(workingDays) as (keyof typeof workingDays)[]).filter(day => workingDays[day]),
-                  date: formData.date,
-                  isFlexibleDate: formData.is_custom_date,
-                  flexibleDurationMonths: formData.flexible_duration_months,
-                  priceAdult: formData.price,
-                  priceChild: formData.price_child,
-                  capacity: formData.available_tickets,
-                  tripType: formData.type,
-                  latitude: formData.latitude,
-                  longitude: formData.longitude,
-                  mapLink: formData.map_link,
-                  galleryPreviewUrls: galleryImages.map(f => URL.createObjectURL(f)),
-                }}
-                creatorEmail={user?.email}
-              />
-              <div className="flex gap-3 mb-8">
-                <Button onClick={() => setShowReview(false)} variant="outline"
-                  className="flex-1 py-6 rounded-2xl font-black uppercase text-sm">
-                  ← Edit Details
-                </Button>
-                <Button type="button" onClick={handleSubmit} disabled={loading}
-                  className="flex-1 py-6 rounded-2xl font-black uppercase tracking-widest text-sm text-white"
-                  style={{ background: `linear-gradient(135deg, ${COLORS.TEAL} 0%, #006666 100%)` }}>
-                  {loading ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Submitting...</> : "Submit for Approval"}
-                </Button>
-              </div>
+              <Card className="bg-white rounded-[32px] p-8 shadow-sm border border-slate-100">
+                <h2 className="text-xs font-black uppercase tracking-widest mb-6" style={{ color: COLORS.TEAL }}>Select Listing Type</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {[{ id: 'trip', label: 'Trip / Tour', sub: 'Flexible or fixed multi-day adventures' }, { id: 'event', label: 'Event / Sport', sub: 'Fixed date single sessions or matches' }].map((type) => (
+                    <label key={type.id} className={`relative p-6 rounded-[24px] border-2 cursor-pointer transition-all ${formData.type === type.id ? 'border-[#008080] bg-[#008080]/5' : 'border-slate-100 bg-slate-50 hover:bg-white'}`}>
+                      <input type="radio" name="type" value={type.id} className="hidden" onChange={(e) => setFormData({...formData, type: e.target.value as any})} />
+                      <div className="flex justify-between items-start">
+                        <div><span className={`block font-black uppercase tracking-tight text-sm ${formData.type === type.id ? 'text-[#008080]' : 'text-slate-600'}`}>{type.label}</span><span className="text-[10px] font-bold text-slate-400 uppercase mt-1 block">{type.sub}</span></div>
+                        {formData.type === type.id && <CheckCircle2 className="h-5 w-5 text-[#008080]" />}
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              </Card>
+
+              <Card className="bg-white rounded-[32px] p-8 shadow-sm border border-slate-100 space-y-6">
+                <h2 className="text-xs font-black uppercase tracking-widest" style={{ color: COLORS.TEAL }}>Experience Details</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2 md:col-span-2">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Experience Name *</Label>
+                    <StyledInput isInvalid={validationErrors.includes("name")} value={formData.name} onChange={(e) => { setFormData({...formData, name: e.target.value}); if(e.target.value) setValidationErrors(prev => prev.filter(err => err !== "name")); }} placeholder="e.g. Hiking in the Clouds" />
+                    {validationErrors.includes("name") && <p className="text-red-500 text-[10px] font-bold">⚠ Experience name is required</p>}
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Country *</Label>
+                    <div className={validationErrors.includes("country") ? "rounded-xl ring-1 ring-red-500" : ""}><CountrySelector value={formData.country} onChange={(val) => { setFormData({...formData, country: val}); setValidationErrors(prev => prev.filter(err => err !== "country")); }} /></div>
+                    {validationErrors.includes("country") && <p className="text-red-500 text-[10px] font-bold">⚠ Country is required</p>}
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Region / Place *</Label>
+                    <div className="relative"><MapPin className="absolute left-4 top-3.5 h-4 w-4 text-slate-400" /><StyledInput isInvalid={validationErrors.includes("place")} className="pl-11" value={formData.place} onChange={(e) => { setFormData({...formData, place: e.target.value}); if(e.target.value) setValidationErrors(prev => prev.filter(err => err !== "place")); }} placeholder="e.g. Mt. Kenya Region" /></div>
+                    {validationErrors.includes("place") && <p className="text-red-500 text-[10px] font-bold">⚠ Region/Place is required</p>}
+                  </div>
+                  <div className="space-y-2 md:col-span-2">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Specific Location *</Label>
+                    <StyledInput isInvalid={validationErrors.includes("location")} value={formData.location} onChange={(e) => { setFormData({...formData, location: e.target.value}); if(e.target.value) setValidationErrors(prev => prev.filter(err => err !== "location")); }} placeholder="e.g. Nanyuki Main Gate" />
+                    {validationErrors.includes("location") && <p className="text-red-500 text-[10px] font-bold">⚠ Specific location is required</p>}
+                  </div>
+                </div>
+              </Card>
             </>
           )}
+
+          {/* ═══ STEP 2: Date & Pricing ═══ */}
+          {currentStep === 2 && (
+            <>
+              <Card className="bg-white rounded-[32px] p-8 shadow-sm border border-slate-100 space-y-6">
+                <h2 className="text-xs font-black uppercase tracking-widest" style={{ color: COLORS.TEAL }}>Date Settings *</h2>
+                {formData.type === "trip" && (
+                  <div className="flex items-center space-x-3 bg-slate-50 p-4 rounded-2xl">
+                    <Checkbox id="custom_date" checked={formData.is_custom_date} onCheckedChange={(checked) => setFormData({...formData, is_custom_date: checked as boolean})} />
+                    <label htmlFor="custom_date" className="text-[11px] font-black uppercase tracking-tight text-slate-500 cursor-pointer">Flexible dates - Open availability</label>
+                  </div>
+                )}
+                {formData.is_custom_date && (
+                  <div className="space-y-3 bg-slate-50 p-4 rounded-2xl">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Listing Duration *</Label>
+                    <p className="text-[10px] text-slate-400">Choose how long this flexible trip will be available. Max 12 months.</p>
+                    <div className="grid grid-cols-4 gap-2">
+                      {[1, 2, 3, 4, 5, 6, 9, 12].map((months) => (
+                        <button key={months} type="button" onClick={() => setFormData({...formData, flexible_duration_months: String(months)})}
+                          className={`p-3 rounded-xl text-center transition-all font-black text-xs uppercase tracking-tight ${formData.flexible_duration_months === String(months) ? 'bg-[#008080] text-white shadow-lg' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'}`}>
+                          {months} {months === 1 ? 'Month' : 'Months'}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {!formData.is_custom_date && (
+                  <>
+                    <div className="relative"><Calendar className="absolute left-4 top-3.5 h-4 w-4 text-slate-400" /><StyledInput isInvalid={validationErrors.includes("date")} type="date" className="pl-11" min={new Date().toISOString().split('T')[0]} value={formData.date} onChange={(e) => { setFormData({...formData, date: e.target.value}); if(e.target.value) setValidationErrors(prev => prev.filter(err => err !== "date")); }} /></div>
+                    {validationErrors.includes("date") && <p className="text-red-500 text-[10px] font-bold">⚠ Please select a date</p>}
+                  </>
+                )}
+              </Card>
+
+              <Card className="bg-white rounded-[32px] p-8 shadow-sm border border-slate-100">
+                <h2 className="text-xs font-black uppercase tracking-widest mb-6" style={{ color: COLORS.TEAL }}>Pricing & Logistics</h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Adult Price (KSh) *</Label>
+                    <div className="relative"><DollarSign className="absolute left-4 top-3.5 h-4 w-4 text-slate-400" /><StyledInput isInvalid={validationErrors.includes("price")} type="number" className="pl-11" value={formData.price} onChange={(e) => { setFormData({...formData, price: e.target.value}); if(e.target.value && parseFloat(e.target.value) >= 0) setValidationErrors(prev => prev.filter(err => err !== "price")); }} /></div>
+                    {parseFloat(formData.price) > 0 && <p className="text-[9px] text-blue-500 font-bold mt-0.5">{usdHint(parseFloat(formData.price))}</p>}
+                    {validationErrors.includes("price") && <p className="text-red-500 text-[10px] font-bold">⚠ Enter a valid price</p>}
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Child Price (KSh)</Label>
+                    <div className="relative"><DollarSign className="absolute left-4 top-3.5 h-4 w-4 text-slate-400" /><StyledInput type="number" className="pl-11" value={formData.price_child} onChange={(e) => setFormData({...formData, price_child: e.target.value})} /></div>
+                    {parseFloat(formData.price_child) > 0 && <p className="text-[9px] text-blue-500 font-bold mt-0.5">{usdHint(parseFloat(formData.price_child))}</p>}
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Max Slots *</Label>
+                    <div className="relative"><Users className="absolute left-4 top-3.5 h-4 w-4 text-slate-400" /><StyledInput isInvalid={validationErrors.includes("available_tickets")} type="number" className="pl-11" value={formData.available_tickets} onChange={(e) => { setFormData({...formData, available_tickets: e.target.value}); if(e.target.value && parseInt(e.target.value) > 0) setValidationErrors(prev => prev.filter(err => err !== "available_tickets")); }} /></div>
+                    {validationErrors.includes("available_tickets") && <p className="text-red-500 text-[10px] font-bold">⚠ Enter number of slots (min 1)</p>}
+                  </div>
+                </div>
+              </Card>
+            </>
+          )}
+
+          {/* ═══ STEP 3: Contact & Photos ═══ */}
+          {currentStep === 3 && (
+            <Card className="bg-white rounded-[32px] p-8 shadow-sm border border-slate-100 space-y-6">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2.5 rounded-xl" style={{ backgroundColor: `${COLORS.TEAL}15` }}>
+                  <MapPin className="h-5 w-5" style={{ color: COLORS.TEAL }} />
+                </div>
+                <div>
+                  <h2 className="text-sm font-black uppercase tracking-tight" style={{ color: COLORS.TEAL }}>Contact & GPS Location</h2>
+                  <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">How guests can reach you</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2 bg-slate-50/80 rounded-2xl p-4">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#008080]" /> Contact Email
+                  </Label>
+                  <StyledInput type="email" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} placeholder="contact@example.com" />
+                </div>
+                <div className="space-y-2 bg-slate-50/80 rounded-2xl p-4">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#FF7F50]" /> Contact Phone *
+                  </Label>
+                  <div className={validationErrors.includes("phone_number") ? "rounded-xl ring-1 ring-red-500" : ""}><PhoneInput value={formData.phone_number} onChange={(val) => { setFormData({...formData, phone_number: val}); if(val) setValidationErrors(prev => prev.filter(err => err !== "phone_number")); }} country={formData.country} placeholder="712345678" /></div>
+                  {validationErrors.includes("phone_number") && <p className="text-red-500 text-[10px] font-bold">⚠ Phone number is required</p>}
+                </div>
+              </div>
+              <div className="p-4 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/50">
+                <Button type="button" onClick={getCurrentLocation} className="w-full h-14 rounded-2xl shadow-lg font-black uppercase text-[11px] tracking-widest text-white active:scale-95 transition-all" style={{ background: formData.map_link ? COLORS.TEAL : COLORS.CORAL }}>
+                  <Navigation className="h-5 w-5 mr-3" />{formData.map_link ? '✓ Location Captured' : 'Tap to Capture GPS Location'}
+                </Button>
+              </div>
+
+              {/* Gallery */}
+              <div className={`pt-6 border-t transition-all ${validationErrors.includes("gallery") ? "border-red-300" : "border-slate-100"}`}>
+                <h3 className={`text-xs font-black uppercase tracking-widest mb-2 ${validationErrors.includes("gallery") ? "text-red-500" : ""}`} style={validationErrors.includes("gallery") ? {} : { color: COLORS.TEAL }}>
+                  Photos * — {galleryImages.length}/5 uploaded
+                  {galleryImages.length < 5 && <span className="text-red-500 ml-1">— {5 - galleryImages.length} more needed</span>}
+                </h3>
+                {validationErrors.includes("gallery") && (
+                  <div className="mb-4 px-4 py-3 bg-red-50 border border-red-300 rounded-2xl flex items-center gap-2">
+                    <span className="text-red-500 text-lg">⚠</span>
+                    <p className="text-red-600 text-xs font-bold uppercase tracking-wide">
+                      You need exactly 5 photos. Please upload {5 - galleryImages.length} more.
+                    </p>
+                  </div>
+                )}
+                <div className={`grid grid-cols-2 md:grid-cols-5 gap-4 p-4 rounded-2xl transition-all ${validationErrors.includes("gallery") ? "ring-2 ring-red-400 bg-red-50/20" : "bg-slate-50/30"}`}>
+                  {galleryImages.map((file, index) => (
+                    <div key={index} className="relative aspect-square rounded-[20px] overflow-hidden border-2 border-slate-100">
+                      <img src={URL.createObjectURL(file)} className="w-full h-full object-cover" alt="Preview" />
+                      <button type="button" onClick={() => removeImage(index)} className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full shadow-lg"><X className="h-3 w-3" /></button>
+                    </div>
+                  ))}
+                  {galleryImages.length < 5 && (
+                    <Label className={`aspect-square rounded-[20px] border-2 border-dashed flex flex-col items-center justify-center cursor-pointer hover:bg-white transition-all ${validationErrors.includes("gallery") ? "border-red-400 bg-red-50" : "border-slate-200 hover:bg-slate-50"}`}>
+                      <Camera className={`h-6 w-6 ${validationErrors.includes("gallery") ? "text-red-400" : "text-slate-400"}`} />
+                      <span className={`text-[9px] font-bold mt-1 uppercase tracking-wide ${validationErrors.includes("gallery") ? "text-red-400" : "text-slate-400"}`}>Add Photo</span>
+                      <Input type="file" multiple className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e.target.files)} />
+                    </Label>
+                  )}
+                </div>
+              </div>
+            </Card>
+          )}
+
+          {/* ═══ STEP 4: Schedule & Description ═══ */}
+          {currentStep === 4 && (
+            <>
+              <Card className="bg-white rounded-[32px] p-8 shadow-sm border border-slate-100">
+                <h2 className="text-xs font-black uppercase tracking-widest mb-6" style={{ color: COLORS.TEAL }}>
+                  {formData.type === "event" ? "Event Hours *" : "Operating Hours & Days *"}
+                </h2>
+                <OperatingHoursSection
+                  openingHours={formData.opening_hours}
+                  closingHours={formData.closing_hours}
+                  workingDays={workingDays}
+                  onOpeningChange={(v) => setFormData({...formData, opening_hours: v})}
+                  onClosingChange={(v) => setFormData({...formData, closing_hours: v})}
+                  onDaysChange={setWorkingDays}
+                  accentColor={COLORS.TEAL}
+                  hideDays={formData.type === "event"}
+                  hide24HourToggle={true}
+                />
+              </Card>
+
+              <Card className="bg-white rounded-[32px] p-8 shadow-sm border border-slate-100">
+                <Label className="text-xs font-black uppercase tracking-widest mb-4 block" style={{ color: COLORS.TEAL }}>Experience Description *</Label>
+                <Textarea className={`rounded-[24px] border-slate-100 bg-slate-50 p-6 min-h-[200px] focus:ring-[#008080] text-sm ${validationErrors.includes("description") ? "border-red-500 ring-1 ring-red-500" : ""}`} value={formData.description} onChange={(e) => {
+                  const words = e.target.value.trim().split(/\s+/);
+                  if (e.target.value.trim() === "" || words.length <= 20) {
+                    setFormData({...formData, description: e.target.value});
+                  }
+                  if (e.target.value.trim()) setValidationErrors(prev => prev.filter(err => err !== "description"));
+                }} placeholder="Describe in 20 words or less..." />
+                <p className="text-xs text-muted-foreground mt-1">
+                  {formData.description.trim() ? formData.description.trim().split(/\s+/).length : 0}/20 words
+                </p>
+                {validationErrors.includes("description") && <p className="text-red-500 text-[10px] font-bold mt-1">⚠ Description is required</p>}
+              </Card>
+            </>
+          )}
+
+          {/* ═══ STEP 5: Review ═══ */}
+          {currentStep === 5 && (
+            <ReviewStep
+              type={formData.type as 'trip' | 'event'}
+              accentColor={COLORS.TEAL}
+              data={{
+                name: formData.name, location: formData.location, place: formData.place,
+                country: formData.country, description: formData.description,
+                email: formData.email, phoneNumber: formData.phone_number,
+                openingHours: formData.opening_hours, closingHours: formData.closing_hours,
+                workingDays: (Object.keys(workingDays) as (keyof typeof workingDays)[]).filter(day => workingDays[day]),
+                date: formData.date, isFlexibleDate: formData.is_custom_date,
+                flexibleDurationMonths: formData.flexible_duration_months,
+                priceAdult: formData.price, priceChild: formData.price_child,
+                capacity: formData.available_tickets, tripType: formData.type,
+                latitude: formData.latitude, longitude: formData.longitude, mapLink: formData.map_link,
+                galleryPreviewUrls: galleryImages.map(f => URL.createObjectURL(f)),
+              }}
+              creatorEmail={user?.email}
+            />
+          )}
+
+          {/* ═══ Navigation Buttons ═══ */}
+          <div className="flex gap-3 pt-2">
+            {currentStep > 1 && (
+              <Button type="button" variant="outline" onClick={handlePrev}
+                className="flex-1 py-6 rounded-2xl font-black uppercase text-[11px] tracking-widest">
+                <ChevronLeft className="h-4 w-4 mr-2" /> Back
+              </Button>
+            )}
+            {currentStep < 5 ? (
+              <Button type="button" onClick={handleNext}
+                className="flex-[2] py-6 rounded-2xl font-black uppercase text-[11px] tracking-widest text-white shadow-xl active:scale-95 transition-all"
+                style={{ background: `linear-gradient(135deg, ${COLORS.TEAL} 0%, #006666 100%)` }}>
+                Continue <ChevronRight className="h-4 w-4 ml-2" />
+              </Button>
+            ) : (
+              <Button type="button" onClick={handleSubmit} disabled={loading}
+                className="flex-[2] py-6 rounded-2xl font-black uppercase text-[11px] tracking-widest text-white shadow-xl active:scale-95 transition-all"
+                style={{ background: `linear-gradient(135deg, ${COLORS.CORAL_LIGHT} 0%, ${COLORS.CORAL} 100%)` }}>
+                {loading ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Submitting...</> : <><CheckCircle2 className="h-4 w-4 mr-2" /> Submit for Approval</>}
+              </Button>
+            )}
+          </div>
         </div>
       </main>
       <MobileBottomBar />
