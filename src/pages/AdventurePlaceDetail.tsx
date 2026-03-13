@@ -228,7 +228,7 @@ const AdventurePlaceDetail = () => {
   );
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-screen bg-background pb-24" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
       <DetailNavBar
         scrolled={scrolled}
         itemName={place.name}
@@ -240,17 +240,7 @@ const AdventurePlaceDetail = () => {
       <div className="max-w-6xl mx-auto md:px-4 md:pt-3">
         {/* Mobile Carousel */}
         <div className="relative w-full h-[45vh] bg-slate-900 overflow-hidden md:rounded-3xl md:hidden">
-          <div className="absolute top-4 left-0 right-0 px-3 z-50 flex justify-between items-center">
-            <Button onClick={goBack} className="rounded-full w-10 h-10 p-0 border-none bg-white/90 backdrop-blur-sm text-slate-900 hover:bg-white shadow-lg transition-all">
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-            <Button
-              onClick={() => handleSaveItem(resolvedId, "adventure_place")}
-              className={`rounded-full w-10 h-10 p-0 border-none shadow-lg backdrop-blur-sm transition-all ${isSaved ? "bg-red-500 hover:bg-red-600" : "bg-white/90 text-slate-900 hover:bg-white"}`}
-            >
-              <Heart className={`h-5 w-5 ${isSaved ? "fill-white text-white" : "text-slate-900"}`} />
-            </Button>
-          </div>
+          {/* No floating buttons on mobile - nav bar handles back/save */}
           <Carousel plugins={[Autoplay({ delay: 3500 })]} className="w-full h-full">
             <CarouselContent className="h-full ml-0">
               {allImages.length > 0 ? allImages.map((img, idx) => (
@@ -359,7 +349,7 @@ const AdventurePlaceDetail = () => {
               )}
             </section>
 
-            <div className="md:hidden"><OperatingHoursInfo /></div>
+            {/* Operating hours moved into mobile booking card below */}
 
             <GeneralFacilitiesDisplay facilityIds={
               Array.isArray(place.amenities)
@@ -406,9 +396,13 @@ const AdventurePlaceDetail = () => {
                   <p className="text-[9px] font-black text-slate-400 uppercase">{liveRating.count} reviews</p>
                 </div>
               </div>
+
+              {/* Operating Hours & Days inside booking card on mobile */}
+              <OperatingHoursInfo />
+
               <Button
                 onClick={() => navigate(`/booking/adventure_place/${resolvedId}`)}
-                className="w-full py-7 rounded-2xl text-md font-black uppercase tracking-widest bg-gradient-to-r from-[#FF7F50] to-[#FF4E50] border-none shadow-lg transition-all active:scale-95"
+                className="w-full py-7 rounded-2xl text-md font-black uppercase tracking-widest bg-gradient-to-r from-[#FF7F50] to-[#FF4E50] border-none shadow-lg transition-all active:scale-95 mt-4"
               >
                 Book Now
               </Button>
