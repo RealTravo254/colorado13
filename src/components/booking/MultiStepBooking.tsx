@@ -632,50 +632,50 @@ import { useSearchParams } from "react-router-dom";
                             <img src={activity.images[0]} alt={activity.name} className="w-10 h-10 rounded-lg object-cover flex-shrink-0" />
                           )}
                           <div className="flex-1 flex justify-between items-center">
-                          <div>
-                            <p className="font-medium">{activity.name}</p>
-                            <p className="text-sm text-muted-foreground">
-                              {formatPrice(activity.price)} per person
-                            </p>
+                            <div>
+                              <p className="font-medium">{activity.name}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {formatPrice(activity.price)} per person
+                              </p>
+                            </div>
+                            {isSelected && (
+                              <div
+                                className="flex items-center gap-2"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <Button
+                                  variant="outline"
+                                  size="icon"
+                                  className="h-8 w-8"
+                                  onClick={() =>
+                                    updateActivityPeople(
+                                      activity.name,
+                                      (selected?.numberOfPeople || 1) - 1
+                                    )
+                                  }
+                                >
+                                  <Minus className="h-3 w-3" />
+                                </Button>
+                                <span className="w-6 text-center">
+                                  {selected?.numberOfPeople || 1}
+                                </span>
+                                <Button
+                                  variant="outline"
+                                  size="icon"
+                                  className="h-8 w-8"
+                                  onClick={() =>
+                                    updateActivityPeople(
+                                      activity.name,
+                                      (selected?.numberOfPeople || 1) + 1
+                                    )
+                                  }
+                                >
+                                  <Plus className="h-3 w-3" />
+                                </Button>
+                              </div>
+                            )}
                           </div>
-                         {isSelected && (
-                           <div
-                             className="flex items-center gap-2"
-                             onClick={(e) => e.stopPropagation()}
-                           >
-                             <Button
-                               variant="outline"
-                               size="icon"
-                               className="h-8 w-8"
-                               onClick={() =>
-                                 updateActivityPeople(
-                                   activity.name,
-                                   (selected?.numberOfPeople || 1) - 1
-                                 )
-                               }
-                             >
-                               <Minus className="h-3 w-3" />
-                             </Button>
-                             <span className="w-6 text-center">
-                               {selected?.numberOfPeople || 1}
-                             </span>
-                             <Button
-                               variant="outline"
-                               size="icon"
-                               className="h-8 w-8"
-                               onClick={() =>
-                                 updateActivityPeople(
-                                   activity.name,
-                                   (selected?.numberOfPeople || 1) + 1
-                                 )
-                               }
-                             >
-                               <Plus className="h-3 w-3" />
-                             </Button>
-                           </div>
-                         )}
-                       </div>
-                     </div>
+                        </div>
                    );
                  })}
                </div>
