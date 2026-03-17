@@ -698,10 +698,33 @@ const Index = () => {
               </section>
             )}
 
+            {/* ─── Quick Navigation Cards (above Partner CTA) ─────────────── */}
+            <section className="mb-4 md:mb-8">
+              <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-3">
+                Quick Access
+              </h2>
+              <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                {QUICK_NAV.map((nav) => (
+                  <button
+                    key={nav.title}
+                    onClick={() => navigate(nav.path)}
+                    className="flex flex-col items-center gap-1.5 py-3 px-2 rounded-2xl bg-card border border-border hover:shadow-md transition-all active:scale-95"
+                  >
+                    <div
+                      className="h-9 w-9 rounded-xl flex items-center justify-center"
+                      style={{ backgroundColor: `${nav.color}15` }}
+                    >
+                      <nav.icon className="h-4.5 w-4.5" style={{ color: nav.color, width: 18, height: 18 }} />
+                    </div>
+                    <span className="text-[10px] font-bold text-foreground leading-tight text-center">{nav.title}</span>
+                  </button>
+                ))}
+              </div>
+            </section>
+
             {/* ─── Become a Host CTA ─────────────────────────────────────── */}
             <section className="mb-4 md:mb-8">
               <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary to-primary/80 p-6 md:p-8">
-                {/* Decorative circles */}
                 <div className="absolute -top-8 -right-8 h-40 w-40 rounded-full bg-white/10 pointer-events-none" />
                 <div className="absolute -bottom-6 -left-6 h-32 w-32 rounded-full bg-white/5 pointer-events-none" />
                 <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -734,30 +757,6 @@ const Index = () => {
                     </button>
                   </div>
                 </div>
-              </div>
-            </section>
-
-            {/* ─── Quick Navigation Cards (above footer) ─────────────────── */}
-            <section className="mb-4 md:mb-8">
-              <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-3">
-                Quick Access
-              </h2>
-              <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-                {QUICK_NAV.map((nav) => (
-                  <button
-                    key={nav.title}
-                    onClick={() => navigate(nav.path)}
-                    className="flex flex-col items-center gap-1.5 py-3 px-2 rounded-2xl bg-card border border-border hover:shadow-md transition-all active:scale-95"
-                  >
-                    <div
-                      className="h-9 w-9 rounded-xl flex items-center justify-center"
-                      style={{ backgroundColor: `${nav.color}15` }}
-                    >
-                      <nav.icon className="h-4.5 w-4.5" style={{ color: nav.color, width: 18, height: 18 }} />
-                    </div>
-                    <span className="text-[10px] font-bold text-foreground leading-tight text-center">{nav.title}</span>
-                  </button>
-                ))}
               </div>
             </section>
 
