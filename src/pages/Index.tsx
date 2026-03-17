@@ -327,7 +327,6 @@ const Index = () => {
       setNearbyPlacesHotels(cachedData.nearbyPlacesHotels || []);
       setLoading(false); setLoadingScrollable(false); setLoadingNearby(false);
       const cacheAge = Date.now() - (cachedData.cachedAt || 0);
-      // Only skip re-fetch if cache is fresh AND has actual category data
       const hasScrollableData = cachedRows.trips.length > 0 || cachedRows.hotels.length > 0 || cachedRows.campsites.length > 0 || cachedRows.events.length > 0;
       if (cacheAge < 5 * 60 * 1000 && hasScrollableData) {
         getUserId().then(setUserId);
@@ -340,7 +339,6 @@ const Index = () => {
   }, [cardLimit, fetchScrollableRows, fetchAllData]);
 
   useEffect(() => {
-    // Only cache when we have actual category data to avoid caching empty state
     const hasScrollableData = scrollableRows.trips.length > 0 || scrollableRows.hotels.length > 0 || scrollableRows.campsites.length > 0 || scrollableRows.events.length > 0;
     if (!loading && !loadingScrollable && listings.length > 0 && hasScrollableData) {
       setCachedHomePageData({ scrollableRows, listings, nearbyPlacesHotels });
@@ -439,29 +437,41 @@ const Index = () => {
         }}
       />
 
-      {/* ─── Fixed mobile top bar on scroll (pill style like DetailNavBar) ── */}
+      {/* ─── Fixed full-width mobile top bar on scroll ────────────────────── */}
       {scrolledPastHero && !isSearchFocused && (
-        <div className="fixed top-0 left-0 right-0 z-[100] md:hidden" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
-          <div className="mx-3 mt-3">
-            <div
-              className="flex items-center justify-between px-3 py-2.5 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.12),0_1px_0_rgba(255,255,255,0.1)_inset] border border-white/10"
-              style={{ backgroundColor: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}
-            >
-              <Sheet open={isIndexDrawerOpen} onOpenChange={setIsIndexDrawerOpen}>
-                <SheetTrigger asChild>
-                  <button className="h-9 w-9 rounded-xl flex items-center justify-center text-white hover:bg-white/20 transition-all active:scale-95" aria-label="Open Menu">
-                    <Menu className="h-5 w-5 stroke-[2.5]" />
-                  </button>
-                </SheetTrigger>
-                <SheetContent side="left" className="w-full sm:w-72 p-0 h-screen border-none">
-                  <NavigationDrawer onClose={() => setIsIndexDrawerOpen(false)} />
-                </SheetContent>
-              </Sheet>
-              <span className="text-[11px] font-black uppercase tracking-[0.12em] text-white truncate">RealTravo</span>
-              <div className="[&_button]:text-white [&_button]:h-9 [&_button]:w-9">
-                <NotificationBell />
-              </div>
-            </div>
+        <div
+          className="fixed top-0 left-0 right-0 z-[100] md:hidden flex items-center justify-between px-4 py-2.5"
+          style={{
+            paddingTop: 'calc(env(safe-area-inset-top, 0px) + 10px)',
+            backgroundColor: 'rgba(0,0,0,0.75)',
+            backdropFilter: 'blur(14px)',
+            WebkitBackdropFilter: 'blur(14px)',
+            borderBottom: '1px solid rgba(255,255,255,0.08)',
+          }}
+        >
+          {/* Left: Menu + Brand name */}
+          <div className="flex items-center gap-2">
+            <Sheet open={isIndexDrawerOpen} onOpenChange={setIsIndexDrawerOpen}>
+              <SheetTrigger asChild>
+                <button
+                  className="h-9 w-9 rounded-xl flex items-center justify-center text-white hover:bg-white/20 transition-all active:scale-95"
+                  aria-label="Open Menu"
+                >
+                  <Menu className="h-5 w-5 stroke-[2.5]" />
+                </button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-full sm:w-72 p-0 h-screen border-none">
+                <NavigationDrawer onClose={() => setIsIndexDrawerOpen(false)} />
+              </SheetContent>
+            </Sheet>
+            <span className="text-[13px] font-black uppercase tracking-[0.14em] text-white">
+              RealTravo
+            </span>
+          </div>
+
+          {/* Right: Notification bell */}
+          <div className="[&_button]:text-white [&_button]:h-9 [&_button]:w-9">
+            <NotificationBell />
           </div>
         </div>
       )}
@@ -503,7 +513,7 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Category pills - aligned to same container width as page content */}
+          {/* Category pills */}
           <div className="absolute bottom-3 left-0 right-0 z-10">
             <div className="container mx-auto px-4 md:px-6">
               <div className="grid grid-cols-5 gap-2 w-full">
@@ -698,7 +708,7 @@ const Index = () => {
               </section>
             )}
 
-            {/* ─── Quick Navigation Cards (above Partner CTA) ─────────────── */}
+            {/* ─── Quick Navigation Cards ─────────────────────────────────── */}
             <section className="mb-4 md:mb-8">
               <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-3">
                 Quick Access
