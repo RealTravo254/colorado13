@@ -445,30 +445,26 @@ const Index = () => {
         }}
       />
 
-      {/* ─── Fixed top bar: always visible on mobile, icons black at top / white after scroll ── */}
+      {/* ─── Fixed top bar: icons always visible, pill bg appears behind them on scroll ── */}
       {!isSearchFocused && (
         <div
-          className="fixed top-0 left-0 right-0 z-[100] md:hidden flex items-center justify-between px-4"
-          style={{
-            paddingTop: 'calc(env(safe-area-inset-top, 0px) + 10px)',
-            paddingBottom: '10px',
-            backgroundColor: scrolledPastHero
-              ? 'rgba(0,0,0,0.75)'
-              : 'transparent',
-            backdropFilter: scrolledPastHero ? 'blur(14px)' : 'none',
-            WebkitBackdropFilter: scrolledPastHero ? 'blur(14px)' : 'none',
-            borderBottom: scrolledPastHero ? '1px solid rgba(255,255,255,0.08)' : 'none',
-            transition: 'background-color 0.2s ease, backdrop-filter 0.2s ease',
-          }}
+          className="fixed top-0 left-0 right-0 z-[100] md:hidden flex items-center justify-between px-4 pointer-events-none"
+          style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 10px)', paddingBottom: '10px' }}
         >
-          {/* Left: Menu + Brand name */}
-          <div className="flex items-center gap-2">
+          {/* Left: Menu icon — pill bg appears on scroll */}
+          <div
+            className="pointer-events-auto rounded-xl transition-all duration-200"
+            style={{
+              backgroundColor: scrolledPastHero ? 'rgba(0,0,0,0.65)' : 'transparent',
+              backdropFilter: scrolledPastHero ? 'blur(14px)' : 'none',
+              WebkitBackdropFilter: scrolledPastHero ? 'blur(14px)' : 'none',
+            }}
+          >
             <Sheet open={isIndexDrawerOpen} onOpenChange={setIsIndexDrawerOpen}>
               <SheetTrigger asChild>
                 <button
-                  className="h-9 w-9 rounded-xl flex items-center justify-center hover:bg-black/10 transition-all active:scale-95"
+                  className="h-9 w-9 rounded-xl flex items-center justify-center text-white transition-all active:scale-95"
                   aria-label="Open Menu"
-                  style={{ color: scrolledPastHero ? '#ffffff' : '#000000' }}
                 >
                   <Menu className="h-5 w-5 stroke-[2.5]" />
                 </button>
@@ -477,18 +473,16 @@ const Index = () => {
                 <NavigationDrawer onClose={() => setIsIndexDrawerOpen(false)} />
               </SheetContent>
             </Sheet>
-            <span
-              className="font-bold text-lg tracking-tight italic"
-              style={{ color: scrolledPastHero ? '#ffffff' : '#000000' }}
-            >
-              RealTravo
-            </span>
           </div>
 
-          {/* Right: Notification bell — black before scroll, white after */}
+          {/* Right: Notification bell — pill bg appears on scroll */}
           <div
-            className="[&_button]:h-9 [&_button]:w-9"
-            style={{ color: scrolledPastHero ? '#ffffff' : '#000000' }}
+            className="pointer-events-auto rounded-xl transition-all duration-200 [&_button]:h-9 [&_button]:w-9 [&_button]:text-white"
+            style={{
+              backgroundColor: scrolledPastHero ? 'rgba(0,0,0,0.65)' : 'transparent',
+              backdropFilter: scrolledPastHero ? 'blur(14px)' : 'none',
+              WebkitBackdropFilter: scrolledPastHero ? 'blur(14px)' : 'none',
+            }}
           >
             <NotificationBell />
           </div>
