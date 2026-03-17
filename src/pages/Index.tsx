@@ -1,4 +1,8 @@
 import { useState, useEffect, useRef, useMemo, useCallback, memo, lazy, Suspense } from "react";
+import { Menu } from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { NavigationDrawer } from "@/components/NavigationDrawer";
+import { NotificationBell } from "@/components/NotificationBell";
 import { useTranslation } from "react-i18next";
 import { SEOHead } from "@/components/SEOHead";
 import { useNavigate, Link } from "react-router-dom";
