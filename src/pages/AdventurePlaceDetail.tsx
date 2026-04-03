@@ -563,7 +563,39 @@ const AdventurePlaceDetail = () => {
         <SimilarItems currentItemId={resolvedId} itemType="adventure" country={place.country} />
       </main>
       <Footer />
-    </div>
+
+      {/* Fixed bottom reserve bar on mobile */}
+      <div className="fixed bottom-0 left-0 right-0 z-[100] md:hidden bg-white border-t border-slate-200 shadow-[0_-4px_20px_rgb(0,0,0,0.08)]"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+        <div className="flex items-center justify-between px-4 py-3">
+          <div>
+            {place.entry_fee && place.entry_fee > 0 ? (
+              <>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-base font-bold text-destructive">{formatPrice(Number(place.entry_fee))}</span>
+                  <span className="text-[9px] font-bold text-slate-400 uppercase">/ adult</span>
+                </div>
+                {place.child_entry_fee != null && (
+                  <div className="text-[10px] font-bold text-slate-500">Child: {formatPrice(Number(place.child_entry_fee || 0))}</div>
+                )}
+              </>
+            ) : getStartingPrice() > 0 ? (
+              <div className="flex items-baseline gap-1">
+                <span className="text-[9px] font-bold text-slate-400 uppercase mr-1">From</span>
+                <span className="text-base font-bold text-destructive">{formatPrice(getStartingPrice())}</span>
+              </div>
+            ) : (
+              <span className="text-sm font-semibold text-emerald-600">Free Entry</span>
+            )}
+          </div>
+          <Button
+            onClick={() => navigate(`/booking/adventure_place/${resolvedId}`)}
+            className="px-6 py-5 rounded-xl text-xs font-black uppercase tracking-widest text-white border-none bg-gradient-to-r from-[#FF7F50] to-[#FF4E50]"
+          >
+            Reserve
+          </Button>
+        </div>
+      </div>
   );
 };
 
