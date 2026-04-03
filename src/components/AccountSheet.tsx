@@ -13,7 +13,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { 
   ChevronRight, User, Briefcase, CreditCard, Shield, 
   LogOut, UserCog, 
-  CalendarCheck, Settings, LayoutDashboard 
+  CalendarCheck, Settings, LayoutDashboard, Receipt, Users
 } from "lucide-react";
 
 const COLORS = {
