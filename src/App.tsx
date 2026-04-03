@@ -73,6 +73,9 @@ const PaymentVerify = lazy(() => import("./pages/PaymentVerify"));
 const TripEventGuide = lazy(() => import("./pages/TripEventGuide"));
 const CampsiteGuide = lazy(() => import("./pages/CampsiteGuide"));
 const HotelGuide = lazy(() => import("./pages/HotelGuide"));
+const PaymentHistory = lazy(() => import("./pages/PaymentHistory"));
+const AdminPaymentVerification = lazy(() => import("./pages/AdminPaymentVerification"));
+const AccountsOverview = lazy(() => import("./pages/admin/AccountsOverview"));
 
 
 const queryClient = new QueryClient({
