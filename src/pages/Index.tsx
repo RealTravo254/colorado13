@@ -128,7 +128,7 @@ const Index = () => {
   const [hasMoreSearchResults, setHasMoreSearchResults] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
   const { toast } = useToast();
-  const { position, loading: locationLoading, permissionDenied, requestLocation, forceRequestLocation } = useGeolocation();
+  const { position, loading: locationLoading, requestLocation, forceRequestLocation } = useGeolocation();
   const [showLocationDialog, setShowLocationDialog] = useState(false);
   const { cardLimit, isLargeScreen } = useResponsiveLimit();
 
