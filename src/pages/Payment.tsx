@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { 
   ArrowLeft, DollarSign, Wallet, TrendingUp, Award, Percent, 
-  Copy, Share2, Link2, Users, ArrowUpRight, CheckCircle, Info
+  Copy, Share2, Link2, Users, ArrowUpRight, CheckCircle, Info, CreditCard
 } from "lucide-react";
 import { useHostVerificationStatus } from "@/hooks/useHostVerificationStatus";
 import { WithdrawalDialog } from "@/components/referral/WithdrawalDialog";
