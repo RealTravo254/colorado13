@@ -9,7 +9,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { SearchBarWithSuggestions } from "@/components/SearchBarWithSuggestions";
 import { useSearchFocus } from "@/components/PageLayout";
 import { ListingCard } from "@/components/ListingCard";
-import { Calendar, Hotel, Tent, Compass, MapPin, ChevronLeft, ChevronRight, Loader2, Navigation, Home, Heart, Ticket, Trophy, Star, Search as SearchIcon } from "lucide-react";
+import { Calendar, Tent, Compass, MapPin, ChevronLeft, ChevronRight, Loader2, Navigation, Home, Heart, Ticket, Trophy, Star, Search as SearchIcon } from "lucide-react";
 import {
   AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription,
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
@@ -26,6 +26,7 @@ import { useRatings, sortByRating } from "@/hooks/useRatings";
 import { useRealtimeBookings } from "@/hooks/useRealtimeBookings";
 import { useResponsiveLimit } from "@/hooks/useResponsiveLimit";
 import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
+import { CategoryCard } from "@/components/CategoryCard";
 
 // ─── Memoized horizontal scroll section ─────────────────────────────────────
 interface ScrollSectionProps {
@@ -99,18 +100,16 @@ const ScrollSection = memo(({ title, viewAllPath, accentColor, children, scrollR
 });
 ScrollSection.displayName = "ScrollSection";
 
-// ─── Category pill data ──────────────────────────────────────────────────────
+// ─── Category cards with images (no Hotels) ──────────────────────────────────
 const CATEGORIES = [
-  { icon: Tent, title: "Adventures", path: "/category/campsite", color: "hsl(142, 70%, 35%)", bgClass: "bg-emerald-600" },
-  { icon: Hotel, title: "Hotels", path: "/category/hotels", color: "hsl(220, 70%, 50%)", bgClass: "bg-blue-600" },
-  { icon: Calendar, title: "Trips", path: "/category/trips", color: "hsl(25, 90%, 50%)", bgClass: "bg-orange-500" },
-  { icon: Compass, title: "Events", path: "/category/events", color: "hsl(340, 75%, 50%)", bgClass: "bg-rose-600" },
+  { icon: Tent, title: "Adventures", path: "/category/campsite", bgImage: "/images/category-adventures.jpg" },
+  { icon: Calendar, title: "Trips", path: "/category/trips", bgImage: "/images/category-trips.jpg" },
+  { icon: Compass, title: "Events", path: "/category/events", bgImage: "/images/category-events.jpg" },
 ];
 
 // ─── Quick navigation cards (above footer) ───────────────────────────────────
 const QUICK_NAV = [
   { icon: Calendar, title: "Trips", path: "/category/trips", color: "hsl(25, 90%, 50%)" },
-  { icon: Hotel, title: "Hotels", path: "/category/hotels", color: "hsl(220, 70%, 50%)" },
   { icon: Trophy, title: "Events & Sports", path: "/category/events", color: "hsl(340, 75%, 50%)" },
   { icon: Tent, title: "Adventure Places", path: "/category/campsite", color: "hsl(142, 70%, 35%)" },
   { icon: Ticket, title: "Bookings", path: "/bookings", color: "hsl(200, 70%, 45%)" },
@@ -158,7 +157,6 @@ const Index = () => {
     listings.forEach(item => ids.add(item.id));
     nearbyPlacesHotels.forEach(item => ids.add(item.id));
     scrollableRows.trips.forEach(item => ids.add(item.id));
-    scrollableRows.hotels.forEach(item => ids.add(item.id));
     scrollableRows.campsites.forEach(item => ids.add(item.id));
     scrollableRows.events.forEach(item => ids.add(item.id));
     return Array.from(ids);
@@ -179,13 +177,11 @@ const Index = () => {
   const sortedNearbyPlaces = useMemo(() => sortByRating(nearbyPlacesHotels, ratings, position, calculateDistance), [nearbyPlacesHotels, ratings, position]);
   const sortedEvents = useMemo(() => sortByRating(scrollableRows.events, ratings, position, calculateDistance), [scrollableRows.events, ratings, position]);
   const sortedCampsites = useMemo(() => sortByRating(scrollableRows.campsites, ratings, position, calculateDistance), [scrollableRows.campsites, ratings, position]);
-  const sortedHotels = useMemo(() => sortByRating(scrollableRows.hotels, ratings, position, calculateDistance), [scrollableRows.hotels, ratings, position]);
   const sortedTrips = useMemo(() => sortByRating(scrollableRows.trips, ratings, position, calculateDistance), [scrollableRows.trips, ratings, position]);
 
   // Scroll refs
   const featuredCampsitesRef = useRef<HTMLDivElement>(null);
   const featuredEventsRef = useRef<HTMLDivElement>(null);
-  const featuredHotelsRef = useRef<HTMLDivElement>(null);
   const featuredTripsRef = useRef<HTMLDivElement>(null);
 
   const [scrollPositions, setScrollPositions] = useState<Record<string, number>>({});
@@ -202,18 +198,16 @@ const Index = () => {
     setLoadingScrollable(true);
     const fetchLimit = Math.max(limit * 3, 30);
     try {
-      const [tripsData, hotelsData, campsitesData, eventsData] = await Promise.all([
+      const [tripsData, campsitesData, eventsData] = await Promise.all([
         supabase.from("trips").select("id,name,location,place,country,image_url,date,is_custom_date,is_flexible_date,available_tickets,activities,type,created_at,price,price_child,description")
           .eq("approval_status", "approved").eq("is_hidden", false).eq("type", "trip").order("date", { ascending: true }).limit(fetchLimit),
-        supabase.from("hotels").select("id,name,location,place,country,image_url,activities,latitude,longitude,created_at,establishment_type,description")
-          .eq("approval_status", "approved").eq("is_hidden", false).limit(fetchLimit),
         supabase.from("adventure_places").select("id,name,location,place,country,image_url,entry_fee,activities,latitude,longitude,created_at,description")
           .eq("approval_status", "approved").eq("is_hidden", false).limit(fetchLimit),
         supabase.from("trips").select("id,name,location,place,country,image_url,date,is_custom_date,is_flexible_date,available_tickets,activities,type,created_at,price,price_child,description")
           .eq("approval_status", "approved").eq("is_hidden", false).eq("type", "event").order("date", { ascending: true }).limit(fetchLimit),
       ]);
       setScrollableRows({
-        trips: tripsData.data || [], hotels: hotelsData.data || [],
+        trips: tripsData.data || [], hotels: [],
         attractions: [], campsites: campsitesData.data || [],
         events: eventsData.data || [], accommodations: [],
       });
@@ -227,15 +221,12 @@ const Index = () => {
   const fetchNearbyPlacesAndHotels = useCallback(async () => {
     setLoadingNearby(true);
     if (!position) return;
-    const [placesData, hotelsData] = await Promise.all([
+    const [placesData] = await Promise.all([
       supabase.from("adventure_places").select("id,name,location,place,country,image_url,entry_fee,activities,latitude,longitude,created_at,description")
-        .eq("approval_status", "approved").eq("is_hidden", false).limit(12),
-      supabase.from("hotels").select("id,name,location,place,country,image_url,activities,latitude,longitude,created_at,description")
         .eq("approval_status", "approved").eq("is_hidden", false).limit(12),
     ]);
     const combined = [
       ...(placesData.data || []).map(item => ({ ...item, type: "ADVENTURE PLACE", table: "adventure_places" })),
-      ...(hotelsData.data || []).map(item => ({ ...item, type: "HOTEL", table: "hotels" })),
     ];
     const withDistance = combined.map(item => {
       const dist = (item as any).latitude && (item as any).longitude && position
@@ -263,10 +254,8 @@ const Index = () => {
       const { data } = await dbQuery;
       return (data || []).map((item: any) => ({ ...item, type: "EVENT" }));
     };
-    const fetchTable = async (table: "hotels" | "adventure_places", type: string) => {
-      let dbQuery = supabase.from(table).select(table === "hotels"
-        ? "id,name,location,place,country,image_url,activities,latitude,longitude,created_at,description"
-        : "id,name,location,place,country,image_url,entry_fee,activities,latitude,longitude,created_at,description")
+    const fetchTable = async (table: "adventure_places", type: string) => {
+      let dbQuery = supabase.from(table).select("id,name,location,place,country,image_url,entry_fee,activities,latitude,longitude,created_at,description")
         .eq("approval_status", "approved").eq("is_hidden", false);
       if (query) { const p = `%${query}%`; dbQuery = dbQuery.or(`name.ilike.${p},location.ilike.${p},country.ilike.${p}`); }
       dbQuery = dbQuery.order('created_at', { ascending: false }).range(offset, offset + limit - 1);
@@ -282,8 +271,8 @@ const Index = () => {
       return (data || []).map((item: any) => ({ ...item, type: "TRIP" }));
     };
 
-    const [events, trips, hotels, adventures] = await Promise.all([fetchEvents(), fetchTrips(), fetchTable("hotels", "HOTEL"), fetchTable("adventure_places", "ADVENTURE PLACE")]);
-    let combined = [...hotels, ...adventures, ...trips, ...events].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    const [events, trips, adventures] = await Promise.all([fetchEvents(), fetchTrips(), fetchTable("adventure_places", "ADVENTURE PLACE")]);
+    let combined = [...adventures, ...trips, ...events].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
     if (offset === 0) { setListings(combined); setHasMoreSearchResults(true); }
     else { setListings(prev => [...prev, ...combined]); }
     if (combined.length < limit) setHasMoreSearchResults(false);
@@ -326,7 +315,7 @@ const Index = () => {
       setNearbyPlacesHotels(cachedData.nearbyPlacesHotels || []);
       setLoading(false); setLoadingScrollable(false); setLoadingNearby(false);
       const cacheAge = Date.now() - (cachedData.cachedAt || 0);
-      const hasScrollableData = cachedRows.trips.length > 0 || cachedRows.hotels.length > 0 || cachedRows.campsites.length > 0 || cachedRows.events.length > 0;
+      const hasScrollableData = cachedRows.trips.length > 0 || cachedRows.campsites.length > 0 || cachedRows.events.length > 0;
       if (cacheAge < 5 * 60 * 1000 && hasScrollableData) {
         getUserId().then(setUserId);
         return;
@@ -338,7 +327,7 @@ const Index = () => {
   }, [cardLimit, fetchScrollableRows, fetchAllData]);
 
   useEffect(() => {
-    const hasScrollableData = scrollableRows.trips.length > 0 || scrollableRows.hotels.length > 0 || scrollableRows.campsites.length > 0 || scrollableRows.events.length > 0;
+    const hasScrollableData = scrollableRows.trips.length > 0 || scrollableRows.campsites.length > 0 || scrollableRows.events.length > 0;
     if (!loading && !loadingScrollable && listings.length > 0 && hasScrollableData) {
       setCachedHomePageData({ scrollableRows, listings, nearbyPlacesHotels });
     }
@@ -395,7 +384,6 @@ const Index = () => {
   }, [listingViewMode, position, bookingStats]);
 
   const displayCampsites = useMemo(() => getDisplayItems(scrollableRows.campsites, sortedCampsites), [scrollableRows.campsites, sortedCampsites, getDisplayItems]);
-  const displayHotels = useMemo(() => getDisplayItems(scrollableRows.hotels, sortedHotels), [scrollableRows.hotels, sortedHotels, getDisplayItems]);
   const displayTrips = useMemo(() => getDisplayItems(scrollableRows.trips, sortedTrips, true), [scrollableRows.trips, sortedTrips, getDisplayItems]);
   const displayEvents = useMemo(() => getDisplayItems(scrollableRows.events, sortedEvents, true), [scrollableRows.events, sortedEvents, getDisplayItems]);
 
@@ -431,8 +419,8 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEOHead
-        title="Realtravo - Book Trips, Hotels & Adventures"
-        description="Discover and book exciting trips, events, hotels, and adventure experiences. Your gateway to unforgettable travel."
+        title="Realtravo - Book Trips & Adventures"
+        description="Discover and book exciting trips, events, and adventure experiences. Your gateway to unforgettable travel."
         canonical="https://realtravo.com/"
         ogImage="https://realtravo.com/fulllogo.png"
         jsonLd={{
@@ -538,22 +526,19 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Category pills */}
+          {/* Category cards with images */}
           <div className="absolute bottom-3 left-0 right-0 z-10">
             <div className="container mx-auto px-4 md:px-6">
-              <div className="grid grid-cols-4 gap-2 w-full">
+              <div className="grid grid-cols-3 gap-2 w-full">
                 {CATEGORIES.map((cat) => (
-                  <button
+                  <CategoryCard
                     key={cat.title}
+                    icon={cat.icon}
+                    title={cat.title}
+                    description=""
                     onClick={() => navigate(cat.path)}
-                    className="flex flex-col items-center gap-1.5 py-3 px-2 rounded-2xl border border-white/20 transition-all hover:scale-105 active:scale-95 shadow-lg backdrop-blur-sm"
-                    style={{ backgroundColor: cat.color }}
-                  >
-                    <div className="h-9 w-9 rounded-xl bg-white/20 flex items-center justify-center">
-                      <cat.icon className="h-4 w-4 text-white" />
-                    </div>
-                    <span className="text-[10px] font-bold text-white leading-tight text-center">{cat.title}</span>
-                  </button>
+                    bgImage={cat.bgImage}
+                  />
                 ))}
               </div>
             </div>
@@ -612,7 +597,7 @@ const Index = () => {
                       availableTickets={isTripsOrEvents ? listing.available_tickets : undefined}
                       bookedTickets={isTripsOrEvents ? bookingStats[listing.id] || 0 : undefined}
                       showBadge={true} priority={index < 4}
-                      hidePrice={listing.type === "HOTEL" || listing.type === "ADVENTURE PLACE"}
+                      hidePrice={listing.type === "ADVENTURE PLACE"}
                       activities={listing.activities} distance={itemDistance}
                       avgRating={ratingData?.avgRating} reviewCount={ratingData?.reviewCount}
                       description={listing.description}
@@ -665,16 +650,6 @@ const Index = () => {
               {displayCampsites.map((place, i) => renderCard(place, "ADVENTURE PLACE", i, { hidePrice: true, categoryColor: "hsl(142, 70%, 35%)" }))}
             </ScrollSection>
 
-            {/* Hotels */}
-            <ScrollSection
-              title={t('sections.hotelsAccommodations')} viewAllPath="/category/hotels"
-              accentColor="hsl(220, 70%, 50%)" scrollRef={featuredHotelsRef}
-              onScroll={handleScroll('featuredHotels')}
-              hasItems={displayHotels.length > 0} loading={loadingScrollable}
-            >
-              {displayHotels.map((hotel, i) => renderCard(hotel, "HOTEL", i, { hidePrice: true, categoryColor: "hsl(220, 70%, 50%)" }))}
-            </ScrollSection>
-
             {/* Trips */}
             <ScrollSection
               title={t('sections.tripsAndTours')} viewAllPath="/category/trips"
@@ -718,7 +693,7 @@ const Index = () => {
                     return (
                       <div key={item.id} className="flex-shrink-0 w-[72vw] sm:w-[280px] md:w-[320px] snap-start">
                         <ListingCard
-                          id={item.id} type={a.type || (a.table === 'hotels' ? 'HOTEL' : 'ADVENTURE PLACE')}
+                          id={item.id} type={a.type || 'ADVENTURE PLACE'}
                           name={item.name} imageUrl={a.image_url} location={a.location} country={a.country}
                           price={a.entry_fee || 0} date="" onSave={handleSave}
                           isSaved={savedItems.has(item.id)} hidePrice={true} showBadge={true}
@@ -738,7 +713,7 @@ const Index = () => {
               <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-3">
                 Quick Access
               </h2>
-              <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+              <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
                 {QUICK_NAV.map((nav) => (
                   <button
                     key={nav.title}
@@ -774,7 +749,7 @@ const Index = () => {
                       Become a Host
                     </h3>
                     <p className="text-primary-foreground/75 text-sm md:text-base leading-relaxed max-w-md">
-                      List your hotel, adventure spot, or tour and reach thousands of travellers. It's free to get started.
+                      List your adventure spot or tour and reach thousands of travellers. It's free to get started.
                     </p>
                   </div>
                   <div className="flex flex-col sm:flex-row gap-2 shrink-0">

@@ -29,14 +29,15 @@ export const PageLayout = ({ children }: PageLayoutProps) => {
   const shouldShowFooter =
     pathname === "/" || pathname === "/contact" || pathname === "/about" || pathname.startsWith("/category/");
 
-  const shouldHideMobileBar =
-    pathname === "/host-verification" || pathname.startsWith("/booking/");
-
-  // Auth page renders its own header
+  // Hide mobile bottom bar on detail pages and booking pages
   const isDetailPage =
     pathname.startsWith("/adventure/") || pathname.startsWith("/hotel/") ||
     pathname.startsWith("/event/") || pathname.startsWith("/trip/");
 
+  const shouldHideMobileBar =
+    pathname === "/host-verification" || pathname.startsWith("/booking/") || isDetailPage;
+
+  // Auth page renders its own header
   const shouldHideHeader =
     pathname === "/auth" || pathname === "/reset-password" || pathname === "/forgot-password" ||
     pathname === "/verify-email" || pathname === "/complete-profile" || pathname.startsWith("/booking/") ||
@@ -59,7 +60,7 @@ export const PageLayout = ({ children }: PageLayoutProps) => {
           </div>
         )}
         {/* pt-14 on md+ for fixed header; on mobile header is not fixed so no top padding needed */}
-        <div className={`flex-1 w-full pb-20 md:pb-0 ${!shouldHideHeader && !hideHeaderForSearch ? (shouldHideHeaderOnMobile ? 'pt-0 md:pt-14' : 'pt-0 md:pt-14') : ''}`}>{children}</div>
+        <div className={`flex-1 w-full ${!shouldHideMobileBar ? 'pb-20' : 'pb-0'} md:pb-0 ${!shouldHideHeader && !hideHeaderForSearch ? (shouldHideHeaderOnMobile ? 'pt-0 md:pt-14' : 'pt-0 md:pt-14') : ''}`}>{children}</div>
         {shouldShowFooter && <Footer />}
         {!shouldHideMobileBar && <MobileBottomBar />}
       </div>
