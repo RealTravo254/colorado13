@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { 
   ArrowLeft, DollarSign, Wallet, TrendingUp, Award, Percent, 
-  Copy, Share2, Link2, Users, ArrowUpRight, CheckCircle, Info
+  Copy, Share2, Link2, Users, ArrowUpRight, CheckCircle, Info, CreditCard
 } from "lucide-react";
 import { useHostVerificationStatus } from "@/hooks/useHostVerificationStatus";
 import { WithdrawalDialog } from "@/components/referral/WithdrawalDialog";
@@ -176,6 +176,11 @@ export default function Payment() {
           <h1 className="text-lg font-black uppercase tracking-tight text-foreground">Payment Dashboard</h1>
           <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Earnings, referrals & withdrawals</p>
         </div>
+
+        {/* Payment History Link */}
+        <Button variant="outline" size="sm" className="mb-4 w-full rounded-xl text-[10px] font-black uppercase tracking-widest border-border" onClick={() => navigate("/payment-history")}>
+          <CreditCard className="mr-2 h-3.5 w-3.5" /> View Payment History
+        </Button>
 
         {/* Balance Card */}
         <div className="bg-card rounded-xl p-4 border border-border mb-4">

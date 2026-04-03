@@ -13,7 +13,9 @@ import {
   ShieldCheck, 
   ArrowLeft, 
   CalendarCheck,
-  LayoutDashboard
+  LayoutDashboard,
+  CreditCard,
+  Users
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -202,6 +204,22 @@ const AdminDashboard = () => {
             label="All Bookings"
             count={bookingsCount}
             activeColor="#2D3748"
+          />
+
+          <AdminMenuButton 
+            onClick={() => navigate("/admin/payment-verification")}
+            icon={<CreditCard className="h-5 w-5" />}
+            label="Payment Verification"
+            count={0}
+            activeColor="#D97706"
+          />
+
+          <AdminMenuButton 
+            onClick={() => navigate("/admin/accounts")}
+            icon={<Users className="h-5 w-5" />}
+            label="Accounts Overview"
+            count={0}
+            activeColor="#7C3AED"
           />
         </div>
       </main>
