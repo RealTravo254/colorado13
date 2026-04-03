@@ -544,7 +544,7 @@ const Index = () => {
           {/* Category pills */}
           <div className="absolute bottom-3 left-0 right-0 z-10">
             <div className="container mx-auto px-4 md:px-6">
-              <div className="grid grid-cols-5 gap-2 w-full">
+              <div className="grid grid-cols-4 gap-2 w-full">
                 {CATEGORIES.map((cat) => (
                   <button
                     key={cat.title}
