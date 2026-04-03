@@ -475,16 +475,32 @@ const Index = () => {
             </Sheet>
           </div>
 
-          {/* Right: Notification bell — pill bg always visible */}
-          <div
-            className="pointer-events-auto rounded-xl [&_button]:h-9 [&_button]:w-9 [&_button]:text-white"
-            style={{
-              backgroundColor: 'rgba(0,0,0,0.65)',
-              backdropFilter: 'blur(14px)',
-              WebkitBackdropFilter: 'blur(14px)',
-            }}
-          >
-            <NotificationBell />
+          {/* Right: Search icon + Notification bell */}
+          <div className="flex items-center gap-2 pointer-events-auto">
+            {showSearchIcon && (
+              <button
+                onClick={handleSearchIconClick}
+                className="h-9 w-9 rounded-xl flex items-center justify-center text-white transition-all active:scale-95"
+                style={{
+                  backgroundColor: 'rgba(0,0,0,0.65)',
+                  backdropFilter: 'blur(14px)',
+                  WebkitBackdropFilter: 'blur(14px)',
+                }}
+                aria-label="Search"
+              >
+                <SearchIcon className="h-5 w-5" />
+              </button>
+            )}
+            <div
+              className="rounded-xl [&_button]:h-9 [&_button]:w-9 [&_button]:text-white"
+              style={{
+                backgroundColor: 'rgba(0,0,0,0.65)',
+                backdropFilter: 'blur(14px)',
+                WebkitBackdropFilter: 'blur(14px)',
+              }}
+            >
+              <NotificationBell />
+            </div>
           </div>
         </div>
       )}
