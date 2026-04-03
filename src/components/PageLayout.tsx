@@ -40,6 +40,7 @@ export const PageLayout = ({ children }: PageLayoutProps) => {
   const shouldHideHeader =
     pathname === "/auth" || pathname === "/reset-password" || pathname === "/forgot-password" ||
     pathname === "/verify-email" || pathname === "/complete-profile" || pathname.startsWith("/booking/") ||
+    pathname === "/explore" ||
     isDetailPage;
 
   // On mobile, only show header on index page

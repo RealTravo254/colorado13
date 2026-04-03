@@ -364,7 +364,7 @@ const Index = () => {
     return () => window.removeEventListener("scroll", ctrl);
   }, []);
 
-  const handleSearchIconClick = () => { setIsSearchVisible(true); setShowSearchIcon(false); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  const handleSearchIconClick = () => { navigate('/explore'); };
 
   const handleMyLocationTap = useCallback(() => {
     if (permissionDenied) { setShowLocationDialog(true); return; }
