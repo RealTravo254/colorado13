@@ -136,7 +136,7 @@ export const NotificationBell = () => {
   useEffect(() => {
     if (!user) return;
     fetchNotifications();
-    const channel = supabase.channel('notifications-changes')
+    const channel = supabase.channel(`notifications-${user.id}`)
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${user.id}` }, 
         (payload) => {
           playNotificationSound();
@@ -144,10 +144,11 @@ export const NotificationBell = () => {
           fetchNotifications();
         }
       )
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'notifications', filter: `user_id=eq.${user.id}` }, fetchNotifications)
-      .subscribe();
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'notifications', filter: `user_id=eq.${user.id}` }, fetchNotifications);
+    
+    channel.subscribe();
     return () => { supabase.removeChannel(channel); };
-  }, [user, playNotificationSound, showInAppNotification]);
+  }, [user?.id]);
 
   const markAsRead = async (notificationId: string) => {
     await supabase.from('notifications').update({ is_read: true }).eq('id', notificationId);
@@ -189,7 +190,7 @@ export const NotificationBell = () => {
           </button>
         </SheetTrigger>
         
-        <SheetContent className="w-full sm:max-w-md p-0 border-none bg-[#F8F9FA]">
+        <SheetContent className="w-[85vw] max-w-sm sm:max-w-md p-0 border-none bg-[#F8F9FA]">
           <div className="p-6 bg-white border-b border-slate-100">
             <SheetHeader>
               <div className="flex items-center justify-between">

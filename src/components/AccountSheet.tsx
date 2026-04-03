@@ -108,7 +108,7 @@ export const AccountSheet = ({ children }: AccountSheetProps) => {
         <SheetTrigger asChild>
           {children}
         </SheetTrigger>
-        <SheetContent className="w-full sm:max-w-md p-0 border-none bg-[#F8F9FA] flex flex-col">
+        <SheetContent className="w-[85vw] max-w-sm sm:max-w-md p-0 border-none bg-[#F8F9FA] flex flex-col">
           <div className="px-6 pt-5 pb-4 bg-white border-b border-slate-100 flex-shrink-0">
             <SheetHeader>
               <SheetTitle className="text-xl font-black uppercase tracking-tighter" style={{ color: COLORS.TEAL }}>
@@ -146,7 +146,7 @@ export const AccountSheet = ({ children }: AccountSheetProps) => {
         {children}
       </SheetTrigger>
       
-      <SheetContent className="w-full sm:max-w-md p-0 border-none bg-[#F8F9FA] flex flex-col">
+      <SheetContent className="w-[85vw] max-w-sm sm:max-w-md p-0 border-none bg-[#F8F9FA] flex flex-col">
         <div className="px-6 pt-5 pb-4 bg-white border-b border-slate-100 flex-shrink-0">
           <SheetHeader>
             <div className="flex items-baseline gap-2">
