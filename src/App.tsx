@@ -76,6 +76,7 @@ const HotelGuide = lazy(() => import("./pages/HotelGuide"));
 const PaymentHistory = lazy(() => import("./pages/PaymentHistory"));
 const AdminPaymentVerification = lazy(() => import("./pages/AdminPaymentVerification"));
 const AccountsOverview = lazy(() => import("./pages/admin/AccountsOverview"));
+const Explore = lazy(() => import("./pages/Explore"));
 
 
 const queryClient = new QueryClient({
