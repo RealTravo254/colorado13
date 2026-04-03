@@ -140,6 +140,17 @@ export const CurrencyProvider = ({ children }: { children: ReactNode }) => {
 
 export const useCurrency = () => {
   const ctx = useContext(CurrencyContext);
-  if (!ctx) throw new Error("useCurrency must be used within CurrencyProvider");
+  if (!ctx) {
+    // Provide safe defaults instead of crashing when used outside provider
+    return {
+      currency: "KES" as Currency,
+      setCurrency: () => {},
+      rate: FALLBACK_RATE,
+      convertPrice: (kesAmount: number) => Math.ceil(kesAmount),
+      formatPrice: (kesAmount: number) => `KSh ${Math.ceil(kesAmount).toLocaleString()}`,
+      usdHint: () => "",
+      loading: false,
+    };
+  }
   return ctx;
 };
