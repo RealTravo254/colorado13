@@ -1,128 +1,81 @@
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface GeolocationPosition {
   latitude: number;
   longitude: number;
 }
 
+interface IpLocationData {
+  country: string | null;
+  city: string | null;
+  region: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  timezone: string | null;
+}
+
 export const useGeolocation = () => {
   const [position, setPosition] = useState<GeolocationPosition | null>(null);
+  const [ipLocation, setIpLocation] = useState<IpLocationData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [requested, setRequested] = useState(false);
-  const [permissionDenied, setPermissionDenied] = useState(false);
-  const watchIdRef = useRef<number | null>(null);
 
-  const requestLocation = useCallback(() => {
+  const fetchLocation = useCallback(async () => {
     if (requested) return;
-    
     setRequested(true);
     setLoading(true);
-    setPermissionDenied(false);
-
-    if (!navigator.geolocation) {
-      setError("Geolocation is not supported by your browser");
+    try {
+      const { data, error: fnError } = await supabase.functions.invoke("get-location");
+      if (fnError) throw fnError;
+      if (data) {
+        setIpLocation(data);
+        if (data.latitude && data.longitude) {
+          setPosition({ latitude: data.latitude, longitude: data.longitude });
+        }
+      }
+    } catch (err: any) {
+      setError(err.message || "Failed to get location");
+    } finally {
       setLoading(false);
-      return;
     }
-
-    // Get initial position
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setPosition({
-          latitude: pos.coords.latitude,
-          longitude: pos.coords.longitude,
-        });
-        setLoading(false);
-        setPermissionDenied(false);
-      },
-      (err) => {
-        setError(err.message);
-        setLoading(false);
-        if (err.code === err.PERMISSION_DENIED) {
-          setPermissionDenied(true);
-        }
-      },
-      {
-        enableHighAccuracy: false,
-        timeout: 5000,
-        maximumAge: 300000,
-      }
-    );
-
-    // Watch for live position updates
-    watchIdRef.current = navigator.geolocation.watchPosition(
-      (pos) => {
-        setPosition({
-          latitude: pos.coords.latitude,
-          longitude: pos.coords.longitude,
-        });
-        setPermissionDenied(false);
-      },
-      (err) => {
-        if (err.code === err.PERMISSION_DENIED) {
-          setPermissionDenied(true);
-        }
-      },
-      {
-        enableHighAccuracy: false,
-        timeout: 10000,
-        maximumAge: 60000,
-      }
-    );
   }, [requested]);
 
-  // Force request location (resets requested state)
-  const forceRequestLocation = useCallback(() => {
+  const requestLocation = useCallback(() => {
+    fetchLocation();
+  }, [fetchLocation]);
+
+  const forceRequestLocation = useCallback(async () => {
     setRequested(false);
     setError(null);
-    setPermissionDenied(false);
-    // Small delay to allow state reset
-    setTimeout(() => {
-      setRequested(true);
-      setLoading(true);
-
-      if (!navigator.geolocation) {
-        setError("Geolocation is not supported by your browser");
-        setLoading(false);
-        return;
-      }
-
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          setPosition({
-            latitude: pos.coords.latitude,
-            longitude: pos.coords.longitude,
-          });
-          setLoading(false);
-          setPermissionDenied(false);
-        },
-        (err) => {
-          setError(err.message);
-          setLoading(false);
-          if (err.code === err.PERMISSION_DENIED) {
-            setPermissionDenied(true);
-          }
-        },
-        {
-          enableHighAccuracy: false,
-          timeout: 5000,
-          maximumAge: 0,
+    setLoading(true);
+    try {
+      const { data, error: fnError } = await supabase.functions.invoke("get-location");
+      if (fnError) throw fnError;
+      if (data) {
+        setIpLocation(data);
+        if (data.latitude && data.longitude) {
+          setPosition({ latitude: data.latitude, longitude: data.longitude });
         }
-      );
-    }, 100);
-  }, []);
-
-  // Cleanup watch on unmount
-  useEffect(() => {
-    return () => {
-      if (watchIdRef.current !== null) {
-        navigator.geolocation.clearWatch(watchIdRef.current);
       }
-    };
+    } catch (err: any) {
+      setError(err.message || "Failed to get location");
+    } finally {
+      setLoading(false);
+      setRequested(true);
+    }
   }, []);
 
-  return { position, error, loading, permissionDenied, requestLocation, forceRequestLocation };
+  return {
+    position,
+    ipLocation,
+    error,
+    loading,
+    permissionDenied: false, // No longer applicable with IP geolocation
+    requestLocation,
+    forceRequestLocation,
+  };
 };
 
 // Helper function to calculate distance between two points (Haversine formula)
@@ -132,7 +85,7 @@ export const calculateDistance = (
   lat2: number,
   lon2: number
 ): number => {
-  const R = 6371; // Radius of the Earth in km
+  const R = 6371;
   const dLat = (lat2 - lat1) * (Math.PI / 180);
   const dLon = (lon2 - lon1) * (Math.PI / 180);
   const a =

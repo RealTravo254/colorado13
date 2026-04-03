@@ -16,14 +16,8 @@ import {
   CalendarCheck, Settings, LayoutDashboard, Receipt, Users
 } from "lucide-react";
 
-const COLORS = {
-  TEAL: "#008080",
-  CORAL: "#FF7F50",
-  KHAKI: "#F0E68C",
-  KHAKI_DARK: "#857F3E",
-  RED: "#FF0000",
-  SOFT_GRAY: "#F8F9FA"
-};
+const ACCENT = "#c2185b";
+const ACCENT_BG = "rgba(194, 24, 91, 0.08)";
 
 interface AccountSheetProps {
   children: React.ReactNode;
@@ -39,11 +33,7 @@ export const AccountSheet = ({ children }: AccountSheetProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    if (!user) {
-      setLoading(false);
-      return;
-    }
-    
+    if (!user) { setLoading(false); return; }
     const fetchUserData = async () => {
       setLoading(true);
       try {
@@ -51,12 +41,10 @@ export const AccountSheet = ({ children }: AccountSheetProps) => {
           supabase.from("profiles").select("name, profile_picture_url").eq("id", user.id).single(),
           supabase.from("user_roles").select("role").eq("user_id", user.id)
         ]);
-        
         if (profileRes.data) {
           setUserName(profileRes.data.name || "User");
           setUserAvatar(profileRes.data.profile_picture_url || null);
         }
-
         if (rolesRes.data && rolesRes.data.length > 0) {
           const roleList = rolesRes.data.map(r => r.role);
           setUserRole(roleList.includes("admin") ? "admin" : "user");
@@ -70,15 +58,8 @@ export const AccountSheet = ({ children }: AccountSheetProps) => {
     fetchUserData();
   }, [user]);
 
-  const handleLogout = async () => {
-    setIsOpen(false);
-    await signOut();
-  };
-
-  const handleNavigate = (path: string) => {
-    setIsOpen(false);
-    navigate(path);
-  };
+  const handleLogout = async () => { setIsOpen(false); await signOut(); };
+  const handleNavigate = (path: string) => { setIsOpen(false); navigate(path); };
 
   const menuItems = [
     { section: "Creator Tools", items: [
@@ -101,39 +82,35 @@ export const AccountSheet = ({ children }: AccountSheetProps) => {
     ]}
   ];
 
-  // Not logged in - show login prompt
+  // Not logged in
   if (!user) {
     return (
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
-        <SheetTrigger asChild>
-          {children}
-        </SheetTrigger>
-        <SheetContent className="w-[85vw] max-w-sm sm:max-w-md p-0 border-none bg-[#F8F9FA] flex flex-col">
-          <div className="px-6 pt-5 pb-4 bg-white border-b border-slate-100 flex-shrink-0">
+        <SheetTrigger asChild>{children}</SheetTrigger>
+        <SheetContent className="w-[85vw] max-w-sm sm:max-w-md p-0 border-none flex flex-col" style={{ background: "linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)" }}>
+          <div className="px-6 pt-6 pb-4">
             <SheetHeader>
-              <SheetTitle className="text-xl font-black uppercase tracking-tighter" style={{ color: COLORS.TEAL }}>
+              <SheetTitle className="text-xl font-bold tracking-tight text-white">
                 Welcome
               </SheetTitle>
             </SheetHeader>
           </div>
-          <div className="flex-1 flex flex-col items-center justify-center px-6 py-12">
-            <div className="h-20 w-20 rounded-full bg-[#008080]/10 flex items-center justify-center mb-6">
-              <User className="h-10 w-10 text-[#008080]" />
+          <div className="flex-1 bg-white rounded-t-3xl flex flex-col items-center justify-center px-6 py-12">
+            <div className="h-16 w-16 rounded-full flex items-center justify-center mb-6" style={{ backgroundColor: ACCENT_BG }}>
+              <User className="h-8 w-8" style={{ color: ACCENT }} />
             </div>
-            <h3 className="text-lg font-bold text-foreground mb-2">Join RealTravo</h3>
-            <p className="text-sm text-muted-foreground text-center mb-8 max-w-xs">
+            <h3 className="text-lg font-bold text-slate-800 mb-2">Join RealTravo</h3>
+            <p className="text-sm text-slate-500 text-center mb-8 max-w-xs">
               Sign up or log in to manage your bookings, save your favorite places, and become a host.
             </p>
-            <div className="flex flex-col gap-3 w-full max-w-xs">
-              <button 
-                onClick={() => { setIsOpen(false); navigate('/auth'); }}
-                className="w-full py-3 rounded-xl text-sm font-bold text-white transition-all active:scale-95"
-                style={{ backgroundColor: COLORS.TEAL }}
-              >
-                <LogIn className="h-4 w-4 inline mr-2" />
-                Sign Up / Log In
-              </button>
-            </div>
+            <button 
+              onClick={() => { setIsOpen(false); navigate('/auth'); }}
+              className="w-full max-w-xs py-3 rounded-2xl text-sm font-bold text-white transition-all active:scale-95"
+              style={{ backgroundColor: ACCENT }}
+            >
+              <LogIn className="h-4 w-4 inline mr-2" />
+              Login / Register
+            </button>
           </div>
         </SheetContent>
       </Sheet>
@@ -142,34 +119,28 @@ export const AccountSheet = ({ children }: AccountSheetProps) => {
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
-      <SheetTrigger asChild>
-        {children}
-      </SheetTrigger>
-      
-      <SheetContent className="w-[85vw] max-w-sm sm:max-w-md p-0 border-none bg-[#F8F9FA] flex flex-col">
-        <div className="px-6 pt-5 pb-4 bg-white border-b border-slate-100 flex-shrink-0">
+      <SheetTrigger asChild>{children}</SheetTrigger>
+      <SheetContent className="w-[85vw] max-w-sm sm:max-w-md p-0 border-none flex flex-col" style={{ background: "linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)" }}>
+        {/* Dark Header */}
+        <div className="px-6 pt-6 pb-4">
           <SheetHeader>
-            <div className="flex items-baseline gap-2">
-              <SheetTitle className="text-xl font-black uppercase tracking-tighter" style={{ color: COLORS.TEAL }}>
-                My Account
-              </SheetTitle>
-            </div>
+            <SheetTitle className="text-xl font-bold tracking-tight text-white">
+              My Account
+            </SheetTitle>
           </SheetHeader>
           
           {!loading && userName && (
-            <div className="flex items-center gap-3 mt-4 p-3 bg-gradient-to-r from-[#008080]/5 to-transparent rounded-xl border border-[#008080]/10">
-              <div className="h-12 w-12 rounded-full bg-[#008080] flex items-center justify-center border-2 border-[#008080]/20 overflow-hidden">
+            <div className="flex items-center gap-3 mt-4 p-3 rounded-2xl bg-white/10 backdrop-blur-sm">
+              <div className="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center overflow-hidden">
                 {userAvatar ? (
                   <img src={userAvatar} alt={userName} className="h-full w-full object-cover" referrerPolicy="no-referrer" />
                 ) : (
-                  <span className="text-white font-bold text-lg">
-                    {userName.charAt(0).toUpperCase()}
-                  </span>
+                  <User className="h-4 w-4 text-white" />
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold text-slate-800 truncate">{userName}</p>
-                <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">
+                <p className="text-sm font-semibold text-white truncate">{userName}</p>
+                <p className="text-[10px] text-white/50 uppercase tracking-wider">
                   {userRole === "admin" ? "Administrator" : "Member"}
                 </p>
               </div>
@@ -177,40 +148,41 @@ export const AccountSheet = ({ children }: AccountSheetProps) => {
           )}
         </div>
 
-        <div className="flex-1 overflow-y-auto px-6 py-4">
+        {/* White rounded content */}
+        <div className="flex-1 overflow-y-auto bg-white rounded-t-3xl py-4">
           {loading ? (
-            <div className="space-y-3">
-              <Skeleton className="h-24 w-full rounded-[20px]" />
-              <Skeleton className="h-20 w-full rounded-[20px]" />
-              <Skeleton className="h-20 w-full rounded-[20px]" />
+            <div className="space-y-3 px-4">
+              <Skeleton className="h-24 w-full rounded-2xl" />
+              <Skeleton className="h-20 w-full rounded-2xl" />
+              <Skeleton className="h-20 w-full rounded-2xl" />
             </div>
           ) : ( 
-            <div className="space-y-4">
+            <div className="space-y-4 px-4">
               {menuItems.map((section, idx) => {
                 const visibleItems = section.items.filter(item => item.show);
                 if (visibleItems.length === 0) return null;
 
                 return (
-                  <div key={idx} className="space-y-2">
-                    <h3 className="ml-2 text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                  <div key={idx} className="space-y-1">
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2 mb-1">
                       {section.section}
-                    </h3>
-                    <div className="bg-white rounded-[20px] overflow-hidden shadow-sm border border-slate-100 divide-y divide-slate-50">
+                    </p>
+                    <div className="bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm divide-y divide-slate-50">
                       {visibleItems.map((item) => (
                         <button 
                           key={item.path} 
                           onClick={() => handleNavigate(item.path)} 
-                          className="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-50 transition-all active:scale-[0.98] group"
+                          className="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-50/80 transition-all group"
                         >
                           <div className="flex items-center gap-3">
-                            <div className="p-1.5 rounded-lg bg-[#F0E68C]/10 group-hover:bg-[#008080] transition-colors">
-                              <item.icon className="h-4 w-4 text-[#857F3E] group-hover:text-white" />
+                            <div className="p-2 rounded-xl" style={{ backgroundColor: ACCENT_BG }}>
+                              <item.icon className="h-4 w-4" style={{ color: ACCENT }} />
                             </div>
-                            <span className="text-[11px] font-black uppercase tracking-tight text-slate-700">
+                            <span className="text-sm font-medium text-slate-700 group-hover:text-slate-900">
                               {item.label}
                             </span>
                           </div>
-                          <ChevronRight className="h-4 w-4 text-slate-300 group-hover:text-[#008080] transition-colors" />
+                          <ChevronRight className="h-4 w-4 text-slate-300 group-hover:text-slate-500 transition-transform group-hover:translate-x-0.5" />
                         </button>
                       ))}
                     </div>
@@ -220,13 +192,13 @@ export const AccountSheet = ({ children }: AccountSheetProps) => {
 
               <button 
                 onClick={handleLogout} 
-                className="w-full flex items-center justify-between px-4 py-3 bg-white rounded-[20px] border border-red-50 shadow-sm hover:bg-red-50/50 transition-all group"
+                className="w-full flex items-center justify-between px-4 py-3 bg-white rounded-2xl border border-red-100 shadow-sm hover:bg-red-50/50 transition-all group"
               >
                 <div className="flex items-center gap-3">
-                  <div className="p-1.5 rounded-lg bg-red-50 group-hover:bg-red-500 transition-colors">
+                  <div className="p-2 rounded-xl bg-red-50 group-hover:bg-red-500 transition-colors">
                     <LogOut className="h-4 w-4 text-red-500 group-hover:text-white" />
                   </div>
-                  <span className="text-[11px] font-black uppercase tracking-tight text-red-500">
+                  <span className="text-sm font-medium text-red-500">
                     Log Out
                   </span>
                 </div>

@@ -40,8 +40,8 @@ export const Header = ({ onSearchClick, showSearchIcon = true, className, __from
   const headerIconStyles = "h-9 w-9 rounded-xl flex items-center justify-center transition-all duration-200 active:scale-90 text-white hover:bg-white/20";
 
   return (
-    <header className={`z-[100] items-center absolute top-0 md:fixed md:top-0 left-0 right-0 flex py-3 ${className || ''}`}
-      style={{ backgroundColor: '#008080' }}
+    <header className={`z-[100] items-center absolute top-0 md:fixed md:top-0 left-0 right-0 flex py-3 md:bg-[#008080] ${className || ''}`}
+      style={{}}
     >
       <div className="container mx-auto px-4 flex items-center justify-between h-full">
         <div className="flex items-center gap-2">
