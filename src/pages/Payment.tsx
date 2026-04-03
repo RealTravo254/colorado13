@@ -177,6 +177,11 @@ export default function Payment() {
           <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Earnings, referrals & withdrawals</p>
         </div>
 
+        {/* Payment History Link */}
+        <Button variant="outline" size="sm" className="mb-4 w-full rounded-xl text-[10px] font-black uppercase tracking-widest border-border" onClick={() => navigate("/payment-history")}>
+          <CreditCard className="mr-2 h-3.5 w-3.5" /> View Payment History
+        </Button>
+
         {/* Balance Card */}
         <div className="bg-card rounded-xl p-4 border border-border mb-4">
           <div className="flex items-center justify-between">
