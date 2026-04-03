@@ -12,7 +12,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { 
   ChevronRight, User, Briefcase, CreditCard, Shield, 
-  LogOut, UserCog, 
+  LogOut, UserCog, LogIn,
   CalendarCheck, Settings, LayoutDashboard, Receipt, Users
 } from "lucide-react";
 
@@ -38,9 +38,11 @@ export const AccountSheet = ({ children }: AccountSheetProps) => {
   const [userRole, setUserRole] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
 
-  // IMMEDIATE DATA LOADING - Fetch as soon as user is available, not just when sheet opens
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
     
     const fetchUserData = async () => {
       setLoading(true);
@@ -66,7 +68,7 @@ export const AccountSheet = ({ children }: AccountSheetProps) => {
       }
     };
     fetchUserData();
-  }, [user]); // Removed isOpen dependency - loads immediately when user exists
+  }, [user]);
 
   const handleLogout = async () => {
     setIsOpen(false);
@@ -99,6 +101,45 @@ export const AccountSheet = ({ children }: AccountSheetProps) => {
     ]}
   ];
 
+  // Not logged in - show login prompt
+  if (!user) {
+    return (
+      <Sheet open={isOpen} onOpenChange={setIsOpen}>
+        <SheetTrigger asChild>
+          {children}
+        </SheetTrigger>
+        <SheetContent className="w-full sm:max-w-md p-0 border-none bg-[#F8F9FA] flex flex-col">
+          <div className="px-6 pt-5 pb-4 bg-white border-b border-slate-100 flex-shrink-0">
+            <SheetHeader>
+              <SheetTitle className="text-xl font-black uppercase tracking-tighter" style={{ color: COLORS.TEAL }}>
+                Welcome
+              </SheetTitle>
+            </SheetHeader>
+          </div>
+          <div className="flex-1 flex flex-col items-center justify-center px-6 py-12">
+            <div className="h-20 w-20 rounded-full bg-[#008080]/10 flex items-center justify-center mb-6">
+              <User className="h-10 w-10 text-[#008080]" />
+            </div>
+            <h3 className="text-lg font-bold text-foreground mb-2">Join RealTravo</h3>
+            <p className="text-sm text-muted-foreground text-center mb-8 max-w-xs">
+              Sign up or log in to manage your bookings, save your favorite places, and become a host.
+            </p>
+            <div className="flex flex-col gap-3 w-full max-w-xs">
+              <button 
+                onClick={() => { setIsOpen(false); navigate('/auth'); }}
+                className="w-full py-3 rounded-xl text-sm font-bold text-white transition-all active:scale-95"
+                style={{ backgroundColor: COLORS.TEAL }}
+              >
+                <LogIn className="h-4 w-4 inline mr-2" />
+                Sign Up / Log In
+              </button>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
+    );
+  }
+
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
@@ -106,7 +147,6 @@ export const AccountSheet = ({ children }: AccountSheetProps) => {
       </SheetTrigger>
       
       <SheetContent className="w-full sm:max-w-md p-0 border-none bg-[#F8F9FA] flex flex-col">
-        {/* COMPACT HEADER - Settings & My Account together */}
         <div className="px-6 pt-5 pb-4 bg-white border-b border-slate-100 flex-shrink-0">
           <SheetHeader>
             <div className="flex items-baseline gap-2">
@@ -116,7 +156,6 @@ export const AccountSheet = ({ children }: AccountSheetProps) => {
             </div>
           </SheetHeader>
           
-          {/* User Profile Info */}
           {!loading && userName && (
             <div className="flex items-center gap-3 mt-4 p-3 bg-gradient-to-r from-[#008080]/5 to-transparent rounded-xl border border-[#008080]/10">
               <div className="h-12 w-12 rounded-full bg-[#008080] flex items-center justify-center border-2 border-[#008080]/20 overflow-hidden">
@@ -138,7 +177,6 @@ export const AccountSheet = ({ children }: AccountSheetProps) => {
           )}
         </div>
 
-        {/* MAIN CONTENT - No ScrollArea, compact spacing */}
         <div className="flex-1 overflow-y-auto px-6 py-4">
           {loading ? (
             <div className="space-y-3">
@@ -148,7 +186,6 @@ export const AccountSheet = ({ children }: AccountSheetProps) => {
             </div>
           ) : ( 
             <div className="space-y-4">
-              {/* Menu Sections - Compact spacing */}
               {menuItems.map((section, idx) => {
                 const visibleItems = section.items.filter(item => item.show);
                 if (visibleItems.length === 0) return null;
@@ -181,7 +218,6 @@ export const AccountSheet = ({ children }: AccountSheetProps) => {
                 );
               })}
 
-              {/* Logout Button - Compact */}
               <button 
                 onClick={handleLogout} 
                 className="w-full flex items-center justify-between px-4 py-3 bg-white rounded-[20px] border border-red-50 shadow-sm hover:bg-red-50/50 transition-all group"
