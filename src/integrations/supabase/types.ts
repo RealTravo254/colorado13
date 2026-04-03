@@ -49,6 +49,7 @@ export type Database = {
           phone_numbers: string[] | null
           place: string
           registration_number: string | null
+          rejection_reason: string | null
           slug: string | null
         }
         Insert: {
@@ -85,6 +86,7 @@ export type Database = {
           phone_numbers?: string[] | null
           place: string
           registration_number?: string | null
+          rejection_reason?: string | null
           slug?: string | null
         }
         Update: {
@@ -121,6 +123,7 @@ export type Database = {
           phone_numbers?: string[] | null
           place?: string
           registration_number?: string | null
+          rejection_reason?: string | null
           slug?: string | null
         }
         Relationships: []
@@ -286,16 +289,72 @@ export type Database = {
           },
         ]
       }
+      companies: {
+        Row: {
+          company_name: string
+          country: string
+          created_at: string
+          email: string
+          id: string
+          phone_number: string
+          profile_photo_url: string | null
+          registration_number: string
+          rejection_reason: string | null
+          updated_at: string
+          user_id: string
+          verification_status: string
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          company_name: string
+          country: string
+          created_at?: string
+          email: string
+          id?: string
+          phone_number: string
+          profile_photo_url?: string | null
+          registration_number: string
+          rejection_reason?: string | null
+          updated_at?: string
+          user_id: string
+          verification_status?: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          company_name?: string
+          country?: string
+          created_at?: string
+          email?: string
+          id?: string
+          phone_number?: string
+          profile_photo_url?: string | null
+          registration_number?: string
+          rejection_reason?: string | null
+          updated_at?: string
+          user_id?: string
+          verification_status?: string
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Relationships: []
+      }
       host_verifications: {
         Row: {
+          business_email: string | null
+          business_phone: string | null
           city: string
           created_at: string
           document_back_url: string | null
           document_front_url: string
           document_type: string
+          hosting_category: string | null
           id: string
           legal_name: string
           postal_code: string | null
+          registration_name: string | null
+          registration_number: string | null
           rejection_reason: string | null
           reviewed_at: string | null
           reviewed_by: string | null
@@ -307,14 +366,19 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          business_email?: string | null
+          business_phone?: string | null
           city?: string
           created_at?: string
           document_back_url?: string | null
           document_front_url: string
           document_type: string
+          hosting_category?: string | null
           id?: string
           legal_name: string
           postal_code?: string | null
+          registration_name?: string | null
+          registration_number?: string | null
           rejection_reason?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
@@ -326,14 +390,19 @@ export type Database = {
           user_id: string
         }
         Update: {
+          business_email?: string | null
+          business_phone?: string | null
           city?: string
           created_at?: string
           document_back_url?: string | null
           document_front_url?: string
           document_type?: string
+          hosting_category?: string | null
           id?: string
           legal_name?: string
           postal_code?: string | null
+          registration_name?: string | null
+          registration_number?: string | null
           rejection_reason?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
@@ -390,6 +459,7 @@ export type Database = {
           phone_numbers: string[] | null
           place: string
           registration_number: string | null
+          rejection_reason: string | null
           slug: string | null
         }
         Insert: {
@@ -427,6 +497,7 @@ export type Database = {
           phone_numbers?: string[] | null
           place: string
           registration_number?: string | null
+          rejection_reason?: string | null
           slug?: string | null
         }
         Update: {
@@ -464,6 +535,7 @@ export type Database = {
           phone_numbers?: string[] | null
           place?: string
           registration_number?: string | null
+          rejection_reason?: string | null
           slug?: string | null
         }
         Relationships: []
@@ -1167,6 +1239,7 @@ export type Database = {
           place: string
           price: number
           price_child: number | null
+          rejection_reason: string | null
           slot_limit_type: string
           slug: string | null
           type: string | null
@@ -1201,6 +1274,7 @@ export type Database = {
           place: string
           price: number
           price_child?: number | null
+          rejection_reason?: string | null
           slot_limit_type?: string
           slug?: string | null
           type?: string | null
@@ -1235,6 +1309,7 @@ export type Database = {
           place?: string
           price?: number
           price_child?: number | null
+          rejection_reason?: string | null
           slot_limit_type?: string
           slug?: string | null
           type?: string | null
@@ -1408,12 +1483,37 @@ export type Database = {
         }
         Relationships: []
       }
+      public_companies: {
+        Row: {
+          company_name: string | null
+          country: string | null
+          id: string | null
+          profile_photo_url: string | null
+          verification_status: string | null
+        }
+        Insert: {
+          company_name?: string | null
+          country?: string | null
+          id?: string | null
+          profile_photo_url?: string | null
+          verification_status?: string | null
+        }
+        Update: {
+          company_name?: string | null
+          country?: string | null
+          id?: string | null
+          profile_photo_url?: string | null
+          verification_status?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       cleanup_expired_listings: { Args: never; Returns: undefined }
       cleanup_old_bookings: { Args: never; Returns: undefined }
       cleanup_old_notifications: { Args: never; Returns: undefined }
       generate_referral_id: { Args: never; Returns: string }
+      get_auth_uid: { Args: never; Returns: string }
       get_date_availability: {
         Args: { p_date: string; p_item_id: string; p_item_type: string }
         Returns: Json
