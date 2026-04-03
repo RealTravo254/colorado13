@@ -596,6 +596,7 @@ const AdventurePlaceDetail = () => {
           </Button>
         </div>
       </div>
+    </div>
   );
 };
 
