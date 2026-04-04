@@ -376,16 +376,16 @@ export const SearchBarWithSuggestions = React.forwardRef<HTMLDivElement, SearchB
                         >
                           <div className="flex-1 flex flex-col justify-center min-w-0">
                             <div className="flex items-center gap-2 mb-1 flex-wrap">
-                               <span className="text-[9px] font-black text-white px-2 py-0.5 rounded-full uppercase tracking-widest" style={{ background: COLORS.TEAL }}>
+                               <span className="text-[9px] font-black bg-primary text-primary-foreground px-2 py-0.5 rounded-full uppercase tracking-widest">
                                 {getTypeLabel(result.type)}
                               </span>
                               {result.date && (
-                                <span className="text-[9px] font-black text-[#FF7F50] uppercase tracking-widest">
+                                <span className="text-[9px] font-black text-secondary uppercase tracking-widest">
                                   • {new Date(result.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
                                 </span>
                               )}
                               {result.matchedActivity && (
-                                <span className="text-[8px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider bg-[#FF7F50]/15 text-[#FF7F50] border border-[#FF7F50]/20">
+                                <span className="text-[8px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider bg-accent/15 text-accent border border-accent/20">
                                   🎯 {result.matchedActivity}
                                 </span>
                               )}
