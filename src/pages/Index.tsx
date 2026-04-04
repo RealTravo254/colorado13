@@ -506,7 +506,7 @@ const Index = () => {
           <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/80" />
 
           {/* Content - centered text + search */}
-          <div className="absolute inset-0 flex flex-col items-center justify-center pb-20 md:pb-20 px-4">
+          <div className="absolute inset-0 flex flex-col items-center justify-center px-4">
             <div className="container mx-auto px-4 md:px-6">
               <p className="text-primary-foreground/70 text-xs md:text-sm font-semibold uppercase tracking-widest text-center mb-2">
                 {t('hero.tagline')}
@@ -529,9 +529,9 @@ const Index = () => {
           </div>
 
           {/* Category cards inside hero image at bottom */}
-          <div className="absolute bottom-0 left-0 right-0 z-20 px-4 md:px-6 pb-3">
-            <div className="container mx-auto">
-              <div className="grid grid-cols-4 gap-2 md:gap-3 w-full">
+          <div className="absolute bottom-0 left-0 right-0 z-20 px-4 md:px-6 pb-2 md:pb-4">
+            <div className="container mx-auto max-w-3xl">
+              <div className="grid grid-cols-4 gap-1.5 md:gap-2">
                 {CATEGORIES.map((cat) => (
                   <CategoryCard
                     key={cat.title}
