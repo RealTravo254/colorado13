@@ -22,27 +22,25 @@ export const CategoryCard = ({
     <button
       onClick={onClick}
       className={cn(
-        "group cursor-pointer overflow-hidden rounded-2xl transition-all duration-300 hover:shadow-lg hover:-translate-y-1 relative",
+        "group cursor-pointer overflow-hidden rounded-2xl transition-all duration-300 hover:shadow-lg hover:-translate-y-1 relative w-full",
         className
       )}
     >
       {bgImage ? (
-        <>
-          <div className="relative w-full aspect-[4/3] overflow-hidden rounded-2xl">
-            <img
-              src={bgImage}
-              alt={title}
-              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-              loading="lazy"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent rounded-2xl" />
-          </div>
-          <div className="absolute bottom-0 left-0 right-0 p-3 text-center">
+        <div className="relative w-full aspect-[4/3] overflow-hidden rounded-2xl">
+          <img
+            src={bgImage}
+            alt={title}
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+            loading="lazy"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent rounded-2xl" />
+          <div className="absolute bottom-0 left-0 right-0 p-2.5 text-center">
             <h3 className="font-extrabold text-xs sm:text-sm md:text-base text-white uppercase tracking-wider drop-shadow-lg">{title}</h3>
           </div>
-        </>
+        </div>
       ) : (
-        <div className="p-2 flex flex-col items-center text-center gap-1 bg-card border-2 border-border rounded-2xl hover:border-primary">
+        <div className="p-2 flex flex-col items-center text-center gap-1 bg-card border-2 border-border rounded-2xl hover:border-primary w-full">
           <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-primary-foreground group-hover:scale-110 transition-transform duration-300">
             <Icon className="h-4 w-4" />
           </div>

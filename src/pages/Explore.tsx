@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search as SearchIcon, SlidersHorizontal, MapPin, Compass, Calendar, Tent, Trophy, X } from "lucide-react";
+import { SearchBarWithSuggestions } from "@/components/SearchBarWithSuggestions";
 import { ListingCard } from "@/components/ListingCard";
 import { ListingSkeleton } from "@/components/ui/listing-skeleton";
 import { supabase } from "@/integrations/supabase/client";
