@@ -11,7 +11,10 @@ export const useRatings = (itemIds: string[]) => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (itemIds.length === 0) return;
+    // Filter to only valid UUIDs to avoid Postgres errors
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    const validIds = itemIds.filter(id => uuidRegex.test(id));
+    if (validIds.length === 0) return;
 
     const fetchRatings = async () => {
       setLoading(true);
@@ -19,7 +22,7 @@ export const useRatings = (itemIds: string[]) => {
         const { data, error } = await supabase
           .from("reviews")
           .select("item_id, rating")
-          .in("item_id", itemIds);
+          .in("item_id", validIds);
 
         if (error) {
           console.error("Error fetching ratings:", error);
