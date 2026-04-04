@@ -514,15 +514,17 @@ const Index = () => {
               <h1 className="text-primary-foreground text-3xl md:text-5xl font-extrabold text-center mb-5 md:mb-7 leading-tight tracking-tight">
                 {t('hero.title')}
               </h1>
-              <SearchBarWithSuggestions
-                value={searchQuery} onChange={setSearchQuery}
-                onSubmit={() => { if (searchQuery.trim()) { fetchAllData(searchQuery); setIsSearchFocused(true); } }}
-                onSuggestionSearch={q => { setSearchQuery(q); fetchAllData(q); setIsSearchFocused(true); }}
-                onFocus={() => setIsSearchFocused(true)}
-                onBlur={() => {}}
-                onBack={() => { setIsSearchFocused(false); setSearchQuery(""); fetchAllData(); }}
-                showBackButton={false}
-              />
+              <div onClick={() => navigate('/explore')} className="cursor-pointer">
+                <SearchBarWithSuggestions
+                  value="" onChange={() => {}}
+                  onSubmit={() => navigate('/explore')}
+                  onSuggestionSearch={() => navigate('/explore')}
+                  onFocus={() => navigate('/explore')}
+                  onBlur={() => {}}
+                  onBack={() => {}}
+                  showBackButton={false}
+                />
+              </div>
             </div>
           </div>
 
