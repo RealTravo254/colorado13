@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Clock, X, TrendingUp, Plane, Hotel, Tent, Landmark, Home, Calendar, Search as SearchIcon, MapPin, Loader2, Sparkles } from "lucide-react";
+import { Clock, TrendingUp, Home, Calendar, Search as SearchIcon, MapPin, Loader2, Sparkles } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { getSessionId } from "@/lib/sessionManager";
 import { Input } from "@/components/ui/input";
