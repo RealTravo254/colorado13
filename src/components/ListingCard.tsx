@@ -13,11 +13,11 @@ const PriceText = ({ price, isUnavailable, type }: { price: number; isUnavailabl
   const label = ['HOTEL', 'ACCOMMODATION'].includes(type) ? '/night' : '/person';
   return (
     <div className={cn(
-      "flex items-center gap-1 rounded-md px-2 py-0.5 bg-destructive/10",
+      "flex items-center gap-1",
       isUnavailable && "opacity-50 line-through"
     )}>
-      <span className="text-xs font-bold text-destructive whitespace-nowrap">{formatPrice(price)}</span>
-      <span className="text-[8px] text-destructive/70 font-medium">{label}</span>
+      <span className="text-xs font-bold text-slate-900 whitespace-nowrap">{formatPrice(price)}</span>
+      <span className="text-[8px] text-slate-500 font-medium">{label}</span>
     </div>
   );
 };
