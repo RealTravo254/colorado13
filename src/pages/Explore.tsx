@@ -149,7 +149,7 @@ const Explore = () => {
       </div>
 
       {/* Results */}
-      <main className="flex-1 container mx-auto px-4 py-4 pb-24 md:pb-8">
+      <main className={cn("flex-1 container mx-auto px-4 py-4 pb-24 md:pb-8 transition-opacity duration-200", isSearchFocused && "pointer-events-none opacity-20")}>
         <p className="text-xs text-muted-foreground mb-3 font-medium">
           {searchQuery ? `Results for "${searchQuery}"` : `${filteredListings.length} listings`}
           {activeFilter !== "all" && ` in ${FILTER_TABS.find(t => t.key === activeFilter)?.label}`}
