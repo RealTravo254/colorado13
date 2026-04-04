@@ -74,6 +74,7 @@ const BecomeHost = () => {
         const hasV = verification && !verificationError;
         setHasVerification(!!hasV);
         setVerificationStatus(verification?.status || null);
+        setHostingCategory(verification?.hosting_category as HostingCategory || null);
         setHasCompany(!!company);
         setCompanyStatus(company?.verification_status || null);
 
