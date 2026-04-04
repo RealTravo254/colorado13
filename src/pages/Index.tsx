@@ -687,7 +687,7 @@ const Index = () => {
                 <div className="flex gap-3 md:gap-4 overflow-x-auto pb-2 scrollbar-hide scroll-smooth snap-x snap-mandatory">
                   {loadingNearby ? (
                     [...Array(4)].map((_, i) => (
-                      <div key={i} className="flex-shrink-0 w-[72vw] sm:w-[280px] md:w-[320px] snap-start">
+                      <div key={i} className="flex-shrink-0 w-[44vw] sm:w-[220px] md:w-[240px] snap-start">
                         <ListingSkeleton />
                       </div>
                     ))
