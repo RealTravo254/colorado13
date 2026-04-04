@@ -166,7 +166,7 @@ const ListingCardComponent = ({
     >
       {/* ── Image Slideshow ── */}
       <div
-        className="relative w-full overflow-hidden aspect-[4/3]"
+        className="relative w-full overflow-hidden aspect-[3/4] sm:aspect-[4/3]"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
@@ -196,6 +196,33 @@ const ListingCardComponent = ({
             </div>
           ))}
         </div>
+
+        {/* Category badge on image */}
+        <div className="absolute top-2 left-2 z-20 flex items-center gap-1.5">
+          <span
+            className={cn(
+              "text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md shadow-sm backdrop-blur-sm",
+              !categoryColor && "text-primary-foreground bg-primary/90"
+            )}
+            style={categoryColor ? { color: '#fff', backgroundColor: `${categoryColor}dd` } : undefined}
+          >
+            {displayType}
+          </span>
+          {urgencyBadge && (
+            <span className={cn("text-[8px] font-bold px-1.5 py-0.5 rounded-full border backdrop-blur-sm", urgencyBadge.color)}>
+              {urgencyBadge.text}
+            </span>
+          )}
+        </div>
+
+        {/* Extra images count badge */}
+        {allSlideImages.length > 1 && (
+          <div className="absolute top-2 right-2 z-20">
+            <span className="text-[9px] font-bold text-white bg-black/50 backdrop-blur-sm px-1.5 py-0.5 rounded-md">
+              +{allSlideImages.length - 1}
+            </span>
+          </div>
+        )}
 
         {/* Navigation arrows (desktop only, on hover) */}
         {allSlideImages.length > 1 && (
@@ -252,32 +279,29 @@ const ListingCardComponent = ({
 
       {/* ── Content below image ── */}
       <div className="flex flex-col gap-1 p-2.5 min-w-0">
-        {/* Category + urgency */}
-        <div className="flex items-center gap-1.5 flex-wrap">
-          <span
-            className={cn(
-              "text-[8px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md",
-              !categoryColor && "text-primary-foreground bg-primary"
-            )}
-            style={categoryColor ? { color: '#fff', backgroundColor: categoryColor } : undefined}
-          >
-            {displayType}
-          </span>
-          {urgencyBadge && (
-            <span className={cn("text-[8px] font-bold px-1.5 py-0.5 rounded-full border", urgencyBadge.color)}>
-              {urgencyBadge.text}
-            </span>
-          )}
-        </div>
-
         {/* Title */}
-        <h3 className="line-clamp-1 text-xs font-bold leading-snug text-foreground group-hover:text-primary transition-colors">
+        <h3 className="line-clamp-2 text-xs font-bold leading-snug text-foreground group-hover:text-primary transition-colors">
           {formattedName}
         </h3>
 
-        {/* Subtitle */}
+        {/* Price */}
+        {!hidePrice && price != null && price > 0 && (
+          <PriceText price={price} isUnavailable={isUnavailable} type={type} />
+        )}
+
+        {/* Subtitle / activities */}
         {subtitle && (
           <p className="line-clamp-1 text-[10px] text-muted-foreground">{subtitle}</p>
+        )}
+
+        {/* Date row */}
+        {(date || isFlexibleDate) && (
+          <div className="flex items-center gap-0.5 text-muted-foreground">
+            <Calendar className="h-2.5 w-2.5" />
+            <span className="text-[9px] font-medium">
+              {isFlexibleDate ? 'Flexible' : new Date(date!).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
+            </span>
+          </div>
         )}
 
         {/* Location */}
@@ -286,39 +310,22 @@ const ListingCardComponent = ({
           <span className="text-[10px] font-medium truncate capitalize">{locationString.toLowerCase()}</span>
         </div>
 
-        {/* Bottom row */}
-        <div className="flex items-center justify-between gap-1.5 pt-1 mt-auto border-t border-border/50">
-          <div className="flex items-center gap-1.5 flex-wrap min-w-0">
-            {avgRating != null && avgRating > 0 && (
-              <div className="flex items-center gap-0.5 flex-shrink-0">
-                <Star className="h-2.5 w-2.5 fill-amber-400 text-amber-400" />
-                <span className="text-[10px] font-bold text-foreground">{avgRating.toFixed(1)}</span>
-                {reviewCount != null && reviewCount > 0 && (
-                  <span className="text-[8px] text-muted-foreground">({reviewCount})</span>
-                )}
-              </div>
-            )}
-
-            {(date || isFlexibleDate) && (
-              <div className="flex items-center gap-0.5 text-muted-foreground flex-shrink-0">
-                <Calendar className="h-2.5 w-2.5" />
-                <span className="text-[9px] font-medium">
-                  {isFlexibleDate ? 'Flexible' : new Date(date!).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
-                </span>
-              </div>
-            )}
-
-            {tracksAvailability && availableTickets > 0 && !isUnavailable && !fewSlotsRemaining && (
-              <span className="text-[8px] font-semibold text-primary flex-shrink-0">
-                <Ticket className="inline h-2.5 w-2.5 mr-0.5" />{remainingTickets}
-              </span>
-            )}
-          </div>
-
-          {!hidePrice && price != null && price > 0 && (
-            <div className="flex-shrink-0">
-              <PriceText price={price} isUnavailable={isUnavailable} type={type} />
+        {/* Bottom row - rating + tickets */}
+        <div className="flex items-center gap-1.5 pt-1 mt-auto border-t border-border/50">
+          {avgRating != null && avgRating > 0 && (
+            <div className="flex items-center gap-0.5 flex-shrink-0">
+              <Star className="h-2.5 w-2.5 fill-amber-400 text-amber-400" />
+              <span className="text-[10px] font-bold text-foreground">{avgRating.toFixed(1)}</span>
+              {reviewCount != null && reviewCount > 0 && (
+                <span className="text-[8px] text-muted-foreground">({reviewCount})</span>
+              )}
             </div>
+          )}
+
+          {tracksAvailability && availableTickets > 0 && !isUnavailable && !fewSlotsRemaining && (
+            <span className="text-[8px] font-semibold text-primary flex-shrink-0">
+              <Ticket className="inline h-2.5 w-2.5 mr-0.5" />{remainingTickets}
+            </span>
           )}
         </div>
       </div>
