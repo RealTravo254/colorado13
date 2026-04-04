@@ -528,22 +528,23 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Category cards with images */}
-          <div className="absolute bottom-3 left-0 right-0 z-10">
-            <div className="container mx-auto px-4 md:px-6">
-              <div className="grid grid-cols-3 gap-2 w-full">
-                {CATEGORIES.map((cat) => (
-                  <CategoryCard
-                    key={cat.title}
-                    icon={cat.icon}
-                    title={cat.title}
-                    description=""
-                    onClick={() => navigate(cat.path)}
-                    bgImage={cat.bgImage}
-                  />
-                ))}
-              </div>
-            </div>
+        </div>
+      )}
+
+      {/* Category cards - below hero, not overlapping */}
+      {!isSearchFocused && (
+        <div className="container mx-auto px-4 md:px-6 -mt-8 relative z-20">
+          <div className="grid grid-cols-3 gap-2 w-full">
+            {CATEGORIES.map((cat) => (
+              <CategoryCard
+                key={cat.title}
+                icon={cat.icon}
+                title={cat.title}
+                description=""
+                onClick={() => navigate(cat.path)}
+                bgImage={cat.bgImage}
+              />
+            ))}
           </div>
         </div>
       )}
