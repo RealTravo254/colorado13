@@ -410,10 +410,10 @@ export const SearchBarWithSuggestions = React.forwardRef<HTMLDivElement, SearchB
 
                   {/* Not Available */}
                   {!isSearching && hasSearched && suggestions.length === 0 && (
-                    <div className="p-10 text-center">
-                      <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-2">Not Available</p>
-                      <p className="text-slate-300 text-[10px]">No results found for "{value}"</p>
-                    </div>
+                     <div className="p-10 text-center">
+                       <p className="text-muted-foreground text-xs font-bold uppercase tracking-widest mb-2">Not Available</p>
+                       <p className="text-muted-foreground/50 text-[10px]">No results found for "{value}"</p>
+                     </div>
                   )}
                 </div>
               )}

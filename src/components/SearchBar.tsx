@@ -18,15 +18,14 @@ export const SearchBar = ({ value, onChange, onSubmit }: SearchBarProps) => {
     <div className="w-full">
       <div className="container mx-auto px-4 md:px-6 lg:px-8">
         <div className="relative w-full max-w-3xl mx-auto"> 
-          <Search className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 h-4 w-4 md:h-5 md:w-5 text-muted-foreground" />
+          <Search className="absolute left-4 md:left-5 top-1/2 -translate-y-1/2 h-4 w-4 md:h-5 md:w-5 text-muted-foreground" />
           <Input
             type="text"
             placeholder="Search for trips, events, hotels, places, or countries..."
             value={value}
             onChange={(e) => onChange(e.target.value)}
             onKeyPress={handleKeyPress}
-            // Retained rounded-full for the 50% radius as requested previously, matching the image.
-            className="pl-10 md:pl-12 pr-3 md:pr-4 h-10 md:h-14 text-sm md:text-lg rounded-full border-2 focus-visible:border-primary shadow-md"
+            className="pl-11 md:pl-14 pr-3 md:pr-4 h-10 md:h-14 text-sm md:text-lg rounded-full border-2 border-border bg-card text-foreground shadow-md focus-visible:ring-2 focus-visible:ring-primary focus-visible:border-primary placeholder:text-muted-foreground transition-all"
           />
         </div>
       </div>
