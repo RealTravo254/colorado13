@@ -166,7 +166,7 @@ const Explore = () => {
             <p className="text-muted-foreground/60 text-xs mt-1">Try a different search or filter</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-3">
             {filteredListings.map((listing, index) => {
               const ratingData = ratings.get(listing.id);
               const isTripsOrEvents = listing.type === "TRIP" || listing.type === "EVENT";
