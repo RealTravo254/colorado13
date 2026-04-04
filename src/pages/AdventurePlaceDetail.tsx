@@ -667,29 +667,25 @@ const AdventurePlaceDetail = () => {
         <div className="flex items-center justify-between px-4 py-3">
           <div>
             {place.entry_fee && place.entry_fee > 0 ? (
-              <>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-base font-bold text-destructive">{formatPrice(Number(place.entry_fee))}</span>
-                  <span className="text-[9px] font-bold text-slate-400 uppercase">/ adult</span>
-                </div>
-                {place.child_entry_fee != null && (
-                  <div className="text-[10px] font-bold text-slate-500">Child: {formatPrice(Number(place.child_entry_fee || 0))}</div>
-                )}
-              </>
+              <div className="flex items-baseline gap-1">
+                <span className="text-xs text-slate-500">From</span>
+                <span className="text-lg font-black text-slate-900">{formatPrice(Number(place.entry_fee))}</span>
+                <span className="text-xs text-slate-500">/ person</span>
+              </div>
             ) : getStartingPrice() > 0 ? (
               <div className="flex items-baseline gap-1">
-                <span className="text-[9px] font-bold text-slate-400 uppercase mr-1">From</span>
-                <span className="text-base font-bold text-destructive">{formatPrice(getStartingPrice())}</span>
+                <span className="text-xs text-slate-500">From</span>
+                <span className="text-lg font-black text-slate-900">{formatPrice(getStartingPrice())}</span>
               </div>
             ) : (
-              <span className="text-sm font-semibold text-emerald-600">Free Entry</span>
+              <span className="text-sm font-bold text-emerald-600">Free Entry</span>
             )}
           </div>
           <Button
             onClick={() => navigate(`/booking/adventure_place/${resolvedId}`)}
-            className="px-6 py-5 rounded-xl text-xs font-black uppercase tracking-widest text-white border-none bg-gradient-to-r from-[#FF7F50] to-[#FF4E50]"
+            className="px-6 py-5 rounded-xl text-sm font-bold text-white border-none bg-emerald-600 hover:bg-emerald-700"
           >
-            Reserve
+            Check availability
           </Button>
         </div>
       </div>
