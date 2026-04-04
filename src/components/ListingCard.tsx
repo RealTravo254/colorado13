@@ -1,5 +1,5 @@
 import React, { useState, memo, useCallback, useMemo, useEffect, useRef } from "react";
-import { MapPin, Star, Calendar, Ticket, ChevronLeft, ChevronRight } from "lucide-react";
+import { MapPin, Star, Calendar, Ticket, ChevronLeft, ChevronRight, Clock } from "lucide-react";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -55,6 +55,8 @@ export interface ListingCardProps {
   categoryColor?: string;
   galleryImages?: string[];
   images?: string[];
+  openingHours?: string;
+  closingHours?: string;
 }
 
 const ListingCardComponent = ({
@@ -63,11 +65,12 @@ const ListingCardComponent = ({
   availableTickets = 0, bookedTickets = 0,
   priority = false, compact = false, avgRating, reviewCount, place,
   isFlexibleDate = false, hidePrice = false, description, categoryColor,
-  galleryImages, images: extraImages, country
+  galleryImages, images: extraImages, country,
+  openingHours, closingHours
 }: ListingCardProps) => {
   const navigate = useNavigate();
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [loadedSlides, setLoadedSlides] = useState(2); // Start with 2 images loaded
+  const [loadedSlides, setLoadedSlides] = useState(2);
   const [imageLoadStates, setImageLoadStates] = useState<Record<number, boolean>>({});
   const slideContainerRef = useRef<HTMLDivElement>(null);
   const touchStartX = useRef(0);
@@ -75,7 +78,6 @@ const ListingCardComponent = ({
   const { ref: cardRef, isIntersecting } = useIntersectionObserver({ rootMargin: '300px', triggerOnce: true });
   const shouldLoad = priority || isIntersecting;
 
-  // Build slideshow images
   const allSlideImages = useMemo(() => {
     const imgs = [imageUrl];
     if (galleryImages?.length) imgs.push(...galleryImages);
@@ -93,12 +95,13 @@ const ListingCardComponent = ({
   const isUnavailable = isOutdated || isSoldOut;
 
   const displayType = useMemo(() => {
+    if (isFlexibleDate && isTrip) return "Guided Tour";
     if (isEventOrSport) return "Event";
     if (type === "ADVENTURE PLACE") return "Adventure";
     if (type === "HOTEL") return "Hotel";
     if (type === "TRIP") return "Trip";
     return type.replace('_', ' ');
-  }, [isEventOrSport, type]);
+  }, [isEventOrSport, type, isFlexibleDate, isTrip]);
 
   const formattedName = useMemo(() => name.toLowerCase().replace(/\b\w/g, c => c.toUpperCase()), [name]);
   const locationString = useMemo(() => [place, location].filter(Boolean).join(', '), [place, location]);
@@ -126,13 +129,11 @@ const ListingCardComponent = ({
     return null;
   }, [isSoldOut, isOutdated, fewSlotsRemaining, remainingTickets]);
 
-  // Slideshow navigation
   const goToSlide = useCallback((index: number, e?: React.MouseEvent) => {
     e?.stopPropagation();
     const maxIndex = Math.min(allSlideImages.length - 1, loadedSlides - 1);
     const newIndex = Math.max(0, Math.min(index, maxIndex));
     setCurrentSlide(newIndex);
-    // Load more images when approaching end
     if (newIndex >= loadedSlides - 1 && loadedSlides < allSlideImages.length) {
       setLoadedSlides(prev => Math.min(prev + 2, allSlideImages.length));
     }
@@ -152,6 +153,13 @@ const ListingCardComponent = ({
 
   const visibleDots = Math.min(loadedSlides, allSlideImages.length);
 
+  const hoursText = useMemo(() => {
+    if (openingHours || closingHours) {
+      return `${openingHours || "08:00"} - ${closingHours || "18:00"}`;
+    }
+    return null;
+  }, [openingHours, closingHours]);
+
   return (
     <Card
       ref={cardRef}
@@ -164,13 +172,12 @@ const ListingCardComponent = ({
         isUnavailable && "opacity-80"
       )}
     >
-      {/* ── Image Slideshow ── */}
+      {/* Image Slideshow */}
       <div
         className="relative w-full overflow-hidden aspect-[3/4] sm:aspect-[4/3]"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
-        {/* Slides */}
         <div
           ref={slideContainerRef}
           className="flex h-full transition-transform duration-300 ease-out"
@@ -277,7 +284,7 @@ const ListingCardComponent = ({
         )}
       </div>
 
-      {/* ── Content below image ── */}
+      {/* Content below image */}
       <div className="flex flex-col gap-1 p-2.5 min-w-0">
         {/* Title */}
         <h3 className="line-clamp-2 text-xs font-bold leading-snug text-slate-900">
@@ -302,6 +309,14 @@ const ListingCardComponent = ({
             <span className="text-[9px] font-medium">
               {isFlexibleDate ? 'Flexible' : new Date(date!).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
             </span>
+          </div>
+        )}
+
+        {/* Hours available */}
+        {hoursText && (
+          <div className="flex items-center gap-0.5 text-slate-500">
+            <Clock className="h-2.5 w-2.5" />
+            <span className="text-[9px] font-medium">{hoursText}</span>
           </div>
         )}
 

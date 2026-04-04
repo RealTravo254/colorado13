@@ -100,11 +100,12 @@ const ScrollSection = memo(({ title, viewAllPath, accentColor, children, scrollR
 });
 ScrollSection.displayName = "ScrollSection";
 
-// ─── Category cards with images (no Hotels) ──────────────────────────────────
+// ─── Category cards with images (no Hotels) + Guide ──────────────────────────
 const CATEGORIES = [
   { icon: Tent, title: "Adventures", path: "/category/campsite", bgImage: "/images/category-adventures.jpg" },
   { icon: Calendar, title: "Trips", path: "/category/trips", bgImage: "/images/category-trips.jpg" },
   { icon: Compass, title: "Events", path: "/category/events", bgImage: "/images/category-events.jpg" },
+  { icon: MapPin, title: "Guided Tours", path: "/category/guided", bgImage: "/images/category-trips.jpg" },
 ];
 
 // ─── Quick navigation cards (above footer) ───────────────────────────────────
@@ -199,11 +200,11 @@ const Index = () => {
     const fetchLimit = Math.max(limit * 3, 30);
     try {
       const [tripsData, campsitesData, eventsData] = await Promise.all([
-        supabase.from("trips").select("id,name,location,place,country,image_url,gallery_images,images,date,is_custom_date,is_flexible_date,available_tickets,activities,type,created_at,price,price_child,description")
+        supabase.from("trips").select("id,name,location,place,country,image_url,gallery_images,images,date,is_custom_date,is_flexible_date,available_tickets,activities,type,created_at,price,price_child,description,opening_hours,closing_hours")
           .eq("approval_status", "approved").eq("is_hidden", false).eq("type", "trip").order("date", { ascending: true }).limit(fetchLimit),
-        supabase.from("adventure_places").select("id,name,location,place,country,image_url,gallery_images,images,entry_fee,activities,latitude,longitude,created_at,description")
+        supabase.from("adventure_places").select("id,name,location,place,country,image_url,gallery_images,images,entry_fee,activities,latitude,longitude,created_at,description,opening_hours,closing_hours")
           .eq("approval_status", "approved").eq("is_hidden", false).limit(fetchLimit),
-        supabase.from("trips").select("id,name,location,place,country,image_url,gallery_images,images,date,is_custom_date,is_flexible_date,available_tickets,activities,type,created_at,price,price_child,description")
+        supabase.from("trips").select("id,name,location,place,country,image_url,gallery_images,images,date,is_custom_date,is_flexible_date,available_tickets,activities,type,created_at,price,price_child,description,opening_hours,closing_hours")
           .eq("approval_status", "approved").eq("is_hidden", false).eq("type", "event").order("date", { ascending: true }).limit(fetchLimit),
       ]);
       setScrollableRows({
@@ -335,7 +336,6 @@ const Index = () => {
 
   useEffect(() => { if (position) fetchNearbyPlacesAndHotels(); }, [position, fetchNearbyPlacesAndHotels]);
 
-  // ─── Top bar appears immediately on ANY scroll, icons black before scroll ──
   useEffect(() => {
     const ctrl = () => {
       if (window.scrollY > 0) {
@@ -359,7 +359,6 @@ const Index = () => {
     setListingViewMode('my_location');
   }, [position, locationLoading, forceRequestLocation]);
 
-  // ─── Display items with filtering ─────────────────────────────────────────
   const getDisplayItems = useCallback((items: any[], sortedByRating: any[], isTripsOrEvents = false) => {
     let result = listingViewMode === 'my_location' && position
       ? [...items].sort((a, b) => {
@@ -387,7 +386,6 @@ const Index = () => {
   const displayTrips = useMemo(() => getDisplayItems(scrollableRows.trips, sortedTrips, true), [scrollableRows.trips, sortedTrips, getDisplayItems]);
   const displayEvents = useMemo(() => getDisplayItems(scrollableRows.events, sortedEvents, true), [scrollableRows.events, sortedEvents, getDisplayItems]);
 
-  // ─── Render helpers ────────────────────────────────────────────────────────
   const renderCard = useCallback((item: any, type: string, index: number, opts: { hidePrice?: boolean; isTrip?: boolean; categoryColor?: string } = {}) => {
     const itemDistance = position && item.latitude && item.longitude ? calculateDistance(position.latitude, position.longitude, item.latitude, item.longitude) : undefined;
     const ratingData = ratings.get(item.id);
@@ -413,6 +411,8 @@ const Index = () => {
           categoryColor={opts.categoryColor}
           galleryImages={item.gallery_images}
           images={item.images}
+          openingHours={item.opening_hours}
+          closingHours={item.closing_hours}
         />
       </div>
     );
@@ -431,13 +431,12 @@ const Index = () => {
         }}
       />
 
-      {/* ─── Fixed top bar: icons always visible, pill bg appears behind them on scroll ── */}
+      {/* Fixed top bar */}
       {!isSearchFocused && (
         <div
           className="fixed top-0 left-0 right-0 z-[100] md:hidden flex items-center justify-between px-4 pointer-events-none"
           style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 10px)', paddingBottom: '10px' }}
         >
-          {/* Left: Menu icon — pill bg always visible */}
           <div
             className="pointer-events-auto rounded-xl"
             style={{
@@ -461,7 +460,6 @@ const Index = () => {
             </Sheet>
           </div>
 
-          {/* Right: Search icon + Notification bell */}
           <div className="flex items-center gap-2 pointer-events-auto">
             {showSearchIcon && (
               <button
@@ -491,7 +489,7 @@ const Index = () => {
         </div>
       )}
 
-      {/* ─── Hero ──────────────────────────────────────────────────────────── */}
+      {/* Hero */}
       {!isSearchFocused && (
         <div ref={searchRef} className="relative w-full h-[44vh] md:h-[38vh] overflow-hidden">
           <div className="absolute inset-0 bg-foreground/80" />
@@ -530,33 +528,27 @@ const Index = () => {
             </div>
           </div>
 
-        </div>
-      )}
-
-      {/* Category cards - below hero, not overlapping */}
-      {!isSearchFocused && (
-        <div className="container mx-auto px-4 md:px-6 -mt-10 relative z-20">
-          <div className="grid grid-cols-3 gap-3 md:gap-4 w-full max-w-2xl mx-auto">
-            {CATEGORIES.map((cat) => (
-              <CategoryCard
-                key={cat.title}
-                icon={cat.icon}
-                title={cat.title}
-                description=""
-                onClick={() => navigate(cat.path)}
-                bgImage={cat.bgImage}
-              />
-            ))}
+          {/* Category cards inside hero image at bottom */}
+          <div className="absolute bottom-0 left-0 right-0 z-20 px-4 md:px-6 pb-3">
+            <div className="container mx-auto">
+              <div className="grid grid-cols-4 gap-2 md:gap-3 w-full">
+                {CATEGORIES.map((cat) => (
+                  <CategoryCard
+                    key={cat.title}
+                    icon={cat.icon}
+                    title={cat.title}
+                    description=""
+                    onClick={() => navigate(cat.path)}
+                    bgImage={cat.bgImage}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       )}
 
-      {/* Remove focused search - navigates to explore instead */}
-
       <main className="w-full">
-        {/* Search results removed - uses /explore page now */}
-
-        {/* ─── Browse sections ───────────────────────────────────────────── */}
         <div className={`w-full ${isSearchFocused ? 'hidden' : ''}`}>
 
           {/* View toggle */}
@@ -655,7 +647,7 @@ const Index = () => {
               </section>
             )}
 
-            {/* ─── Quick Navigation Cards ─────────────────────────────────── */}
+            {/* Quick Navigation Cards */}
             <section className="mb-4 md:mb-8">
               <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-3">
                 Quick Access
@@ -679,7 +671,7 @@ const Index = () => {
               </div>
             </section>
 
-            {/* ─── Become a Host CTA ─────────────────────────────────────── */}
+            {/* Become a Host CTA */}
             <section className="mb-4 md:mb-8">
               <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary to-primary/80 p-6 md:p-8">
                 <div className="absolute -top-8 -right-8 h-40 w-40 rounded-full bg-white/10 pointer-events-none" />
