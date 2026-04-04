@@ -46,6 +46,7 @@ const CategoryDetail = () => {
     events: { title: "Events", tables: ["trips"], type: "EVENT", tripType: "event", filterType: "trips-events" },
     adventure: { title: "Attractions", tables: ["adventure_places"], type: "ATTRACTION", filterType: "adventure" },
     campsite: { title: "Campsite & Experience", tables: ["adventure_places"], type: "ADVENTURE PLACE", filterType: "adventure" },
+    guided: { title: "Guided Tours", tables: ["trips"], type: "TRIP", tripType: "trip", filterType: "trips-events", flexibleOnly: true },
   };
 
   const config = category ? categoryConfig[category] : null;
@@ -96,7 +97,7 @@ const CategoryDetail = () => {
   };
 
   const tripEventIds = useMemo(() => {
-    if (category !== 'trips' && category !== 'events') return [];
+    if (category !== 'trips' && category !== 'events' && category !== 'guided') return [];
     return items.map((item: any) => item.id);
   }, [items, category]);
 
@@ -112,8 +113,8 @@ const CategoryDetail = () => {
         .from(table as any)
         .select(
           table === "trips"
-            ? "id,name,location,place,country,image_url,gallery_images,images,date,is_custom_date,is_flexible_date,available_tickets,activities,type,created_at,price,price_child,description,event_category"
-            : "id,name,location,place,country,image_url,gallery_images,images,entry_fee,available_slots,activities,latitude,longitude,created_at,description"
+            ? "id,name,location,place,country,image_url,gallery_images,images,date,is_custom_date,is_flexible_date,available_tickets,activities,type,created_at,price,price_child,description,event_category,opening_hours,closing_hours"
+            : "id,name,location,place,country,image_url,gallery_images,images,entry_fee,available_slots,activities,latitude,longitude,created_at,description,opening_hours,closing_hours"
         )
         .eq("approval_status", "approved")
         .eq("is_hidden", false);
@@ -121,8 +122,11 @@ const CategoryDetail = () => {
       if (config.tripType) {
         query = query.eq("type", config.tripType);
       }
+
+      if (config.flexibleOnly) {
+        query = query.eq("is_flexible_date", true);
+      }
       
-      // Filter by establishment type for accommodation category
       if (config.establishmentType && table === "hotels") {
         query = query.eq("establishment_type", config.establishmentType);
       }
@@ -153,7 +157,7 @@ const CategoryDetail = () => {
 
   const sortedItems = useMemo(() => {
     const sorted = sortByRating(items, ratings, position, calculateDistance);
-    if (category === 'trips' || category === 'events') {
+    if (category === 'trips' || category === 'events' || category === 'guided') {
       const available: any[] = [];
       const soldOutOrOutdated: any[] = [];
       sorted.forEach(item => {
@@ -209,23 +213,19 @@ const CategoryDetail = () => {
             onBack={() => { setIsSearchFocused(false); setSearchQuery(""); }} 
             showBackButton={isSearchFocused}
             categoryType={category === "events" ? "events" : undefined}
+            showEventCategories={true}
           />
         </div>
       </div>
 
       <main className={cn("container px-4 py-6 transition-opacity duration-200", isSearchFocused && "pointer-events-none opacity-20")}>
-        {/* FIXED GRID: 
-          Changed grid-cols-2 to grid-cols-1 on small mobile.
-          On 'sm' (640px+) it goes to 2 columns.
-          This prevents cards with min-width: 320px from overlapping.
-        */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
           {loading ? (
             <div className="col-span-full"><TealLoader text="Loading listings..." /></div>
           ) : (
             filteredItems.map(item => {
               const ratingData = ratings.get(item.id);
-              const isTripsOrEvents = category === 'trips' || category === 'events';
+              const isTripsOrEvents = category === 'trips' || category === 'events' || category === 'guided';
               
               return (
                 <div key={item.id} className="w-full">
@@ -250,6 +250,8 @@ const CategoryDetail = () => {
                     description={item.description}
                     galleryImages={item.gallery_images}
                     images={item.images}
+                    openingHours={item.opening_hours}
+                    closingHours={item.closing_hours}
                   />
                 </div>
               );

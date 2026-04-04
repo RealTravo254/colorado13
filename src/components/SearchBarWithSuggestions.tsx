@@ -27,6 +27,7 @@ interface SearchBarProps {
   onBack?: () => void;
   showBackButton?: boolean;
   categoryType?: "events" | undefined;
+  showEventCategories?: boolean;
 }
 
 interface SearchResult {
@@ -51,7 +52,9 @@ interface TrendingSearch {
   search_count: number;
 }
 
-export const SearchBarWithSuggestions = React.forwardRef<HTMLDivElement, SearchBarProps>(({ value, onChange, onSubmit, onSuggestionSearch, onFocus, onBlur, onBack, showBackButton = false, categoryType }, _ref) => {
+const EVENT_CATEGORIES = ["Roadtrips", "Music Events", "Pool Party", "Outdoor", "Cultural Events", "Night Parties", "Food", "Dancing Events"];
+
+export const SearchBarWithSuggestions = React.forwardRef<HTMLDivElement, SearchBarProps>(({ value, onChange, onSubmit, onSuggestionSearch, onFocus, onBlur, onBack, showBackButton = false, categoryType, showEventCategories = false }, _ref) => {
   const { user } = useAuth();
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [suggestions, setSuggestions] = useState<SearchResult[]>([]);
@@ -62,6 +65,8 @@ export const SearchBarWithSuggestions = React.forwardRef<HTMLDivElement, SearchB
   const [trendingSearches, setTrendingSearches] = useState<TrendingSearch[]>([]);
   const navigate = useNavigate();
   const wrapperRef = useRef<HTMLDivElement>(null);
+
+  const shouldShowEventCategories = categoryType === "events" || showEventCategories;
 
   useEffect(() => {
     const history = localStorage.getItem(SEARCH_HISTORY_KEY);
@@ -79,7 +84,6 @@ export const SearchBarWithSuggestions = React.forwardRef<HTMLDivElement, SearchB
     }
   };
 
-  // Fetch most popular items to show on focus (before typing)
   const fetchMostPopular = async () => {
     try {
       const [tripsData, eventsData, hotelsData, adventuresData] = await Promise.all([
@@ -146,7 +150,6 @@ export const SearchBarWithSuggestions = React.forwardRef<HTMLDivElement, SearchB
       if (queryValue) {
         combined = combined
           .map(item => {
-            // Check if the match is via an activity name
             const activityMatch = findMatchingActivity(item.activities, queryValue);
             return { ...item, matchedActivity: activityMatch };
           })
@@ -231,12 +234,12 @@ export const SearchBarWithSuggestions = React.forwardRef<HTMLDivElement, SearchB
         <div ref={wrapperRef} className="relative w-full max-w-4xl mx-auto" style={{ isolation: 'isolate' }}>
           <div className="flex items-center gap-3">
             {showBackButton && (
-              <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full bg-white shadow-sm border border-slate-100 hover:text-[#008080]">
+              <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full bg-white shadow-sm border border-slate-100 hover:bg-white hover:text-primary">
                 <Home className="h-5 w-5" />
               </Button>
             )}
             <div className="relative flex-1 group">
-              <SearchIcon className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 z-10 group-focus-within:text-[#008080] transition-colors" />
+              <SearchIcon className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 z-10 group-focus-within:text-primary transition-colors" />
               <Input
                 type="text"
                 placeholder="Where to next? Search countries, experiences, stays..."
@@ -244,7 +247,7 @@ export const SearchBarWithSuggestions = React.forwardRef<HTMLDivElement, SearchB
                 onChange={(e) => { onChange(e.target.value); setShowSuggestions(true); }}
                 onKeyDown={handleKeyPress}
                 onFocus={() => { setShowSuggestions(true); onFocus?.(); }}
-                className="pl-14 pr-32 h-10 md:h-16 text-sm md:text-base rounded-full border-none shadow-xl bg-white focus-visible:ring-2 focus-visible:ring-[#008080] placeholder:text-slate-400 placeholder:font-medium transition-all"
+                className="pl-14 pr-32 h-10 md:h-16 text-sm md:text-base rounded-full border-none shadow-xl bg-white focus-visible:ring-2 focus-visible:ring-primary placeholder:text-slate-400 placeholder:font-medium transition-all"
               />
               <Button
                 onClick={() => { saveToHistory(value); onSubmit(); setShowSuggestions(false); }}
@@ -263,19 +266,19 @@ export const SearchBarWithSuggestions = React.forwardRef<HTMLDivElement, SearchB
               {/* History / Trending / Most Popular Section (Shown when input is empty) */}
               {!value.trim() && (
                 <div className="p-2 min-h-[100px]">
-                  {/* Event Category Quick Filters */}
-                  {categoryType === "events" && (
+                  {/* Event Category Quick Filters - shown for events category or when showEventCategories is true */}
+                  {shouldShowEventCategories && (
                     <div className="mb-4">
                       <div className="flex items-center gap-2 px-5 py-3">
-                        <Calendar className="h-4 w-4 text-[#008080]" />
+                        <Calendar className="h-4 w-4 text-primary" />
                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Event Types</p>
                       </div>
                       <div className="flex flex-wrap gap-2 px-4">
-                        {["Roadtrips", "Music Events", "Pool Party", "Outdoor", "Cultural Events", "Night Parties", "Food", "Dancing Events"].map((cat) => (
+                        {EVENT_CATEGORIES.map((cat) => (
                           <Badge
                             key={cat}
                             onClick={() => { onChange(cat); setShowSuggestions(false); onSubmit(); }}
-                            className="cursor-pointer bg-[#008080]/10 hover:bg-[#008080]/20 text-[#008080] border border-[#008080]/20 py-2 px-3 rounded-xl text-[10px] font-bold transition-colors"
+                            className="cursor-pointer bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 py-2 px-3 rounded-xl text-[10px] font-bold transition-colors"
                           >
                             {cat}
                           </Badge>
@@ -284,7 +287,7 @@ export const SearchBarWithSuggestions = React.forwardRef<HTMLDivElement, SearchB
                     </div>
                   )}
 
-                  {/* Most Popular Section - Always shown first on focus */}
+                  {/* Most Popular Section */}
                   {mostPopular.length > 0 && (
                     <div className="mb-4">
                       <div className="flex items-center gap-2 px-5 py-3">
@@ -315,7 +318,7 @@ export const SearchBarWithSuggestions = React.forwardRef<HTMLDivElement, SearchB
                     <div className="mb-4">
                       <div className="flex items-center justify-between px-5 py-3">
                         <div className="flex items-center gap-2">
-                          <Clock className="h-4 w-4 text-[#008080]" />
+                          <Clock className="h-4 w-4 text-primary" />
                           <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Recent</p>
                         </div>
                         <button onClick={(e) => { e.stopPropagation(); clearHistory(); }} className="text-[10px] font-black uppercase text-[#FF7F50] hover:underline">Clear</button>
@@ -325,7 +328,7 @@ export const SearchBarWithSuggestions = React.forwardRef<HTMLDivElement, SearchB
                           <Badge 
                             key={i} 
                             onClick={() => { onChange(item); saveToHistory(item); onSubmit(); setShowSuggestions(false); }} 
-                            className="cursor-pointer bg-slate-50 hover:bg-[#008080]/10 text-slate-600 border border-slate-100 py-2 px-4 rounded-xl text-xs font-bold transition-colors"
+                            className="cursor-pointer bg-slate-50 hover:bg-primary/10 text-slate-600 border border-slate-100 py-2 px-4 rounded-xl text-xs font-bold transition-colors"
                           >
                             {item}
                           </Badge>
@@ -346,7 +349,7 @@ export const SearchBarWithSuggestions = React.forwardRef<HTMLDivElement, SearchB
                           onClick={() => { onChange(item.query); saveToHistory(item.query); onSubmit(); setShowSuggestions(false); }} 
                           className="w-full px-5 py-4 flex items-center justify-between hover:bg-slate-50 transition-colors group text-left rounded-[20px]"
                         >
-                          <span className="text-sm font-black text-slate-700 uppercase tracking-tight group-hover:text-[#008080]">{item.query}</span>
+                          <span className="text-sm font-black text-slate-700 uppercase tracking-tight group-hover:text-primary">{item.query}</span>
                           <span className="text-[10px] font-bold text-slate-300 uppercase tracking-tighter">{item.search_count} explores</span>
                         </button>
                       ))}
@@ -361,7 +364,7 @@ export const SearchBarWithSuggestions = React.forwardRef<HTMLDivElement, SearchB
                   {/* Loading State */}
                   {isSearching && (
                     <div className="p-10 flex flex-col items-center justify-center gap-3">
-                      <Loader2 className="h-6 w-6 animate-spin text-[#008080]" />
+                      <Loader2 className="h-6 w-6 animate-spin text-primary" />
                       <span className="text-slate-400 text-xs font-bold uppercase tracking-widest">Searching...</span>
                     </div>
                   )}
@@ -393,7 +396,7 @@ export const SearchBarWithSuggestions = React.forwardRef<HTMLDivElement, SearchB
                               )}
                             </div>
                             <h4 className="font-black text-foreground uppercase tracking-tight text-sm truncate">{result.name}</h4>
-                            <div className="flex items-center gap-1.5 text-muted-foreground group-hover:text-[#008080] transition-colors mt-0.5">
+                            <div className="flex items-center gap-1.5 text-muted-foreground group-hover:text-primary transition-colors mt-0.5">
                               <MapPin className="h-3 w-3 shrink-0" />
                               <span className="text-[10px] font-bold uppercase">
                                 {[result.location, result.place, result.country].filter(Boolean).join(" · ")}
@@ -410,7 +413,7 @@ export const SearchBarWithSuggestions = React.forwardRef<HTMLDivElement, SearchB
                     </>
                   )}
 
-                  {/* Not Available - Only show after search completes with no results */}
+                  {/* Not Available */}
                   {!isSearching && hasSearched && suggestions.length === 0 && (
                     <div className="p-10 text-center">
                       <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-2">Not Available</p>
