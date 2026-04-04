@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { SimilarItems } from "@/components/SimilarItems";
+
 import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import { ReviewSection } from "@/components/ReviewSection";
