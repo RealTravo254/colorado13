@@ -320,10 +320,10 @@ export const SearchBarWithSuggestions = React.forwardRef<HTMLDivElement, SearchB
                       </div>
                       <div className="flex flex-wrap gap-2 px-4">
                         {searchHistory.map((item, i) => (
-                          <Badge 
+                           <Badge 
                             key={i} 
                             onClick={() => { onChange(item); saveToHistory(item); onSubmit(); setShowSuggestions(false); }} 
-                            className="cursor-pointer bg-slate-50 hover:bg-primary/10 text-slate-600 border border-slate-100 py-2 px-4 rounded-xl text-xs font-bold transition-colors"
+                            className="cursor-pointer bg-muted hover:bg-primary/10 text-muted-foreground border border-border py-2 px-4 rounded-xl text-xs font-bold transition-colors"
                           >
                             {item}
                           </Badge>
