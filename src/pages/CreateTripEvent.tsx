@@ -221,7 +221,10 @@ const CreateTripEvent = () => {
         days_opened: daysOpened.length > 0 ? daysOpened : null,
         created_by: user.id, approval_status: approvalStatusSchema.parse("pending"),
         flexible_end_date: flexibleEndDate,
-      }]);
+        inclusions: inclusions.length > 0 ? inclusions : null,
+        exclusions: exclusions.length > 0 ? exclusions : null,
+        event_category: formData.type === 'event' ? (formData.event_category || null) : null,
+      } as any]);
 
       if (error) throw error;
       toast({ title: "Success!", description: `Ref: ${friendlySlug} — Submitted for approval.`, duration: 5000 });
