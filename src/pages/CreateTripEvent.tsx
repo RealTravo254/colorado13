@@ -272,6 +272,26 @@ const CreateTripEvent = () => {
                 </div>
               </Card>
 
+              {/* Event Category Selector */}
+              {formData.type === "event" && (
+                <Card className="bg-white rounded-[32px] p-8 shadow-sm border border-slate-100 space-y-4">
+                  <h2 className="text-xs font-black uppercase tracking-widest" style={{ color: COLORS.TEAL }}>Event Category *</h2>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                    {EVENT_CATEGORIES.map((cat) => (
+                      <button key={cat} type="button" onClick={() => setFormData({...formData, event_category: cat})}
+                        className={`p-3 rounded-xl text-center transition-all font-bold text-xs uppercase tracking-tight ${formData.event_category === cat ? 'bg-[#008080] text-white shadow-lg' : 'bg-slate-50 border border-slate-200 text-slate-600 hover:bg-slate-100'}`}>
+                        {cat}
+                      </button>
+                    ))}
+                  </div>
+                  {formData.event_category === "Others" && (
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Specify Event Type</Label>
+                      <StyledInput value={formData.event_category === "Others" ? "" : formData.event_category} onChange={(e) => setFormData({...formData, event_category: e.target.value || "Others"})} placeholder="e.g. Yoga Retreat" />
+                    </div>
+                  )}
+                </Card>
+              )}
               <Card className="bg-white rounded-[32px] p-8 shadow-sm border border-slate-100 space-y-6">
                 <h2 className="text-xs font-black uppercase tracking-widest" style={{ color: COLORS.TEAL }}>Experience Details</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
