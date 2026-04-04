@@ -220,7 +220,6 @@ export const NotificationBell = () => {
                       
                       <div className="bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm divide-y divide-slate-50">
                         {group.notifications.map((notification) => {
-                          const hasDeepLink = !!getNotificationDeepLink(notification);
                           return (
                             <button
                               key={notification.id}
@@ -257,6 +256,17 @@ export const NotificationBell = () => {
                 </div>
               )}
             </ScrollArea>
+          </div>
+
+          {/* Cancel button at bottom */}
+          <div className="bg-white px-4 pb-4 pt-2">
+            <Button 
+              variant="outline" 
+              onClick={() => setIsOpen(false)} 
+              className="w-full py-3 rounded-2xl text-sm font-bold text-slate-600 border-slate-200 hover:bg-slate-50"
+            >
+              Cancel
+            </Button>
           </div>
         </SheetContent>
       </Sheet>
