@@ -129,7 +129,6 @@ const App = () => {
                     <Route path="/contact" element={<Contact />} />
                     <Route path="/about" element={<About />} />
                     <Route path="/category/:category" element={<CategoryDetail />} />
-                    <Route path="/category/guided" element={<CategoryDetail />} />
                     <Route path="/trip/:slug" element={<Suspense fallback={<TealLoader />}><TripDetail /></Suspense>} />
                     <Route path="/event/:slug" element={<Suspense fallback={<TealLoader />}><EventDetail /></Suspense>} />
                     {/* Hotel route removed */}
