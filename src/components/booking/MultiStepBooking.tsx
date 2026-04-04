@@ -6,7 +6,7 @@ import { useSearchParams } from "react-router-dom";
  import { Calendar } from "@/components/ui/calendar";
  import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
  import { format, addDays, isBefore, isAfter, parseISO } from "date-fns";
- import { CalendarIcon, Users, Check, Loader2, Minus, Plus } from "lucide-react";
+ import { CalendarIcon, Users, Check, Loader2, Minus, Plus, Ticket } from "lucide-react";
  import { cn } from "@/lib/utils";
  import { useAuth } from "@/contexts/AuthContext";
  import { supabase } from "@/integrations/supabase/client";
@@ -21,6 +21,7 @@ import { useSearchParams } from "react-router-dom";
    guest_phone: string;
    selectedActivities?: { name: string; price: number; numberOfPeople: number }[];
    selectedFacilities?: { name: string; price: number; startDate?: string; endDate?: string }[];
+   ticketSelections?: { name: string; price: number; quantity: number }[];
  }
  
  interface Activity {
@@ -33,6 +34,11 @@ import { useSearchParams } from "react-router-dom";
    name: string;
    price: number;
    images?: string[];
+ }
+
+ interface TicketType {
+   name: string;
+   price: number;
  }
  
  interface MultiStepBookingProps {
@@ -58,7 +64,13 @@ import { useSearchParams } from "react-router-dom";
    isFlexibleDate?: boolean;
    entranceType?: string;
    workingDays?: string[];
+   ticketTypes?: TicketType[];
+   allowChildren?: boolean;
  }
+
+const TEAL = "#008080";
+const TEAL_DARK = "#006666";
+const CORAL = "#FF7F50";
  
  export const MultiStepBooking = ({
    onSubmit,
@@ -74,8 +86,10 @@ import { useSearchParams } from "react-router-dom";
    fixedDate = "",
    totalCapacity = 100,
    workingDays = [],
-   primaryColor = "#008080",
-   accentColor = "#FF7F50",
+   primaryColor = TEAL,
+   accentColor = CORAL,
+   ticketTypes = [],
+   allowChildren = true,
  }: MultiStepBookingProps) => {
    const { user } = useAuth();
    const { formatPrice } = useCurrency();
@@ -96,8 +110,12 @@ import { useSearchParams } from "react-router-dom";
      { name: string; price: number; startDate?: string; endDate?: string }[]
    >([]);
   const [isFacilityOnlyMode, setIsFacilityOnlyMode] = useState(false);
+  const [ticketSelections, setTicketSelections] = useState<{ name: string; price: number; quantity: number }[]>(
+    ticketTypes.map(t => ({ name: t.name, price: t.price, quantity: 0 }))
+  );
+
+  const hasTicketTypes = ticketTypes.length > 0;
  
-   // Prefill user data if logged in
    useEffect(() => {
      if (user) {
        const fetchProfile = async () => {
@@ -116,19 +134,15 @@ import { useSearchParams } from "react-router-dom";
      }
    }, [user]);
 
-  // Handle facility-only booking mode from query params
   useEffect(() => {
     const facilityName = searchParams.get("facility");
     const skipToFacility = searchParams.get("skipToFacility");
     
     if (facilityName && skipToFacility === "true") {
       setIsFacilityOnlyMode(true);
-      
-      // Find the facility and pre-select it
       const targetFacility = facilities.find(
         f => f.name.toLowerCase() === decodeURIComponent(facilityName).toLowerCase()
       );
-      
       if (targetFacility) {
         setSelectedFacilities([{
           name: targetFacility.name,
@@ -140,93 +154,79 @@ import { useSearchParams } from "react-router-dom";
  
    const steps = [];
 
-  // In facility-only mode, we go straight to facilities, then optional extras, then details, then review
   if (isFacilityOnlyMode) {
-    // Step 1: Facilities (with date selection per facility)
     steps.push({ id: "facilities", title: "Select Dates" });
-    
-    // Step 2: Optional - add more facilities or activities
     if (activities.length > 0) {
       steps.push({ id: "activities", title: "Add Activities" });
     }
-    
-    // Step 3: Guest details (if not logged in)
     if (!user) {
       steps.push({ id: "details", title: "Your Details" });
     }
-    
-    // Step 4: Review
     steps.push({ id: "review", title: "Review" });
   } else {
-    // Normal flow
-    // Step 1: Date selection (if not skipped)
     if (!skipDateSelection) {
       steps.push({ id: "date", title: "Select Date" });
     }
     
-    // Step 2: Travelers
-    steps.push({ id: "travelers", title: "Travelers" });
+    // Use "tickets" step instead of "travelers" when ticket types exist
+    if (hasTicketTypes) {
+      steps.push({ id: "tickets", title: "Select Tickets" });
+    } else {
+      steps.push({ id: "travelers", title: "Travelers" });
+    }
     
-    // Step 3: Activities & Facilities (always show if available)
     if (!skipFacilitiesAndActivities && (activities.length > 0 || facilities.length > 0)) {
       steps.push({ id: "extras", title: "Extras" });
     }
-    
-    // Step 4: Guest details (if not logged in)
     if (!user) {
       steps.push({ id: "details", title: "Your Details" });
     }
-    
-    // Step 5: Review
     steps.push({ id: "review", title: "Review" });
   }
 
   const calculateTotal = () => {
     let total = 0;
     
-    // In facility-only mode, we don't charge base admission
     if (!isFacilityOnlyMode) {
-      total = numAdults * priceAdult + numChildren * priceChild;
+      if (hasTicketTypes) {
+        ticketSelections.forEach(t => total += t.price * t.quantity);
+      } else {
+        total = numAdults * priceAdult + numChildren * priceChild;
+      }
     }
     
     selectedActivities.forEach((a) => (total += a.price * a.numberOfPeople));
     selectedFacilities.forEach((f) => {
       if (f.startDate && f.endDate) {
-        const days = Math.max(
-          1,
-          Math.ceil(
-            (new Date(f.endDate).getTime() - new Date(f.startDate).getTime()) /
-              (1000 * 60 * 60 * 24)
-          )
-        );
+        const days = Math.max(1, Math.ceil((new Date(f.endDate).getTime() - new Date(f.startDate).getTime()) / (1000 * 60 * 60 * 24)));
         total += f.price * days;
       }
     });
     return total;
   };
 
+  const getTotalTickets = () => ticketSelections.reduce((sum, t) => sum + t.quantity, 0);
+
   const handleNext = () => {
-    if (currentStep < steps.length - 1) {
-      setCurrentStep(currentStep + 1);
-    }
+    if (currentStep < steps.length - 1) setCurrentStep(currentStep + 1);
   };
 
   const handleBack = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
-    }
+    if (currentStep > 0) setCurrentStep(currentStep - 1);
   };
 
   const handleSubmit = async () => {
+    const totalTickets = hasTicketTypes ? getTotalTickets() : numAdults + numChildren;
     const formData: BookingFormData = {
       visit_date: visitDate ? format(visitDate, "yyyy-MM-dd") : fixedDate,
-      num_adults: isFacilityOnlyMode ? 0 : numAdults,
-      num_children: isFacilityOnlyMode ? 0 : numChildren,
+      num_adults: hasTicketTypes ? totalTickets : (isFacilityOnlyMode ? 0 : numAdults),
+      num_children: hasTicketTypes ? 0 : (isFacilityOnlyMode ? 0 : numChildren),
       guest_name: guestName,
       guest_email: guestEmail,
       guest_phone: guestPhone,
       selectedActivities,
       selectedFacilities,
+      ticketSelections: hasTicketTypes ? ticketSelections.filter(t => t.quantity > 0) : undefined,
     };
     await onSubmit(formData);
   };
@@ -236,19 +236,12 @@ import { useSearchParams } from "react-router-dom";
     if (existing) {
       setSelectedActivities(selectedActivities.filter((a) => a.name !== activity.name));
     } else {
-      setSelectedActivities([
-        ...selectedActivities,
-        { name: activity.name, price: activity.price, numberOfPeople: 1 },
-      ]);
+      setSelectedActivities([...selectedActivities, { name: activity.name, price: activity.price, numberOfPeople: 1 }]);
     }
   };
 
   const updateActivityPeople = (name: string, count: number) => {
-    setSelectedActivities(
-      selectedActivities.map((a) =>
-        a.name === name ? { ...a, numberOfPeople: Math.max(1, count) } : a
-      )
-    );
+    setSelectedActivities(selectedActivities.map((a) => a.name === name ? { ...a, numberOfPeople: Math.max(1, count) } : a));
   };
 
   const toggleFacility = (facility: Facility) => {
@@ -256,181 +249,104 @@ import { useSearchParams } from "react-router-dom";
     if (existing) {
       setSelectedFacilities(selectedFacilities.filter((f) => f.name !== facility.name));
     } else {
-      setSelectedFacilities([
-        ...selectedFacilities,
-        { name: facility.name, price: facility.price },
-      ]);
+      setSelectedFacilities([...selectedFacilities, { name: facility.name, price: facility.price }]);
     }
   };
 
   const updateFacilityDates = (name: string, startDate?: string, endDate?: string) => {
-    setSelectedFacilities(
-      selectedFacilities.map((f) =>
-        f.name === name ? { ...f, startDate, endDate } : f
-      )
-    );
+    setSelectedFacilities(selectedFacilities.map((f) => f.name === name ? { ...f, startDate, endDate } : f));
+  };
+
+  const updateTicketQuantity = (name: string, quantity: number) => {
+    setTicketSelections(ticketSelections.map(t => t.name === name ? { ...t, quantity: Math.max(0, Math.min(quantity, totalCapacity)) } : t));
   };
 
   const currentStepId = steps[currentStep]?.id;
 
   const isStepValid = () => {
     switch (currentStepId) {
-      case "date":
-        return !!visitDate;
-      case "travelers":
-        return numAdults > 0;
+      case "date": return !!visitDate;
+      case "travelers": return numAdults > 0;
+      case "tickets": return getTotalTickets() > 0;
       case "facilities":
-        // At least one facility must have dates set
-        return selectedFacilities.length > 0 && 
-               selectedFacilities.some(f => f.startDate && f.endDate);
-      case "activities":
-        return true; // Optional
-      case "extras":
-        return true;
-      case "details":
-        return guestName.trim() && guestEmail.trim() && guestPhone.trim();
-      case "review":
-        return true;
-      default:
-        return true;
+        return selectedFacilities.length > 0 && selectedFacilities.some(f => f.startDate && f.endDate);
+      case "activities": return true;
+      case "extras": return true;
+      case "details": return guestName.trim() && guestEmail.trim() && guestPhone.trim();
+      case "review": return true;
+      default: return true;
     }
   };
 
   if (isCompleted) {
     return (
       <div className="p-8 text-center">
-        <div
-          className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center"
-          style={{ backgroundColor: primaryColor }}
-        >
+        <div className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center" style={{ backgroundColor: TEAL }}>
           <Check className="h-8 w-8 text-white" />
         </div>
-        <h3 className="text-xl font-bold mb-2">Booking Confirmed!</h3>
-        <p className="text-muted-foreground">Thank you for booking {itemName}</p>
+        <h3 className="text-xl font-black uppercase tracking-tight mb-2">Booking Confirmed!</h3>
+        <p className="text-muted-foreground text-sm">Thank you for booking {itemName}</p>
       </div>
     );
   }
 
   return (
     <div className="p-6">
-      {/* Progress indicator */}
-      <div className="flex items-center justify-between mb-8">
-        {steps.map((step, index) => (
-          <div key={step.id} className="flex items-center">
-            <div
-              className={cn(
-                "w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold",
-                index <= currentStep
-                  ? "text-white"
-                  : "bg-muted text-muted-foreground"
-              )}
-              style={{
-                backgroundColor: index <= currentStep ? primaryColor : undefined,
-              }}
-            >
-              {index < currentStep ? <Check className="h-4 w-4" /> : index + 1}
-            </div>
-            {index < steps.length - 1 && (
-              <div
-                className={cn(
-                  "h-1 w-8 mx-1",
-                  index < currentStep ? "" : "bg-muted"
-                )}
-                style={{
-                  backgroundColor: index < currentStep ? primaryColor : undefined,
-                }}
-              />
-            )}
-          </div>
-        ))}
+      {/* Progress indicator - Teal styled */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Booking Progress</p>
+          <span className="text-[10px] font-black uppercase tracking-wider" style={{ color: TEAL }}>
+            {currentStep + 1}/{steps.length}
+          </span>
+        </div>
+        <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+          <div className="h-full transition-all duration-500 ease-out rounded-full" style={{ width: `${((currentStep + 1) / steps.length) * 100}%`, backgroundColor: TEAL }} />
+        </div>
+        <div className="flex justify-between mt-2">
+          {steps.map((step, index) => (
+            <span key={step.id} className={cn("text-[9px] font-bold uppercase tracking-wider", index <= currentStep ? "text-[#008080]" : "text-slate-300")}>
+              {step.title}
+            </span>
+          ))}
+        </div>
       </div>
 
-      <h2 className="text-lg font-bold mb-6">{steps[currentStep]?.title}</h2>
+      <h2 className="text-lg font-black uppercase tracking-tight mb-6" style={{ color: TEAL }}>{steps[currentStep]?.title}</h2>
 
       {/* Facility-only mode: Facilities with dates */}
       {currentStepId === "facilities" && (
         <div className="space-y-4">
           <p className="text-sm text-muted-foreground mb-4">
-            Select check-in and check-out dates for your selected facility. You can also add more facilities.
+            Select check-in and check-out dates for your selected facility.
           </p>
-          
           {facilities.map((facility) => {
             const isSelected = selectedFacilities.some(f => f.name === facility.name);
             const selected = selectedFacilities.find(f => f.name === facility.name);
-            
             return (
-              <div
-                key={facility.name}
-                className={cn(
-                  "p-4 border rounded-xl transition-all",
-                  isSelected && "border-2"
-                )}
-                style={{
-                  borderColor: isSelected ? primaryColor : undefined,
-                }}
-              >
-                <div 
-                  className="flex items-center gap-3 cursor-pointer"
-                  onClick={() => toggleFacility(facility)}
-                >
-                  {facility.images?.[0] && (
-                    <img src={facility.images[0]} alt={facility.name} className="w-10 h-10 rounded-lg object-cover flex-shrink-0" />
-                  )}
+              <div key={facility.name} className={cn("p-4 border rounded-2xl transition-all", isSelected && "border-2 border-[#008080] bg-[#008080]/5")}>
+                <div className="flex items-center gap-3 cursor-pointer" onClick={() => toggleFacility(facility)}>
                   <div className="flex-1">
-                    <p className="font-medium">{facility.name}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {formatPrice(facility.price)} per night
-                    </p>
+                    <p className="font-bold text-sm">{facility.name}</p>
+                    <p className="text-xs text-muted-foreground">{formatPrice(facility.price)} per night</p>
                   </div>
-                  <div
-                    className={cn(
-                      "w-6 h-6 rounded-full border-2 flex items-center justify-center",
-                      isSelected ? "border-none" : "border-muted-foreground"
-                    )}
-                    style={{
-                      backgroundColor: isSelected ? primaryColor : undefined,
-                    }}
-                  >
+                  <div className={cn("w-6 h-6 rounded-full border-2 flex items-center justify-center", isSelected ? "border-none bg-[#008080]" : "border-slate-300")}>
                     {isSelected && <Check className="h-4 w-4 text-white" />}
                   </div>
                 </div>
-                
                 {isSelected && (
                   <div className="mt-4 grid grid-cols-2 gap-3">
                     <div>
-                      <Label className="text-xs">Check-in Date</Label>
-                      <Input
-                        type="date"
-                        value={selected?.startDate || ""}
-                        min={format(new Date(), "yyyy-MM-dd")}
-                        onChange={(e) =>
-                          updateFacilityDates(
-                            facility.name,
-                            e.target.value,
-                            selected?.endDate
-                          )
-                        }
-                      />
+                      <Label className="text-[10px] font-black uppercase text-slate-400">Check-in</Label>
+                      <Input type="date" className="rounded-xl" value={selected?.startDate || ""} min={format(new Date(), "yyyy-MM-dd")} onChange={(e) => updateFacilityDates(facility.name, e.target.value, selected?.endDate)} />
                     </div>
                     <div>
-                      <Label className="text-xs">Check-out Date</Label>
-                      <Input
-                        type="date"
-                        value={selected?.endDate || ""}
-                        min={selected?.startDate || format(new Date(), "yyyy-MM-dd")}
-                        onChange={(e) =>
-                          updateFacilityDates(
-                            facility.name,
-                            selected?.startDate,
-                            e.target.value
-                          )
-                        }
-                      />
+                      <Label className="text-[10px] font-black uppercase text-slate-400">Check-out</Label>
+                      <Input type="date" className="rounded-xl" value={selected?.endDate || ""} min={selected?.startDate || format(new Date(), "yyyy-MM-dd")} onChange={(e) => updateFacilityDates(facility.name, selected?.startDate, e.target.value)} />
                     </div>
                     {selected?.startDate && selected?.endDate && (
-                      <div className="col-span-2 text-sm font-medium" style={{ color: primaryColor }}>
-                        {Math.max(1, Math.ceil((new Date(selected.endDate).getTime() - new Date(selected.startDate).getTime()) / (1000 * 60 * 60 * 24)))} nights - 
-                        {formatPrice(facility.price * Math.max(1, Math.ceil((new Date(selected.endDate).getTime() - new Date(selected.startDate).getTime()) / (1000 * 60 * 60 * 24))))}
+                      <div className="col-span-2 text-sm font-bold" style={{ color: TEAL }}>
+                        {Math.max(1, Math.ceil((new Date(selected.endDate).getTime() - new Date(selected.startDate).getTime()) / (1000 * 60 * 60 * 24)))} nights — {formatPrice(facility.price * Math.max(1, Math.ceil((new Date(selected.endDate).getTime() - new Date(selected.startDate).getTime()) / (1000 * 60 * 60 * 24))))}
                       </div>
                     )}
                   </div>
@@ -444,73 +360,29 @@ import { useSearchParams } from "react-router-dom";
       {/* Facility-only mode: Activities step */}
       {currentStepId === "activities" && (
         <div className="space-y-4">
-          <p className="text-sm text-muted-foreground mb-4">
-            Would you like to add any activities to your booking? (Optional)
-          </p>
-          
+          <p className="text-sm text-muted-foreground mb-4">Add any activities to your booking? (Optional)</p>
           {activities.map((activity) => {
             const isSelected = selectedActivities.some(a => a.name === activity.name);
             const selected = selectedActivities.find(a => a.name === activity.name);
-            
             return (
-              <div
-                key={activity.name}
-                className={cn(
-                  "p-4 border rounded-xl cursor-pointer transition-all",
-                  isSelected && "border-2"
-                )}
-                style={{
-                  borderColor: isSelected ? accentColor : undefined,
-                }}
-                onClick={() => toggleActivity(activity)}
-              >
+              <div key={activity.name} className={cn("p-4 border rounded-2xl cursor-pointer transition-all", isSelected && "border-2 border-[#008080] bg-[#008080]/5")} onClick={() => toggleActivity(activity)}>
                 <div className="flex items-center gap-3">
-                  {activity.images?.[0] && (
-                    <img src={activity.images[0]} alt={activity.name} className="w-10 h-10 rounded-lg object-cover flex-shrink-0" />
-                  )}
                   <div className="flex-1 flex justify-between items-center">
                     <div>
-                      <p className="font-medium">{activity.name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {formatPrice(activity.price)} per person
-                      </p>
+                      <p className="font-bold text-sm">{activity.name}</p>
+                      <p className="text-xs text-muted-foreground">{formatPrice(activity.price)} per person</p>
                     </div>
-                  {isSelected && (
-                    <div
-                      className="flex items-center gap-2"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={() =>
-                          updateActivityPeople(
-                            activity.name,
-                            (selected?.numberOfPeople || 1) - 1
-                          )
-                        }
-                      >
-                        <Minus className="h-3 w-3" />
-                      </Button>
-                      <span className="w-6 text-center">
-                        {selected?.numberOfPeople || 1}
-                      </span>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={() =>
-                          updateActivityPeople(
-                            activity.name,
-                            (selected?.numberOfPeople || 1) + 1
-                          )
-                        }
-                      >
-                        <Plus className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  )}
+                    {isSelected && (
+                      <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                        <Button variant="outline" size="icon" className="h-8 w-8 rounded-xl" onClick={() => updateActivityPeople(activity.name, (selected?.numberOfPeople || 1) - 1)}>
+                          <Minus className="h-3 w-3" />
+                        </Button>
+                        <span className="w-6 text-center font-bold">{selected?.numberOfPeople || 1}</span>
+                        <Button variant="outline" size="icon" className="h-8 w-8 rounded-xl" onClick={() => updateActivityPeople(activity.name, (selected?.numberOfPeople || 1) + 1)}>
+                          <Plus className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -522,162 +394,128 @@ import { useSearchParams } from "react-router-dom";
       {/* Date Selection Step */}
       {currentStepId === "date" && (
         <div className="space-y-4">
-          <Label>When would you like to visit?</Label>
+          <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">When would you like to visit?</Label>
            <Popover>
              <PopoverTrigger asChild>
-               <Button
-                 variant="outline"
-                 className={cn(
-                   "w-full justify-start text-left font-normal",
-                   !visitDate && "text-muted-foreground"
-                 )}
-               >
-                 <CalendarIcon className="mr-2 h-4 w-4" />
+               <Button variant="outline" className={cn("w-full justify-start text-left font-bold rounded-2xl h-14 border-slate-200", !visitDate && "text-muted-foreground")}>
+                 <CalendarIcon className="mr-2 h-4 w-4" style={{ color: TEAL }} />
                  {visitDate ? format(visitDate, "PPP") : "Select a date"}
                </Button>
              </PopoverTrigger>
              <PopoverContent className="w-auto p-0">
-               <Calendar
-                 mode="single"
-                 selected={visitDate}
-                 onSelect={setVisitDate}
-                 disabled={(date) => isBefore(date, new Date())}
-                 initialFocus
-               />
+               <Calendar mode="single" selected={visitDate} onSelect={setVisitDate} disabled={(date) => isBefore(date, new Date())} initialFocus />
              </PopoverContent>
            </Popover>
          </div>
        )}
- 
-       {/* Travelers Step */}
-       {currentStepId === "travelers" && (
-         <div className="space-y-6">
-           <p className="text-xs text-muted-foreground">Maximum 20 people per booking. You can make multiple bookings.</p>
-           <div className="flex items-center justify-between p-4 border rounded-xl">
-             <div>
-               <p className="font-semibold">Adults</p>
-               <p className="text-sm text-muted-foreground">
-                 {formatPrice(priceAdult)} each
-               </p>
+
+       {/* Ticket Types Step */}
+       {currentStepId === "tickets" && (
+         <div className="space-y-4">
+           <p className="text-xs text-muted-foreground mb-2">Select the type and quantity of tickets you want to purchase.</p>
+           {ticketSelections.map((ticket) => (
+             <div key={ticket.name} className={cn("p-4 border rounded-2xl transition-all", ticket.quantity > 0 ? "border-[#008080] bg-[#008080]/5" : "border-slate-200")}>
+               <div className="flex items-center justify-between">
+                 <div className="flex items-center gap-3">
+                   <div className="p-2 rounded-xl" style={{ backgroundColor: ticket.quantity > 0 ? "rgba(0,128,128,0.1)" : "rgba(100,116,139,0.08)" }}>
+                     <Ticket className="h-4 w-4" style={{ color: ticket.quantity > 0 ? TEAL : "#94a3b8" }} />
+                   </div>
+                   <div>
+                     <p className="font-bold text-sm uppercase tracking-tight">{ticket.name}</p>
+                     <p className="text-xs text-muted-foreground">{formatPrice(ticket.price)} each</p>
+                   </div>
+                 </div>
+                 <div className="flex items-center gap-3">
+                   <Button variant="outline" size="icon" className="h-9 w-9 rounded-xl" onClick={() => updateTicketQuantity(ticket.name, ticket.quantity - 1)}>
+                     <Minus className="h-3 w-3" />
+                   </Button>
+                   <span className="w-8 text-center font-black text-lg">{ticket.quantity}</span>
+                   <Button variant="outline" size="icon" className="h-9 w-9 rounded-xl" onClick={() => updateTicketQuantity(ticket.name, ticket.quantity + 1)}>
+                     <Plus className="h-3 w-3" />
+                   </Button>
+                 </div>
+               </div>
+               {ticket.quantity > 0 && (
+                 <div className="mt-2 text-right">
+                   <span className="text-sm font-bold" style={{ color: TEAL }}>{formatPrice(ticket.price * ticket.quantity)}</span>
+                 </div>
+               )}
              </div>
-             <div className="flex items-center gap-3">
-               <Button
-                 variant="outline"
-                 size="icon"
-                 onClick={() => setNumAdults(Math.max(1, numAdults - 1))}
-               >
-                 <Minus className="h-4 w-4" />
-               </Button>
-               <span className="w-8 text-center font-bold">{numAdults}</span>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => setNumAdults(Math.min(Math.min(20, totalCapacity) - numChildren, numAdults + 1))}
-                >
-                 <Plus className="h-4 w-4" />
-               </Button>
+           ))}
+           {getTotalTickets() > 0 && (
+             <div className="p-4 rounded-2xl bg-[#008080]/5 border border-[#008080]/20 flex justify-between items-center">
+               <span className="text-xs font-black uppercase tracking-widest text-slate-500">Total Tickets</span>
+               <span className="text-lg font-black" style={{ color: TEAL }}>{getTotalTickets()}</span>
              </div>
-           </div>
- 
-           <div className="flex items-center justify-between p-4 border rounded-xl">
-             <div>
-               <p className="font-semibold">Children</p>
-               <p className="text-sm text-muted-foreground">
-                 {formatPrice(priceChild)} each
-               </p>
-             </div>
-             <div className="flex items-center gap-3">
-               <Button
-                 variant="outline"
-                 size="icon"
-                 onClick={() => setNumChildren(Math.max(0, numChildren - 1))}
-               >
-                 <Minus className="h-4 w-4" />
-               </Button>
-               <span className="w-8 text-center font-bold">{numChildren}</span>
-               <Button
-                 variant="outline"
-                 size="icon"
-                  onClick={() =>
-                    setNumChildren(Math.min(Math.min(20, totalCapacity) - numAdults, numChildren + 1))
-                  }
-               >
-                 <Plus className="h-4 w-4" />
-               </Button>
-             </div>
-           </div>
+           )}
          </div>
        )}
  
-       {/* Extras Step (Activities & Facilities) */}
+       {/* Travelers Step (when no ticket types) */}
+       {currentStepId === "travelers" && (
+         <div className="space-y-4">
+           <p className="text-xs text-muted-foreground">Maximum 20 people per booking.</p>
+           <div className="flex items-center justify-between p-4 border rounded-2xl border-slate-200">
+             <div>
+               <p className="font-bold text-sm">Adults</p>
+               <p className="text-xs text-muted-foreground">{formatPrice(priceAdult)} each</p>
+             </div>
+             <div className="flex items-center gap-3">
+               <Button variant="outline" size="icon" className="rounded-xl" onClick={() => setNumAdults(Math.max(1, numAdults - 1))}>
+                 <Minus className="h-4 w-4" />
+               </Button>
+               <span className="w-8 text-center font-black">{numAdults}</span>
+               <Button variant="outline" size="icon" className="rounded-xl" onClick={() => setNumAdults(Math.min(Math.min(20, totalCapacity) - numChildren, numAdults + 1))}>
+                 <Plus className="h-4 w-4" />
+               </Button>
+             </div>
+           </div>
+ 
+           {allowChildren && (
+             <div className="flex items-center justify-between p-4 border rounded-2xl border-slate-200">
+               <div>
+                 <p className="font-bold text-sm">Children</p>
+                 <p className="text-xs text-muted-foreground">{formatPrice(priceChild)} each</p>
+               </div>
+               <div className="flex items-center gap-3">
+                 <Button variant="outline" size="icon" className="rounded-xl" onClick={() => setNumChildren(Math.max(0, numChildren - 1))}>
+                   <Minus className="h-4 w-4" />
+                 </Button>
+                 <span className="w-8 text-center font-black">{numChildren}</span>
+                 <Button variant="outline" size="icon" className="rounded-xl" onClick={() => setNumChildren(Math.min(Math.min(20, totalCapacity) - numAdults, numChildren + 1))}>
+                   <Plus className="h-4 w-4" />
+                 </Button>
+               </div>
+             </div>
+           )}
+         </div>
+       )}
+ 
+       {/* Extras Step (Activities & Facilities) - no images */}
        {currentStepId === "extras" && (
          <div className="space-y-6">
            {activities.length > 0 && (
              <div>
-               <h3 className="font-semibold mb-3">Activities</h3>
+               <h3 className="font-black text-sm uppercase tracking-tight mb-3" style={{ color: TEAL }}>Activities</h3>
                <div className="space-y-3">
                  {activities.map((activity) => {
-                   const isSelected = selectedActivities.some(
-                     (a) => a.name === activity.name
-                   );
-                   const selected = selectedActivities.find(
-                     (a) => a.name === activity.name
-                   );
+                   const isSelected = selectedActivities.some((a) => a.name === activity.name);
+                   const selected = selectedActivities.find((a) => a.name === activity.name);
                    return (
-                     <div
-                       key={activity.name}
-                       className={cn(
-                         "p-4 border rounded-xl cursor-pointer transition-all",
-                         isSelected && "border-2"
-                       )}
-                       style={{
-                         borderColor: isSelected ? primaryColor : undefined,
-                       }}
-                       onClick={() => toggleActivity(activity)}
-                     >
+                     <div key={activity.name} className={cn("p-4 border rounded-2xl cursor-pointer transition-all", isSelected && "border-2 border-[#008080] bg-[#008080]/5")} onClick={() => toggleActivity(activity)}>
                       <div className="flex items-center gap-3">
-                          {activity.images?.[0] && (
-                            <img src={activity.images[0]} alt={activity.name} className="w-10 h-10 rounded-lg object-cover flex-shrink-0" />
-                          )}
                           <div className="flex-1 flex justify-between items-center">
                             <div>
-                              <p className="font-medium">{activity.name}</p>
-                              <p className="text-sm text-muted-foreground">
-                                {formatPrice(activity.price)} per person
-                              </p>
+                              <p className="font-bold text-sm">{activity.name}</p>
+                              <p className="text-xs text-muted-foreground">{formatPrice(activity.price)} per person</p>
                             </div>
                             {isSelected && (
-                              <div
-                                className="flex items-center gap-2"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                <Button
-                                  variant="outline"
-                                  size="icon"
-                                  className="h-8 w-8"
-                                  onClick={() =>
-                                    updateActivityPeople(
-                                      activity.name,
-                                      (selected?.numberOfPeople || 1) - 1
-                                    )
-                                  }
-                                >
+                              <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                                <Button variant="outline" size="icon" className="h-8 w-8 rounded-xl" onClick={() => updateActivityPeople(activity.name, (selected?.numberOfPeople || 1) - 1)}>
                                   <Minus className="h-3 w-3" />
                                 </Button>
-                                <span className="w-6 text-center">
-                                  {selected?.numberOfPeople || 1}
-                                </span>
-                                <Button
-                                  variant="outline"
-                                  size="icon"
-                                  className="h-8 w-8"
-                                  onClick={() =>
-                                    updateActivityPeople(
-                                      activity.name,
-                                      (selected?.numberOfPeople || 1) + 1
-                                    )
-                                  }
-                                >
+                                <span className="w-6 text-center font-bold">{selected?.numberOfPeople || 1}</span>
+                                <Button variant="outline" size="icon" className="h-8 w-8 rounded-xl" onClick={() => updateActivityPeople(activity.name, (selected?.numberOfPeople || 1) + 1)}>
                                   <Plus className="h-3 w-3" />
                                 </Button>
                               </div>
@@ -693,72 +531,30 @@ import { useSearchParams } from "react-router-dom";
  
            {facilities.length > 0 && (
              <div>
-               <h3 className="font-semibold mb-3">Facilities</h3>
+               <h3 className="font-black text-sm uppercase tracking-tight mb-3" style={{ color: TEAL }}>Facilities</h3>
                <div className="space-y-3">
                  {facilities.map((facility) => {
-                   const isSelected = selectedFacilities.some(
-                     (f) => f.name === facility.name
-                   );
-                   const selected = selectedFacilities.find(
-                     (f) => f.name === facility.name
-                   );
+                   const isSelected = selectedFacilities.some((f) => f.name === facility.name);
+                   const selected = selectedFacilities.find((f) => f.name === facility.name);
                    return (
-                     <div
-                       key={facility.name}
-                       className={cn(
-                         "p-4 border rounded-xl cursor-pointer transition-all",
-                         isSelected && "border-2"
-                       )}
-                       style={{
-                         borderColor: isSelected ? primaryColor : undefined,
-                       }}
-                       onClick={() => toggleFacility(facility)}
-                     >
+                     <div key={facility.name} className={cn("p-4 border rounded-2xl cursor-pointer transition-all", isSelected && "border-2 border-[#008080] bg-[#008080]/5")} onClick={() => toggleFacility(facility)}>
                         <div className="flex items-center gap-3">
-                          {facility.images?.[0] && (
-                            <img src={facility.images[0]} alt={facility.name} className="w-10 h-10 rounded-lg object-cover flex-shrink-0" />
-                          )}
                           <div className="flex-1 flex justify-between items-center">
                             <div>
-                              <p className="font-medium">{facility.name}</p>
-                              <p className="text-sm text-muted-foreground">
-                                {formatPrice(facility.price)} per day
-                              </p>
+                              <p className="font-bold text-sm">{facility.name}</p>
+                              <p className="text-xs text-muted-foreground">{formatPrice(facility.price)} per day</p>
                             </div>
                           </div>
                         </div>
                        {isSelected && (
-                         <div
-                           className="mt-3 grid grid-cols-2 gap-2"
-                           onClick={(e) => e.stopPropagation()}
-                         >
+                         <div className="mt-3 grid grid-cols-2 gap-2" onClick={(e) => e.stopPropagation()}>
                            <div>
-                             <Label className="text-xs">Start Date</Label>
-                             <Input
-                               type="date"
-                               value={selected?.startDate || ""}
-                               onChange={(e) =>
-                                 updateFacilityDates(
-                                   facility.name,
-                                   e.target.value,
-                                   selected?.endDate
-                                 )
-                               }
-                             />
+                             <Label className="text-[10px] font-black uppercase text-slate-400">Start Date</Label>
+                             <Input type="date" className="rounded-xl" value={selected?.startDate || ""} onChange={(e) => updateFacilityDates(facility.name, e.target.value, selected?.endDate)} />
                            </div>
                            <div>
-                             <Label className="text-xs">End Date</Label>
-                             <Input
-                               type="date"
-                               value={selected?.endDate || ""}
-                               onChange={(e) =>
-                                 updateFacilityDates(
-                                   facility.name,
-                                   selected?.startDate,
-                                   e.target.value
-                                 )
-                               }
-                             />
+                             <Label className="text-[10px] font-black uppercase text-slate-400">End Date</Label>
+                             <Input type="date" className="rounded-xl" value={selected?.endDate || ""} onChange={(e) => updateFacilityDates(facility.name, selected?.startDate, e.target.value)} />
                            </div>
                          </div>
                        )}
@@ -775,30 +571,16 @@ import { useSearchParams } from "react-router-dom";
        {currentStepId === "details" && (
          <div className="space-y-4">
            <div>
-             <Label>Full Name</Label>
-             <Input
-               value={guestName}
-               onChange={(e) => setGuestName(e.target.value)}
-               placeholder="Enter your full name"
-             />
+             <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Full Name</Label>
+             <Input className="rounded-xl h-12 mt-1" value={guestName} onChange={(e) => setGuestName(e.target.value)} placeholder="Enter your full name" />
            </div>
            <div>
-             <Label>Email</Label>
-             <Input
-               type="email"
-               value={guestEmail}
-               onChange={(e) => setGuestEmail(e.target.value)}
-               placeholder="Enter your email"
-             />
+             <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Email</Label>
+             <Input className="rounded-xl h-12 mt-1" type="email" value={guestEmail} onChange={(e) => setGuestEmail(e.target.value)} placeholder="Enter your email" />
            </div>
            <div>
-             <Label>Phone</Label>
-             <Input
-               type="tel"
-               value={guestPhone}
-               onChange={(e) => setGuestPhone(e.target.value)}
-               placeholder="Enter your phone number"
-             />
+             <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Phone</Label>
+             <Input className="rounded-xl h-12 mt-1" type="tel" value={guestPhone} onChange={(e) => setGuestPhone(e.target.value)} placeholder="Enter your phone number" />
            </div>
          </div>
        )}
@@ -806,81 +588,74 @@ import { useSearchParams } from "react-router-dom";
        {/* Review Step */}
        {currentStepId === "review" && (
          <div className="space-y-4">
-           <div className="p-4 bg-muted rounded-xl space-y-2">
+           <div className="p-5 bg-slate-50 rounded-2xl border border-slate-100 space-y-3">
             {!isFacilityOnlyMode && (
               <>
-                <div className="flex justify-between">
-                  <span>Date</span>
-                  <span className="font-medium">
-                    {visitDate ? format(visitDate, "PPP") : fixedDate || "Flexible"}
-                  </span>
+                <div className="flex justify-between text-sm">
+                  <span className="text-slate-500">Date</span>
+                  <span className="font-bold">{visitDate ? format(visitDate, "PPP") : fixedDate || "Flexible"}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span>Adults × {numAdults}</span>
-                  <span>{formatPrice(numAdults * priceAdult)}</span>
-                </div>
-                {numChildren > 0 && (
-                  <div className="flex justify-between">
-                    <span>Children × {numChildren}</span>
-                    <span>{formatPrice(numChildren * priceChild)}</span>
-                  </div>
+                {hasTicketTypes ? (
+                  ticketSelections.filter(t => t.quantity > 0).map((t) => (
+                    <div key={t.name} className="flex justify-between text-sm">
+                      <span className="text-slate-500">{t.name} × {t.quantity}</span>
+                      <span className="font-bold">{formatPrice(t.price * t.quantity)}</span>
+                    </div>
+                  ))
+                ) : (
+                  <>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-slate-500">Adults × {numAdults}</span>
+                      <span className="font-bold">{formatPrice(numAdults * priceAdult)}</span>
+                    </div>
+                    {numChildren > 0 && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-slate-500">Children × {numChildren}</span>
+                        <span className="font-bold">{formatPrice(numChildren * priceChild)}</span>
+                      </div>
+                    )}
+                  </>
                 )}
               </>
             )}
             {selectedFacilities.map((f) => {
-              const days =
-                f.startDate && f.endDate
-                  ? Math.max(
-                      1,
-                      Math.ceil(
-                        (new Date(f.endDate).getTime() -
-                          new Date(f.startDate).getTime()) /
-                          (1000 * 60 * 60 * 24)
-                      )
-                    )
-                  : 1;
+              const days = f.startDate && f.endDate ? Math.max(1, Math.ceil((new Date(f.endDate).getTime() - new Date(f.startDate).getTime()) / (1000 * 60 * 60 * 24))) : 1;
               return (
-                <div key={f.name} className="flex justify-between">
-                  <span>
+                <div key={f.name} className="flex justify-between text-sm">
+                  <span className="text-slate-500">
                     {f.name} ({days} nights)
                     {f.startDate && f.endDate && (
-                      <span className="text-xs text-muted-foreground block">
-                        {format(new Date(f.startDate), "MMM d")} - {format(new Date(f.endDate), "MMM d")}
-                      </span>
+                      <span className="text-[10px] text-slate-400 block">{format(new Date(f.startDate), "MMM d")} - {format(new Date(f.endDate), "MMM d")}</span>
                     )}
                   </span>
-                  <span>{formatPrice(f.price * days)}</span>
+                  <span className="font-bold">{formatPrice(f.price * days)}</span>
                 </div>
               );
             })}
             {selectedActivities.map((a) => (
-               <div className="flex justify-between">
-                <span>
-                  {a.name} × {a.numberOfPeople}
-                </span>
-                <span>{formatPrice(a.price * a.numberOfPeople)}</span>
+               <div key={a.name} className="flex justify-between text-sm">
+                <span className="text-slate-500">{a.name} × {a.numberOfPeople}</span>
+                <span className="font-bold">{formatPrice(a.price * a.numberOfPeople)}</span>
                </div>
             ))}
-             <div className="border-t pt-2 mt-2 flex justify-between font-bold text-lg">
+             <div className="border-t border-slate-200 pt-3 mt-3 flex justify-between font-black text-lg">
                <span>Total</span>
-               <span style={{ color: primaryColor }}>
-                 {formatPrice(calculateTotal())}
-               </span>
+               <span style={{ color: TEAL }}>{formatPrice(calculateTotal())}</span>
              </div>
            </div>
  
-           <div className="p-4 border rounded-xl space-y-1">
-             <p className="font-medium">{guestName || user?.email}</p>
-             <p className="text-sm text-muted-foreground">{guestEmail || user?.email}</p>
-             <p className="text-sm text-muted-foreground">{guestPhone}</p>
+           <div className="p-4 border rounded-2xl border-slate-200 space-y-1">
+             <p className="font-bold text-sm">{guestName || user?.email}</p>
+             <p className="text-xs text-muted-foreground">{guestEmail || user?.email}</p>
+             <p className="text-xs text-muted-foreground">{guestPhone}</p>
            </div>
          </div>
        )}
  
-       {/* Navigation buttons */}
+       {/* Navigation buttons - Teal/Coral styled like navigation drawer */}
        <div className="flex gap-3 mt-8">
          {currentStep > 0 && (
-           <Button variant="outline" onClick={handleBack} className="flex-1">
+           <Button variant="outline" onClick={handleBack} className="flex-1 py-6 rounded-2xl font-black uppercase text-[11px] tracking-widest border-slate-200">
              Back
            </Button>
          )}
@@ -888,8 +663,8 @@ import { useSearchParams } from "react-router-dom";
            <Button
              onClick={handleNext}
              disabled={!isStepValid()}
-             className="flex-1"
-             style={{ backgroundColor: primaryColor }}
+             className="flex-[2] py-6 rounded-2xl text-[11px] font-black uppercase tracking-[0.15em] text-white shadow-xl transition-all active:scale-95 border-none"
+             style={{ background: `linear-gradient(135deg, ${TEAL} 0%, ${TEAL_DARK} 100%)`, boxShadow: `0 8px 20px -6px ${TEAL}88` }}
            >
              Continue
            </Button>
@@ -897,14 +672,11 @@ import { useSearchParams } from "react-router-dom";
           <Button
               onClick={handleSubmit}
               disabled={isProcessing || calculateTotal() <= 0}
-              className="flex-1"
-              style={{ backgroundColor: accentColor }}
+              className="flex-[2] py-6 rounded-2xl text-[11px] font-black uppercase tracking-[0.15em] text-white shadow-xl transition-all active:scale-95 border-none"
+              style={{ background: `linear-gradient(135deg, #FF9E7A 0%, ${CORAL} 100%)`, boxShadow: `0 8px 20px -6px ${CORAL}88` }}
             >
               {isProcessing ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Processing...
-                </>
+                <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing...</>
               ) : (
                 "Confirm Booking"
               )}
@@ -913,4 +685,4 @@ import { useSearchParams } from "react-router-dom";
        </div>
      </div>
    );
- }; 
+ };

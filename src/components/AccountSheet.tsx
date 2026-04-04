@@ -207,6 +207,16 @@ export const AccountSheet = ({ children }: AccountSheetProps) => {
             </div>
           )}
         </div>
+
+        {/* Cancel button at bottom */}
+        <div className="bg-white px-4 pb-4 pt-2">
+          <button 
+            onClick={() => setIsOpen(false)} 
+            className="w-full py-3 rounded-2xl text-sm font-bold text-slate-600 border border-slate-200 hover:bg-slate-50 transition-all"
+          >
+            Cancel
+          </button>
+        </div>
       </SheetContent>
     </Sheet>
   );

@@ -42,6 +42,7 @@ export type Database = {
           latitude: number | null
           local_name: string | null
           location: string
+          location_link: string | null
           longitude: number | null
           map_link: string | null
           name: string
@@ -79,6 +80,7 @@ export type Database = {
           latitude?: number | null
           local_name?: string | null
           location: string
+          location_link?: string | null
           longitude?: number | null
           map_link?: string | null
           name: string
@@ -116,6 +118,7 @@ export type Database = {
           latitude?: number | null
           local_name?: string | null
           location?: string
+          location_link?: string | null
           longitude?: number | null
           map_link?: string | null
           name?: string
@@ -298,6 +301,7 @@ export type Database = {
           id: string
           phone_number: string
           profile_photo_url: string | null
+          registration_name: string | null
           registration_number: string
           rejection_reason: string | null
           updated_at: string
@@ -314,6 +318,7 @@ export type Database = {
           id?: string
           phone_number: string
           profile_photo_url?: string | null
+          registration_name?: string | null
           registration_number: string
           rejection_reason?: string | null
           updated_at?: string
@@ -330,6 +335,7 @@ export type Database = {
           id?: string
           phone_number?: string
           profile_photo_url?: string | null
+          registration_name?: string | null
           registration_number?: string
           rejection_reason?: string | null
           updated_at?: string
@@ -452,6 +458,7 @@ export type Database = {
           link_source_url: string | null
           local_name: string | null
           location: string
+          location_link: string | null
           longitude: number | null
           map_link: string | null
           name: string
@@ -490,6 +497,7 @@ export type Database = {
           link_source_url?: string | null
           local_name?: string | null
           location: string
+          location_link?: string | null
           longitude?: number | null
           map_link?: string | null
           name: string
@@ -528,6 +536,7 @@ export type Database = {
           link_source_url?: string | null
           local_name?: string | null
           location?: string
+          location_link?: string | null
           longitude?: number | null
           map_link?: string | null
           name?: string
@@ -1211,6 +1220,7 @@ export type Database = {
       trips: {
         Row: {
           activities: Json | null
+          allow_children: boolean | null
           approval_status: string
           approved_at: string | null
           approved_by: string | null
@@ -1235,6 +1245,7 @@ export type Database = {
           is_flexible_date: boolean | null
           is_hidden: boolean | null
           location: string
+          location_link: string | null
           map_link: string | null
           name: string
           opening_hours: string | null
@@ -1245,10 +1256,12 @@ export type Database = {
           rejection_reason: string | null
           slot_limit_type: string
           slug: string | null
+          ticket_types: Json | null
           type: string | null
         }
         Insert: {
           activities?: Json | null
+          allow_children?: boolean | null
           approval_status?: string
           approved_at?: string | null
           approved_by?: string | null
@@ -1273,6 +1286,7 @@ export type Database = {
           is_flexible_date?: boolean | null
           is_hidden?: boolean | null
           location: string
+          location_link?: string | null
           map_link?: string | null
           name: string
           opening_hours?: string | null
@@ -1283,10 +1297,12 @@ export type Database = {
           rejection_reason?: string | null
           slot_limit_type?: string
           slug?: string | null
+          ticket_types?: Json | null
           type?: string | null
         }
         Update: {
           activities?: Json | null
+          allow_children?: boolean | null
           approval_status?: string
           approved_at?: string | null
           approved_by?: string | null
@@ -1311,6 +1327,7 @@ export type Database = {
           is_flexible_date?: boolean | null
           is_hidden?: boolean | null
           location?: string
+          location_link?: string | null
           map_link?: string | null
           name?: string
           opening_hours?: string | null
@@ -1321,6 +1338,7 @@ export type Database = {
           rejection_reason?: string | null
           slot_limit_type?: string
           slug?: string | null
+          ticket_types?: Json | null
           type?: string | null
         }
         Relationships: []
