@@ -198,13 +198,13 @@ const EventDetail = () => {
             </CarouselContent>
           </Carousel>
           {allImages.length > 1 && <ImageGalleryModal images={allImages} name={event.name} />}
-          <div className="absolute bottom-6 left-0 z-40 w-full px-4 pointer-events-none">
-            <div className="relative z-10 space-y-2 pointer-events-auto bg-gradient-to-r from-black/70 via-black/50 to-transparent rounded-2xl p-4 max-w-xl">
-              <Button className="bg-[#FF7F50] hover:bg-[#FF7F50] border-none px-3 py-1 h-auto uppercase font-black tracking-[0.1em] text-[9px] rounded-full shadow-lg">Event</Button>
-              <h1 className="text-2xl font-black uppercase tracking-tighter leading-none text-white drop-shadow-2xl">{event.name}</h1>
-              <div className="flex items-center gap-2 cursor-pointer group w-fit" onClick={openInMaps}>
-                <MapPin className="h-4 w-4 text-white" />
-                <span className="text-xs font-bold text-white uppercase tracking-wide">{[event.place, event.location, event.country].filter(Boolean).join(', ')}</span>
+          <div className="absolute bottom-4 left-0 z-40 w-full px-4 pointer-events-none">
+            <div className="relative z-10 space-y-1 pointer-events-auto bg-gradient-to-r from-black/70 via-black/50 to-transparent rounded-xl p-3 max-w-md">
+              <span className="text-[8px] font-black uppercase tracking-widest text-primary-foreground/80 bg-primary/80 px-2 py-0.5 rounded-md">Event</span>
+              <h1 className="text-lg font-black uppercase tracking-tighter leading-none text-white drop-shadow-2xl">{event.name}</h1>
+              <div className="flex items-center gap-1.5 cursor-pointer group w-fit" onClick={openInMaps}>
+                <MapPin className="h-3 w-3 text-white" />
+                <span className="text-[10px] font-bold text-white uppercase tracking-wide">{[event.place, event.location, event.country].filter(Boolean).join(', ')}</span>
               </div>
             </div>
           </div>
