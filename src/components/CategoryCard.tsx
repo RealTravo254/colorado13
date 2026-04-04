@@ -28,17 +28,17 @@ export const CategoryCard = ({
     >
       {bgImage ? (
         <>
-          <div className="relative w-full aspect-[4/3] overflow-hidden">
+          <div className="relative w-full aspect-[4/3] overflow-hidden rounded-2xl">
             <img
               src={bgImage}
               alt={title}
               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
               loading="lazy"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent rounded-2xl" />
           </div>
-          <div className="absolute bottom-0 left-0 right-0 p-2 text-center">
-            <h3 className="font-bold text-[10px] text-white uppercase tracking-wider drop-shadow-md">{title}</h3>
+          <div className="absolute bottom-0 left-0 right-0 p-3 text-center">
+            <h3 className="font-extrabold text-xs sm:text-sm md:text-base text-white uppercase tracking-wider drop-shadow-lg">{title}</h3>
           </div>
         </>
       ) : (

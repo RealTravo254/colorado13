@@ -535,8 +535,8 @@ const Index = () => {
 
       {/* Category cards - below hero, not overlapping */}
       {!isSearchFocused && (
-        <div className="container mx-auto px-4 md:px-6 -mt-8 relative z-20">
-          <div className="grid grid-cols-3 gap-2 w-full">
+        <div className="container mx-auto px-4 md:px-6 -mt-10 relative z-20">
+          <div className="grid grid-cols-3 gap-3 md:gap-4 w-full max-w-2xl mx-auto">
             {CATEGORIES.map((cat) => (
               <CategoryCard
                 key={cat.title}
