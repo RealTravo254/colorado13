@@ -114,7 +114,7 @@ const CategoryDetail = () => {
         .from(table as any)
         .select(
           table === "trips"
-            ? "id,name,location,place,country,image_url,date,is_custom_date,is_flexible_date,available_tickets,activities,type,created_at,price,price_child,description"
+            ? "id,name,location,place,country,image_url,date,is_custom_date,is_flexible_date,available_tickets,activities,type,created_at,price,price_child,description,event_category"
             : table === "hotels"
               ? "id,name,location,place,country,image_url,activities,latitude,longitude,created_at,establishment_type,description"
               : table === "adventure_places"
