@@ -372,7 +372,7 @@ export const SearchBarWithSuggestions = React.forwardRef<HTMLDivElement, SearchB
                         <button
                           key={result.id}
                           onClick={() => handleSuggestionClick(result)}
-                          className="w-full p-3 flex gap-4 hover:bg-slate-50 transition-all group text-left rounded-[24px]"
+                          className="w-full p-3 flex gap-4 hover:bg-muted transition-all group text-left rounded-[24px]"
                         >
                           <div className="flex-1 flex flex-col justify-center min-w-0">
                             <div className="flex items-center gap-2 mb-1 flex-wrap">
