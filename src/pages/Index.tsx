@@ -370,14 +370,16 @@ const Index = () => {
 
     if (isTripsOrEvents) {
       const today = new Date().toISOString().split('T')[0];
-      const flexible: any[] = [], fixed: any[] = [];
+      const filtered: any[] = [];
       result.forEach(item => {
         if (item.date && !item.is_flexible_date && item.date < today) return;
+        // Exclude flexible/guided trips from trips section
+        if (item.is_flexible_date) return;
         const bookedCount = bookingStats[item.id] || 0;
         if (!item.is_flexible_date && item.available_tickets != null && (item.available_tickets <= 0 || bookedCount >= item.available_tickets)) return;
-        (item.is_flexible_date ? flexible : fixed).push(item);
+        filtered.push(item);
       });
-      return [...flexible, ...fixed];
+      return filtered;
     }
     return result;
   }, [listingViewMode, position, bookingStats]);
