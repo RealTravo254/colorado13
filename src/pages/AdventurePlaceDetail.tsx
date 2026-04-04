@@ -334,20 +334,82 @@ const AdventurePlaceDetail = () => {
       </div>
 
       <main className="container px-4 mt-6 relative z-30 max-w-6xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-[1.8fr,1fr] gap-4">
-          <div className="space-y-4">
-            <section className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
-              <h2 className="text-[11px] font-black uppercase tracking-widest mb-2 text-slate-900">About This Property</h2>
-              {place.description ? (
-                <p className="text-foreground text-sm leading-relaxed whitespace-pre-line">{place.description}</p>
-              ) : (
-                <div className="flex items-center gap-2 text-slate-300 italic py-4">
-                  <AlertCircle className="h-4 w-4" /> Description coming soon
+        <div className="grid grid-cols-1 lg:grid-cols-[1.8fr,1fr] gap-6">
+          <div className="space-y-6">
+            {/* About This Activity - icon list style like reference */}
+            <section className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+              <h2 className="text-lg font-black text-slate-900 mb-4">About this property</h2>
+              
+              {/* Icon list items */}
+              <div className="space-y-4">
+                {is24Hours ? (
+                  <div className="flex items-start gap-3">
+                    <Clock className="h-5 w-5 text-slate-700 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-sm font-bold text-slate-900">Open 24 Hours</p>
+                      <p className="text-xs text-slate-500">Available round the clock</p>
+                    </div>
+                  </div>
+                ) : (place.opening_hours || place.closing_hours) && (
+                  <div className="flex items-start gap-3">
+                    <Clock className="h-5 w-5 text-slate-700 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-sm font-bold text-slate-900">
+                        {place.opening_hours || "08:00 AM"} - {place.closing_hours || "06:00 PM"}
+                      </p>
+                      <p className="text-xs text-slate-500">
+                        {Array.isArray(place.days_opened) ? place.days_opened.join(", ") : "Open daily"}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {place.entry_fee && place.entry_fee > 0 ? (
+                  <div className="flex items-start gap-3">
+                    <Circle className="h-5 w-5 text-slate-700 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-sm font-bold text-slate-900">Entry fee from {formatPrice(Number(place.entry_fee))}</p>
+                      <p className="text-xs text-slate-500">Per adult admission</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-start gap-3">
+                    <Circle className="h-5 w-5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-sm font-bold text-emerald-700">Free entry</p>
+                      <p className="text-xs text-slate-500">No admission fee required</p>
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex items-start gap-3">
+                  <MapPin className="h-5 w-5 text-slate-700 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="text-sm font-bold text-slate-900">{[place.place, place.location].filter(Boolean).join(", ")}</p>
+                    <p className="text-xs text-slate-500">{place.country}</p>
+                  </div>
+                </div>
+
+                {(place.phone_numbers?.length > 0 || place.email) && (
+                  <div className="flex items-start gap-3">
+                    <Phone className="h-5 w-5 text-slate-700 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-sm font-bold text-slate-900">Contact available</p>
+                      <p className="text-xs text-slate-500">
+                        {place.phone_numbers?.[0] || place.email}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Description */}
+              {place.description && (
+                <div className="mt-5 pt-5 border-t border-slate-100">
+                  <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line">{place.description}</p>
                 </div>
               )}
             </section>
-
-            {/* Operating hours moved into mobile booking card below */}
 
             {/* General amenities - above booking card on mobile */}
             <div className="lg:hidden">
@@ -358,51 +420,55 @@ const AdventurePlaceDetail = () => {
               } />
             </div>
 
-            {/* Mobile booking card - above activities */}
-            <div className="bg-white rounded-[32px] p-6 shadow-xl border border-slate-100 lg:hidden">
-              <div className="flex justify-between items-start mb-6">
+            {/* Mobile booking card */}
+            <div className="bg-white rounded-2xl p-5 shadow-lg border border-slate-100 lg:hidden">
+              <div className="flex justify-between items-start mb-4">
                 <div>
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Starting from</p>
+                  <p className="text-xs text-slate-500 mb-0.5">From</p>
                   {place.entry_fee && place.entry_fee > 0 ? (
-                    <div className="space-y-1">
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-lg font-bold text-destructive">{formatPrice(Number(place.entry_fee))}</span>
-                        <span className="text-[10px] font-bold text-slate-400 uppercase">/ adult</span>
-                      </div>
-                      {place.child_entry_fee !== undefined && (
-                        <div className="text-sm font-bold text-slate-500">Child: {formatPrice(Number(place.child_entry_fee || 0))}</div>
-                      )}
+                    <div>
+                      <span className="text-2xl font-black text-slate-900">{formatPrice(Number(place.entry_fee))}</span>
+                      <span className="text-xs text-slate-500 ml-1">per person</span>
                     </div>
                   ) : (
-                    <span className="text-sm font-normal text-emerald-600">Free Entry</span>
+                    <span className="text-lg font-bold text-emerald-600">Free Entry</span>
                   )}
                 </div>
-                <div className="text-right">
-                  <div className="flex items-center gap-1 text-amber-500 font-black text-lg">
-                    <Star className="h-4 w-4 fill-current" />
-                    <span>{liveRating.avg || "0"}</span>
-                  </div>
-                  <p className="text-[9px] font-black text-slate-400 uppercase">{liveRating.count} reviews</p>
+                <div className="flex items-center gap-1 text-slate-800">
+                  <Star className="h-4 w-4 fill-current" />
+                  <span className="text-sm font-bold">{liveRating.avg || "0"}</span>
+                  <span className="text-[10px] text-slate-500">({liveRating.count})</span>
                 </div>
               </div>
 
-              {/* Operating Hours & Days inside booking card on mobile */}
-              <OperatingHoursInfo />
-
               <Button
                 onClick={() => navigate(`/booking/adventure_place/${resolvedId}`)}
-                className="w-full py-7 rounded-2xl text-md font-black uppercase tracking-widest bg-gradient-to-r from-[#FF7F50] to-[#FF4E50] border-none shadow-lg transition-all active:scale-95 mt-4"
+                className="w-full py-6 rounded-xl text-sm font-bold bg-emerald-600 hover:bg-emerald-700 border-none shadow-md"
               >
-                Book Now
+                Check availability
               </Button>
-              <div className="grid grid-cols-3 gap-3 mt-4">
+
+              {/* Trust badges */}
+              <div className="mt-4 space-y-2">
+                <div className="flex items-start gap-2">
+                  <div className="h-5 w-5 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <Circle className="h-3 w-3 text-emerald-600 fill-emerald-600" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-slate-800">Reserve now & pay later</p>
+                    <p className="text-[10px] text-slate-500">Keep your plans flexible</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-2 mt-4">
                 <UtilityButton
-                  icon={<Navigation className="h-5 w-5" />}
+                  icon={<Navigation className="h-4 w-4" />}
                   label="Map"
                   onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${place.name}, ${place.location}`)}`, "_blank")}
                 />
                 <UtilityButton
-                  icon={<Copy className="h-5 w-5" />}
+                  icon={<Copy className="h-4 w-4" />}
                   label="Copy"
                   onClick={async () => {
                     const link = getShareLink(resolvedId, "adventure_place", place.name, place.location);
@@ -411,7 +477,7 @@ const AdventurePlaceDetail = () => {
                   }}
                 />
                 <UtilityButton
-                  icon={<Share2 className="h-5 w-5" />}
+                  icon={<Share2 className="h-4 w-4" />}
                   label="Share"
                   onClick={async () => {
                     const link = getShareLink(resolvedId, "adventure_place", place.name, place.location);
@@ -426,7 +492,7 @@ const AdventurePlaceDetail = () => {
               </div>
             </div>
 
-            {/* Desktop only general facilities (mobile shown above booking card) */}
+            {/* Desktop only general facilities */}
             <div className="hidden lg:block">
               <GeneralFacilitiesDisplay facilityIds={
                 Array.isArray(place.amenities)
@@ -449,18 +515,18 @@ const AdventurePlaceDetail = () => {
 
             <div id="contact-section" className="lg:hidden">
               {(place.phone_numbers?.length > 0 || place.email) && (
-                <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 space-y-3">
-                  <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Contact</h3>
+                <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 space-y-3">
+                  <h3 className="text-sm font-bold text-slate-900">Contact</h3>
                   {place.phone_numbers?.map((phone: string, idx: number) => (
-                    <a key={idx} href={`tel:${phone}`} className="flex items-center gap-3 text-slate-600 hover:text-[#008080] transition-colors">
-                      <div className="p-2 rounded-lg bg-slate-50"><Phone className="h-4 w-4 text-[#008080]" /></div>
-                      <span className="text-xs font-bold uppercase tracking-tight">{phone}</span>
+                    <a key={idx} href={`tel:${phone}`} className="flex items-center gap-3 text-slate-600 hover:text-teal-600 transition-colors">
+                      <Phone className="h-4 w-4 text-slate-500" />
+                      <span className="text-sm">{phone}</span>
                     </a>
                   ))}
                   {place.email && (
-                    <a href={`mailto:${place.email}`} className="flex items-center gap-3 text-slate-600 hover:text-[#008080] transition-colors">
-                      <div className="p-2 rounded-lg bg-slate-50"><Mail className="h-4 w-4 text-[#008080]" /></div>
-                      <span className="text-xs font-bold tracking-tight">{place.email}</span>
+                    <a href={`mailto:${place.email}`} className="flex items-center gap-3 text-slate-600 hover:text-teal-600 transition-colors">
+                      <Mail className="h-4 w-4 text-slate-500" />
+                      <span className="text-sm">{place.email}</span>
                     </a>
                   )}
                 </div>
