@@ -239,16 +239,17 @@ const EventDetail = () => {
                     <div key={idx} className="rounded-2xl overflow-hidden relative group">
                       <img src={img} alt={`${event.name} - Gallery ${idx + 3}`} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                       {idx === 2 && allImages.length > 5 && (
-                        <div className="absolute inset-0 bg-black/60 flex items-center justify-center backdrop-blur-sm">
+                        <div className="absolute inset-0 bg-black/60 flex items-center justify-center backdrop-blur-sm cursor-pointer">
                           <div className="text-center">
                             <span className="text-white text-2xl font-black">+{allImages.length - 5}</span>
-                            <p className="text-white text-xs font-bold uppercase mt-1">More</p>
+                            <p className="text-white text-xs font-bold uppercase mt-1">See All</p>
                           </div>
                         </div>
                       )}
                     </div>
                   ))}
                 </div>
+                <ImageGalleryModal images={allImages} name={event.name} />
               </>
             ) : (
               <div className="col-span-4 rounded-3xl bg-slate-200 flex items-center justify-center">
