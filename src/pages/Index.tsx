@@ -88,7 +88,7 @@ const ScrollSection = memo(({ title, viewAllPath, accentColor, children, scrollR
         >
           {loading || !hasItems ? (
             [...Array(4)].map((_, i) => (
-              <div key={i} className="flex-shrink-0 w-[72vw] sm:w-[280px] md:w-[320px] snap-start">
+              <div key={i} className="flex-shrink-0 w-[44vw] sm:w-[220px] md:w-[240px] snap-start">
                 <ListingSkeleton />
               </div>
             ))
@@ -199,11 +199,11 @@ const Index = () => {
     const fetchLimit = Math.max(limit * 3, 30);
     try {
       const [tripsData, campsitesData, eventsData] = await Promise.all([
-        supabase.from("trips").select("id,name,location,place,country,image_url,date,is_custom_date,is_flexible_date,available_tickets,activities,type,created_at,price,price_child,description")
+        supabase.from("trips").select("id,name,location,place,country,image_url,gallery_images,images,date,is_custom_date,is_flexible_date,available_tickets,activities,type,created_at,price,price_child,description")
           .eq("approval_status", "approved").eq("is_hidden", false).eq("type", "trip").order("date", { ascending: true }).limit(fetchLimit),
-        supabase.from("adventure_places").select("id,name,location,place,country,image_url,entry_fee,activities,latitude,longitude,created_at,description")
+        supabase.from("adventure_places").select("id,name,location,place,country,image_url,gallery_images,images,entry_fee,activities,latitude,longitude,created_at,description")
           .eq("approval_status", "approved").eq("is_hidden", false).limit(fetchLimit),
-        supabase.from("trips").select("id,name,location,place,country,image_url,date,is_custom_date,is_flexible_date,available_tickets,activities,type,created_at,price,price_child,description")
+        supabase.from("trips").select("id,name,location,place,country,image_url,gallery_images,images,date,is_custom_date,is_flexible_date,available_tickets,activities,type,created_at,price,price_child,description")
           .eq("approval_status", "approved").eq("is_hidden", false).eq("type", "event").order("date", { ascending: true }).limit(fetchLimit),
       ]);
       setScrollableRows({
@@ -394,14 +394,14 @@ const Index = () => {
     const today = new Date().toISOString().split('T')[0];
     const isOutdated = item.date && !item.is_flexible_date && item.date < today;
     return (
-      <div key={item.id} className="flex-shrink-0 w-[72vw] sm:w-[280px] md:w-[320px] snap-start">
+      <div key={item.id} className="flex-shrink-0 w-[44vw] sm:w-[220px] md:w-[240px] snap-start">
         <ListingCard
           id={item.id} type={type as any} name={item.name}
           imageUrl={item.image_url} location={item.location} country={item.country}
           price={item.price || item.entry_fee || 0} date={item.date || ""}
           isCustomDate={item.is_custom_date} isFlexibleDate={item.is_flexible_date}
           isOutdated={isOutdated}
-          onSave={handleSave} isSaved={savedItems.has(item.id)}
+          isSaved={savedItems.has(item.id)}
           hidePrice={opts.hidePrice ?? false}
           showBadge={true} priority={index === 0}
           activities={item.activities} distance={itemDistance}
@@ -411,6 +411,8 @@ const Index = () => {
           bookedTickets={opts.isTrip ? bookingStats[item.id] || 0 : undefined}
           description={item.description}
           categoryColor={opts.categoryColor}
+          galleryImages={item.gallery_images}
+          images={item.images}
         />
       </div>
     );
@@ -491,7 +493,7 @@ const Index = () => {
 
       {/* ─── Hero ──────────────────────────────────────────────────────────── */}
       {!isSearchFocused && (
-        <div ref={searchRef} className="relative w-full h-[52vh] md:h-[44vh] overflow-hidden">
+        <div ref={searchRef} className="relative w-full h-[44vh] md:h-[38vh] overflow-hidden">
           <div className="absolute inset-0 bg-foreground/80" />
           <picture>
             <source srcSet="/images/hero-background.webp" type="image/webp" />
@@ -514,100 +516,45 @@ const Index = () => {
               <h1 className="text-primary-foreground text-3xl md:text-5xl font-extrabold text-center mb-5 md:mb-7 leading-tight tracking-tight">
                 {t('hero.title')}
               </h1>
-              <SearchBarWithSuggestions
-                value={searchQuery} onChange={setSearchQuery}
-                onSubmit={() => { if (searchQuery.trim()) { fetchAllData(searchQuery); setIsSearchFocused(true); } }}
-                onSuggestionSearch={q => { setSearchQuery(q); fetchAllData(q); setIsSearchFocused(true); }}
-                onFocus={() => setIsSearchFocused(true)}
-                onBlur={() => {}}
-                onBack={() => { setIsSearchFocused(false); setSearchQuery(""); fetchAllData(); }}
-                showBackButton={false}
-              />
-            </div>
-          </div>
-
-          {/* Category cards with images */}
-          <div className="absolute bottom-3 left-0 right-0 z-10">
-            <div className="container mx-auto px-4 md:px-6">
-              <div className="grid grid-cols-3 gap-2 w-full">
-                {CATEGORIES.map((cat) => (
-                  <CategoryCard
-                    key={cat.title}
-                    icon={cat.icon}
-                    title={cat.title}
-                    description=""
-                    onClick={() => navigate(cat.path)}
-                    bgImage={cat.bgImage}
-                  />
-                ))}
+              <div onClick={() => navigate('/explore')} className="cursor-pointer">
+                <SearchBarWithSuggestions
+                  value="" onChange={() => {}}
+                  onSubmit={() => navigate('/explore')}
+                  onSuggestionSearch={() => navigate('/explore')}
+                  onFocus={() => navigate('/explore')}
+                  onBlur={() => {}}
+                  onBack={() => {}}
+                  showBackButton={false}
+                />
               </div>
             </div>
           </div>
+
         </div>
       )}
 
-      {/* ─── Focused search bar ────────────────────────────────────────────── */}
-      {isSearchFocused && (
-        <div className="sticky top-0 z-50 bg-background p-4 border-b shadow-sm">
-          <div className="container px-4 mx-auto">
-            <SearchBarWithSuggestions
-              value={searchQuery} onChange={setSearchQuery}
-              onSubmit={() => { if (searchQuery.trim()) fetchAllData(searchQuery); }}
-              onSuggestionSearch={q => { setSearchQuery(q); fetchAllData(q); }}
-              onFocus={() => setIsSearchFocused(true)}
-              onBlur={() => {}}
-              onBack={() => { setIsSearchFocused(false); setSearchQuery(""); fetchAllData(); }}
-              showBackButton={true}
-            />
+      {/* Category cards - below hero, not overlapping */}
+      {!isSearchFocused && (
+        <div className="container mx-auto px-4 md:px-6 -mt-8 relative z-20">
+          <div className="grid grid-cols-3 gap-2 w-full">
+            {CATEGORIES.map((cat) => (
+              <CategoryCard
+                key={cat.title}
+                icon={cat.icon}
+                title={cat.title}
+                description=""
+                onClick={() => navigate(cat.path)}
+                bgImage={cat.bgImage}
+              />
+            ))}
           </div>
         </div>
       )}
+
+      {/* Remove focused search - navigates to explore instead */}
 
       <main className="w-full">
-        {/* ─── Search results ────────────────────────────────────────────── */}
-        {isSearchFocused && (
-          <div className="container mx-auto px-4 md:px-6 mt-6 pb-20 md:pb-8">
-            <h2 className="text-lg md:text-xl font-bold mb-5 text-foreground">
-              {searchQuery ? t('sections.searchResults') : t('sections.allListings')}
-            </h2>
-            {loading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {[...Array(6)].map((_, i) => <ListingSkeleton key={i} />)}
-              </div>
-            ) : sortedListings.length === 0 ? (
-              <div className="text-center py-16">
-                <p className="text-muted-foreground text-sm">{t('sections.noResults')}</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {sortedListings.map((listing, index) => {
-                  const itemDistance = position && listing.latitude && listing.longitude ? calculateDistance(position.latitude, position.longitude, listing.latitude, listing.longitude) : undefined;
-                  const ratingData = ratings.get(listing.id);
-                  const isTripsOrEvents = listing.type === "TRIP" || listing.type === "EVENT";
-                  const today = new Date().toISOString().split('T')[0];
-                  const isOutdated = listing.date && !listing.is_flexible_date && listing.date < today;
-                  return (
-                    <ListingCard
-                      key={listing.id} id={listing.id} type={listing.type}
-                      name={listing.name} location={listing.location} country={listing.country}
-                      imageUrl={listing.image_url} price={listing.price || listing.entry_fee || 0}
-                      date={listing.date} isCustomDate={listing.is_custom_date}
-                      isFlexibleDate={listing.is_flexible_date} isOutdated={isOutdated}
-                      isSaved={savedItems.has(listing.id)} onSave={() => handleSave(listing.id, listing.type)}
-                      availableTickets={isTripsOrEvents ? listing.available_tickets : undefined}
-                      bookedTickets={isTripsOrEvents ? bookingStats[listing.id] || 0 : undefined}
-                      showBadge={true} priority={index < 4}
-                      hidePrice={listing.type === "ADVENTURE PLACE"}
-                      activities={listing.activities} distance={itemDistance}
-                      avgRating={ratingData?.avgRating} reviewCount={ratingData?.reviewCount}
-                      description={listing.description}
-                    />
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        )}
+        {/* Search results removed - uses /explore page now */}
 
         {/* ─── Browse sections ───────────────────────────────────────────── */}
         <div className={`w-full ${isSearchFocused ? 'hidden' : ''}`}>
@@ -682,7 +629,7 @@ const Index = () => {
                 <div className="flex gap-3 md:gap-4 overflow-x-auto pb-2 scrollbar-hide scroll-smooth snap-x snap-mandatory">
                   {loadingNearby ? (
                     [...Array(4)].map((_, i) => (
-                      <div key={i} className="flex-shrink-0 w-[72vw] sm:w-[280px] md:w-[320px] snap-start">
+                      <div key={i} className="flex-shrink-0 w-[44vw] sm:w-[220px] md:w-[240px] snap-start">
                         <ListingSkeleton />
                       </div>
                     ))
@@ -691,11 +638,11 @@ const Index = () => {
                     const dist = a.latitude && a.longitude && position ? calculateDistance(position.latitude, position.longitude, a.latitude, a.longitude) : undefined;
                     const rd = ratings.get(item.id);
                     return (
-                      <div key={item.id} className="flex-shrink-0 w-[72vw] sm:w-[280px] md:w-[320px] snap-start">
+                      <div key={item.id} className="flex-shrink-0 w-[44vw] sm:w-[220px] md:w-[240px] snap-start">
                         <ListingCard
                           id={item.id} type={a.type || 'ADVENTURE PLACE'}
                           name={item.name} imageUrl={a.image_url} location={a.location} country={a.country}
-                          price={a.entry_fee || 0} date="" onSave={handleSave}
+                          price={a.entry_fee || 0} date=""
                           isSaved={savedItems.has(item.id)} hidePrice={true} showBadge={true}
                           priority={index === 0} activities={a.activities} distance={dist}
                           avgRating={rd?.avgRating} reviewCount={rd?.reviewCount} place={a.place}

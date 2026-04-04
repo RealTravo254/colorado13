@@ -44,10 +44,8 @@ const CategoryDetail = () => {
   const categoryConfig: { [key: string]: any } = {
     trips: { title: "Trips", tables: ["trips"], type: "TRIP", tripType: "trip", filterType: "trips-events" },
     events: { title: "Events", tables: ["trips"], type: "EVENT", tripType: "event", filterType: "trips-events" },
-    hotels: { title: "Hotels", tables: ["hotels"], type: "HOTEL", filterType: "hotels" },
     adventure: { title: "Attractions", tables: ["adventure_places"], type: "ATTRACTION", filterType: "adventure" },
     campsite: { title: "Campsite & Experience", tables: ["adventure_places"], type: "ADVENTURE PLACE", filterType: "adventure" },
-    accommodation: { title: "Accommodation", tables: ["hotels"], type: "HOTEL", filterType: "accommodation", establishmentType: "accommodation_only" }
   };
 
   const config = category ? categoryConfig[category] : null;
@@ -114,12 +112,8 @@ const CategoryDetail = () => {
         .from(table as any)
         .select(
           table === "trips"
-            ? "id,name,location,place,country,image_url,date,is_custom_date,is_flexible_date,available_tickets,activities,type,created_at,price,price_child,description,event_category"
-            : table === "hotels"
-              ? "id,name,location,place,country,image_url,activities,latitude,longitude,created_at,establishment_type,description"
-              : table === "adventure_places"
-                ? "id,name,location,place,country,image_url,entry_fee,available_slots,activities,latitude,longitude,created_at,description"
-                : "*"
+            ? "id,name,location,place,country,image_url,gallery_images,images,date,is_custom_date,is_flexible_date,available_tickets,activities,type,created_at,price,price_child,description,event_category"
+            : "id,name,location,place,country,image_url,gallery_images,images,entry_fee,available_slots,activities,latitude,longitude,created_at,description"
         )
         .eq("approval_status", "approved")
         .eq("is_hidden", false);
@@ -225,7 +219,7 @@ const CategoryDetail = () => {
           On 'sm' (640px+) it goes to 2 columns.
           This prevents cards with min-width: 320px from overlapping.
         */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
           {loading ? (
             <div className="col-span-full"><TealLoader text="Loading listings..." /></div>
           ) : (
@@ -247,7 +241,6 @@ const CategoryDetail = () => {
                     isCustomDate={item.is_custom_date}
                     isFlexibleDate={item.is_flexible_date}
                     isOutdated={item.isOutdated}
-                    onSave={handleSave} 
                     isSaved={savedItems.has(item.id)}
                     availableTickets={isTripsOrEvents ? item.available_tickets : undefined}
                     bookedTickets={isTripsOrEvents ? bookingStats[item.id] || 0 : undefined}
@@ -255,6 +248,8 @@ const CategoryDetail = () => {
                     avgRating={ratingData?.avgRating}
                     reviewCount={ratingData?.reviewCount}
                     description={item.description}
+                    galleryImages={item.gallery_images}
+                    images={item.images}
                   />
                 </div>
               );

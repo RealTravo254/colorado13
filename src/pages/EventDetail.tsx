@@ -198,13 +198,13 @@ const EventDetail = () => {
             </CarouselContent>
           </Carousel>
           {allImages.length > 1 && <ImageGalleryModal images={allImages} name={event.name} />}
-          <div className="absolute bottom-6 left-0 z-40 w-full px-4 pointer-events-none">
-            <div className="relative z-10 space-y-2 pointer-events-auto bg-gradient-to-r from-black/70 via-black/50 to-transparent rounded-2xl p-4 max-w-xl">
-              <Button className="bg-[#FF7F50] hover:bg-[#FF7F50] border-none px-3 py-1 h-auto uppercase font-black tracking-[0.1em] text-[9px] rounded-full shadow-lg">Event</Button>
-              <h1 className="text-2xl font-black uppercase tracking-tighter leading-none text-white drop-shadow-2xl">{event.name}</h1>
-              <div className="flex items-center gap-2 cursor-pointer group w-fit" onClick={openInMaps}>
-                <MapPin className="h-4 w-4 text-white" />
-                <span className="text-xs font-bold text-white uppercase tracking-wide">{[event.place, event.location, event.country].filter(Boolean).join(', ')}</span>
+          <div className="absolute bottom-4 left-0 z-40 w-full px-4 pointer-events-none">
+            <div className="relative z-10 space-y-1 pointer-events-auto bg-gradient-to-r from-black/70 via-black/50 to-transparent rounded-xl p-3 max-w-md">
+              <span className="text-[8px] font-black uppercase tracking-widest text-primary-foreground/80 bg-primary/80 px-2 py-0.5 rounded-md">Event</span>
+              <h1 className="text-lg font-black uppercase tracking-tighter leading-none text-white drop-shadow-2xl">{event.name}</h1>
+              <div className="flex items-center gap-1.5 cursor-pointer group w-fit" onClick={openInMaps}>
+                <MapPin className="h-3 w-3 text-white" />
+                <span className="text-[10px] font-bold text-white uppercase tracking-wide">{[event.place, event.location, event.country].filter(Boolean).join(', ')}</span>
               </div>
             </div>
           </div>
@@ -218,13 +218,13 @@ const EventDetail = () => {
                 <div className="col-span-2 row-span-2 rounded-3xl overflow-hidden relative group">
                   <img src={allImages[0]} alt={event.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                  <div className="absolute bottom-6 left-6 right-6 z-20">
-                    <div className="space-y-3">
-                      <Button className="bg-[#FF7F50] hover:bg-[#FF7F50] border-none px-4 py-1.5 h-auto uppercase font-black tracking-[0.1em] text-[10px] rounded-full shadow-lg">Experience</Button>
-                      <h1 className="text-3xl font-black uppercase tracking-tighter leading-none text-white drop-shadow-2xl">{event.name}</h1>
-                      <div className="flex items-center gap-2 cursor-pointer group/map w-fit" onClick={openInMaps}>
-                        <MapPin className="h-4 w-4 text-white" />
-                        <span className="text-sm font-bold text-white uppercase tracking-wide">{[event.place, event.location, event.country].filter(Boolean).join(', ')}</span>
+                   <div className="absolute bottom-4 left-4 right-4 z-20">
+                    <div className="space-y-1.5">
+                      <span className="text-[9px] font-black uppercase tracking-widest text-primary-foreground/80 bg-primary/80 px-2 py-0.5 rounded-md">Experience</span>
+                      <h1 className="text-xl font-black uppercase tracking-tighter leading-none text-white drop-shadow-2xl">{event.name}</h1>
+                      <div className="flex items-center gap-1.5 cursor-pointer group/map w-fit" onClick={openInMaps}>
+                        <MapPin className="h-3.5 w-3.5 text-white" />
+                        <span className="text-xs font-bold text-white uppercase tracking-wide">{[event.place, event.location, event.country].filter(Boolean).join(', ')}</span>
                       </div>
                     </div>
                   </div>
@@ -239,16 +239,17 @@ const EventDetail = () => {
                     <div key={idx} className="rounded-2xl overflow-hidden relative group">
                       <img src={img} alt={`${event.name} - Gallery ${idx + 3}`} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                       {idx === 2 && allImages.length > 5 && (
-                        <div className="absolute inset-0 bg-black/60 flex items-center justify-center backdrop-blur-sm">
+                        <div className="absolute inset-0 bg-black/60 flex items-center justify-center backdrop-blur-sm cursor-pointer">
                           <div className="text-center">
                             <span className="text-white text-2xl font-black">+{allImages.length - 5}</span>
-                            <p className="text-white text-xs font-bold uppercase mt-1">More</p>
+                            <p className="text-white text-xs font-bold uppercase mt-1">See All</p>
                           </div>
                         </div>
                       )}
                     </div>
                   ))}
                 </div>
+                <ImageGalleryModal images={allImages} name={event.name} />
               </>
             ) : (
               <div className="col-span-4 rounded-3xl bg-slate-200 flex items-center justify-center">
@@ -262,8 +263,8 @@ const EventDetail = () => {
       <main className="container px-4 max-w-6xl mx-auto mt-6 relative z-50">
         <div className="grid lg:grid-cols-[1.7fr,1fr] gap-6">
           <div className="space-y-6">
-            <div className="bg-white rounded-[28px] p-7 shadow-sm border border-slate-100">
-              <h2 className="text-xl font-black uppercase tracking-tight mb-4" style={{ color: COLORS.TEAL }}>About this Event</h2>
+            <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
+              <h2 className="text-sm font-black uppercase tracking-tight mb-3" style={{ color: COLORS.TEAL }}>About this Event</h2>
               {event.description ? (
                 <p className="text-foreground text-sm leading-relaxed whitespace-pre-line">{event.description}</p>
               ) : (

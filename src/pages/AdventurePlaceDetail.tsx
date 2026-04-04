@@ -256,17 +256,17 @@ const AdventurePlaceDetail = () => {
             </CarouselContent>
           </Carousel>
           {allImages.length > 1 && <ImageGalleryModal images={allImages} name={place.name} />}
-          <div className="absolute bottom-6 left-0 w-full px-4 z-20">
-            <div className="bg-gradient-to-r from-black/70 via-black/50 to-transparent rounded-2xl p-4 max-w-xl">
-              <div className="flex flex-wrap gap-2 mb-2">
-                <Badge className="bg-amber-400 text-black border-none px-2 py-0.5 text-[9px] font-black uppercase rounded-full flex items-center gap-1 shadow-lg">
-                  <Star className="h-3 w-3 fill-current" />{liveRating.avg > 0 ? liveRating.avg : "—"}
+          <div className="absolute bottom-4 left-0 w-full px-4 z-20">
+            <div className="bg-gradient-to-r from-black/70 via-black/50 to-transparent rounded-xl p-3 max-w-md">
+              <div className="flex flex-wrap gap-1.5 mb-1.5">
+                <Badge className="bg-amber-400 text-black border-none px-2 py-0.5 text-[8px] font-black uppercase rounded-full flex items-center gap-1 shadow-lg">
+                  <Star className="h-2.5 w-2.5 fill-current" />{liveRating.avg > 0 ? liveRating.avg : "—"}
                 </Badge>
               </div>
-              <h1 className="text-2xl font-black text-white uppercase tracking-tighter leading-none mb-2">{place.name}</h1>
+              <h1 className="text-lg font-black text-white uppercase tracking-tighter leading-none mb-1">{place.name}</h1>
               <div className="flex items-center gap-1 text-white">
-                <MapPin className="h-3.5 w-3.5" />
-                <span className="text-xs font-bold uppercase truncate">{[place.place, place.location, place.country].filter(Boolean).join(", ")}</span>
+                <MapPin className="h-3 w-3" />
+                <span className="text-[10px] font-bold uppercase truncate">{[place.place, place.location, place.country].filter(Boolean).join(", ")}</span>
               </div>
             </div>
           </div>
@@ -281,16 +281,16 @@ const AdventurePlaceDetail = () => {
                 <div className="col-span-2 row-span-2 rounded-3xl overflow-hidden relative group">
                   <img src={allImages[0]} alt={place.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                  <div className="absolute bottom-6 left-6 right-6 z-20 space-y-3">
-                    <div className="flex flex-wrap gap-2">
-                      <Badge className="bg-amber-400 text-black border-none px-3 py-1 text-[10px] font-black uppercase rounded-full flex items-center gap-1.5 shadow-lg">
-                        <Star className="h-3.5 w-3.5 fill-current" />{liveRating.avg > 0 ? liveRating.avg : "—"}
+                  <div className="absolute bottom-4 left-4 right-4 z-20 space-y-1.5">
+                    <div className="flex flex-wrap gap-1.5">
+                      <Badge className="bg-amber-400 text-black border-none px-2 py-0.5 text-[9px] font-black uppercase rounded-full flex items-center gap-1 shadow-lg">
+                        <Star className="h-3 w-3 fill-current" />{liveRating.avg > 0 ? liveRating.avg : "—"}
                       </Badge>
                     </div>
-                    <h1 className="text-3xl font-black text-white uppercase tracking-tighter leading-none">{place.name}</h1>
-                    <div className="flex items-center gap-2 text-white">
-                      <MapPin className="h-4 w-4" />
-                      <span className="text-sm font-bold uppercase">{[place.place, place.location, place.country].filter(Boolean).join(", ")}</span>
+                    <h1 className="text-xl font-black text-white uppercase tracking-tighter leading-none">{place.name}</h1>
+                    <div className="flex items-center gap-1.5 text-white">
+                      <MapPin className="h-3.5 w-3.5" />
+                      <span className="text-xs font-bold uppercase">{[place.place, place.location, place.country].filter(Boolean).join(", ")}</span>
                     </div>
                   </div>
                 </div>
@@ -303,6 +303,14 @@ const AdventurePlaceDetail = () => {
                   {allImages.slice(2, 5).map((img, idx) => (
                     <div key={idx} className="rounded-2xl overflow-hidden relative group">
                       <img src={img} alt={`${place.name} - ${idx + 3}`} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                      {idx === 2 && allImages.length > 5 && (
+                        <div className="absolute inset-0 bg-black/60 flex items-center justify-center backdrop-blur-sm cursor-pointer">
+                          <div className="text-center">
+                            <span className="text-white text-2xl font-black">+{allImages.length - 5}</span>
+                            <p className="text-white text-xs font-bold uppercase mt-1">See All</p>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -328,8 +336,8 @@ const AdventurePlaceDetail = () => {
       <main className="container px-4 mt-6 relative z-30 max-w-6xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-[1.8fr,1fr] gap-4">
           <div className="space-y-4">
-            <section className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
-              <h2 className="text-[11px] font-black uppercase tracking-widest mb-3 text-slate-900">About This Property</h2>
+            <section className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
+              <h2 className="text-[11px] font-black uppercase tracking-widest mb-2 text-slate-900">About This Property</h2>
               {place.description ? (
                 <p className="text-foreground text-sm leading-relaxed whitespace-pre-line">{place.description}</p>
               ) : (
