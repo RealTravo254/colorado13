@@ -31,6 +31,7 @@ const Explore = () => {
   const [loading, setLoading] = useState(true);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const { savedItems, handleSave } = useSavedItems();
   const { position } = useGeolocation();
 
   const allItemIds = useMemo(() => listings.map(l => l.id), [listings]);
