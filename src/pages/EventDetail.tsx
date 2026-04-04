@@ -15,7 +15,7 @@ import { ReviewSection } from "@/components/ReviewSection";
 import { useSavedItems } from "@/hooks/useSavedItems";
 import { trackReferralClick } from "@/lib/referralUtils";
 import { getShareLink } from "@/lib/shareUtils";
-import { extractIdFromSlug } from "@/lib/slugUtils";
+import { getSlugLookupCandidates } from "@/lib/slugUtils";
 import { useBookingSubmit, BookingFormData } from "@/hooks/useBookingSubmit";
 import { useRealtimeItemAvailability } from "@/hooks/useRealtimeBookings";
 import { DetailNavBar } from "@/components/detail/DetailNavBar"; 
@@ -54,7 +54,6 @@ const SELECT_FIELDS = "id,name,location,place,country,image_url,gallery_images,i
 
 const EventDetail = () => {
   const { slug: rawSlug } = useParams();
-  const id = rawSlug ? extractIdFromSlug(rawSlug) : null;
   const navigate = useNavigate();
   const goBack = useSafeBack();
   const { user } = useAuth();
@@ -66,17 +65,21 @@ const EventDetail = () => {
   const [showBooking, setShowBooking] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { savedItems, handleSave: handleSaveItem } = useSavedItems();
-  const isSaved = savedItems.has(id || "");
+  const currentItemId = event?.id || "";
+  const isSaved = savedItems.has(currentItemId);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    if (id) fetchEvent();
+    if (rawSlug) fetchEvent();
+  }, [rawSlug]);
+
+  useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const refSlug = urlParams.get("ref");
-    if (refSlug && id) trackReferralClick(refSlug, id, "event", "booking");
-  }, [id]);
+    if (refSlug && event?.id) trackReferralClick(refSlug, event.id, "event", "booking");
+  }, [event?.id]);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 300);
@@ -85,47 +88,39 @@ const EventDetail = () => {
   }, []);
 
   const fetchEvent = async () => {
-    if (!id) return;
+    if (!rawSlug) return;
+    setLoading(true);
+    setEvent(null);
+
     try {
-      let data: any = null;
-      const candidates = [...new Set([id, rawSlug])].filter(Boolean) as string[];
+      const candidates = getSlugLookupCandidates(rawSlug);
 
-      for (const candidate of candidates) {
-        if (data) break;
-        // Try by id with type=event
-        const idRes = await supabase
-          .from("trips")
-          .select(SELECT_FIELDS)
-          .eq("id", candidate)
-          .eq("type", "event")
-          .maybeSingle() as { data: any };
-        if (idRes.data) { data = idRes.data; break; }
+      const findMatch = (rows: any[] | null | undefined, field: "id" | "slug") => {
+        if (!rows?.length) return null;
 
-        // Try by slug with type=event
-        const slugRes = await supabase
-          .from("trips")
-          .select(SELECT_FIELDS)
-          .eq("slug", candidate)
-          .eq("type", "event")
-          .maybeSingle() as { data: any };
-        if (slugRes.data) { data = slugRes.data; break; }
+        for (const candidate of candidates) {
+          const match = rows.find((row) => row?.[field] === candidate);
+          if (match) return match;
+        }
 
-        // Fallback: try by id without type filter (event may have been saved with different type)
-        const fallbackRes = await supabase
-          .from("trips")
-          .select(SELECT_FIELDS)
-          .eq("id", candidate)
-          .maybeSingle() as { data: any };
-        if (fallbackRes.data) { data = fallbackRes.data; break; }
+        return rows[0] || null;
+      };
 
-        // Fallback: try by slug without type filter
-        const fallbackSlugRes = await supabase
-          .from("trips")
-          .select(SELECT_FIELDS)
-          .eq("slug", candidate)
-          .maybeSingle() as { data: any };
-        if (fallbackSlugRes.data) { data = fallbackSlugRes.data; break; }
-      }
+      const fetchByField = async (field: "id" | "slug", type?: string) => {
+        let query: any = supabase.from("trips").select(SELECT_FIELDS).in(field, candidates);
+        if (type) {
+          query = query.eq("type", type);
+        }
+
+        const { data } = await query;
+        return findMatch(data, field);
+      };
+
+      const data =
+        (await fetchByField("id", "event")) ||
+        (await fetchByField("slug", "event")) ||
+        (await fetchByField("id")) ||
+        (await fetchByField("slug"));
 
       if (!data) throw new Error("Not found");
       setEvent(data);
@@ -134,7 +129,7 @@ const EventDetail = () => {
     } finally { setLoading(false); }
   };
 
-  const handleSave = () => id && handleSaveItem(id, "event");
+  const handleSave = () => currentItemId && handleSaveItem(currentItemId, "event");
   const handleCopyLink = async () => {
     if (!event) return;
     const link = getShareLink(event.id, "event", event.name, event.location);
@@ -178,7 +173,7 @@ const EventDetail = () => {
     } finally { setIsProcessing(false); }
   };
 
-  const { remainingSlots, isSoldOut } = useRealtimeItemAvailability(id || undefined, event?.available_tickets || 0);
+  const { remainingSlots, isSoldOut } = useRealtimeItemAvailability(event?.id || undefined, event?.available_tickets || 0);
 
   if (loading) return <TealLoader />;
   if (!event) return null;

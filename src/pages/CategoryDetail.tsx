@@ -123,8 +123,8 @@ const CategoryDetail = () => {
         query = query.eq("type", config.tripType);
       }
 
-      if (config.flexibleOnly) {
-        query = query.eq("is_flexible_date", true);
+      if (config.flexibleOnly && table === "trips") {
+        query = query.or("is_flexible_date.eq.true,is_custom_date.eq.true");
       }
       
       if (config.establishmentType && table === "hotels") {
@@ -239,7 +239,7 @@ const CategoryDetail = () => {
                     price={item.price || item.entry_fee} 
                     date={item.date}
                     isCustomDate={item.is_custom_date}
-                    isFlexibleDate={item.is_flexible_date}
+                     isFlexibleDate={Boolean(item.is_flexible_date || item.is_custom_date)}
                     isOutdated={item.isOutdated}
                     isSaved={savedItems.has(item.id)}
                     availableTickets={isTripsOrEvents ? item.available_tickets : undefined}

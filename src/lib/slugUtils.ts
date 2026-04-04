@@ -21,6 +21,31 @@ export const parseSlug = (slug: string): string => {
 };
 
 /**
+ * Builds exact-match candidates for looking up records from slug-based routes.
+ * This supports UUIDs, direct text IDs, and combined slug-id URLs such as
+ * "sw-swimming-0WQU" or "name-location-3333-paul-1QIU".
+ */
+export const getSlugLookupCandidates = (slugWithId: string): string[] => {
+  if (!slugWithId) return [];
+
+  const normalized = slugWithId.trim().replace(/^\/+|\/+$/g, '');
+  const candidates = new Set<string>([normalized]);
+
+  const uuidPattern = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
+  const uuidMatch = normalized.match(uuidPattern);
+  if (uuidMatch) {
+    candidates.add(uuidMatch[0]);
+  }
+
+  const segments = normalized.split('-').filter(Boolean);
+  for (let start = 1; start < segments.length; start += 1) {
+    candidates.add(segments.slice(start).join('-'));
+  }
+
+  return Array.from(candidates);
+};
+
+/**
  * Creates a full URL path with slug and id for fallback
  * Uses full UUID for reliable database lookups
  */

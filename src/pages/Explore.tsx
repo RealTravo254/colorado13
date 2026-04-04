@@ -41,15 +41,15 @@ const Explore = () => {
   const sortedListings = useMemo(() => sortByRating(listings, ratings, position, calculateDistance), [listings, ratings, position]);
 
   const filteredListings = useMemo(() => {
-    if (activeFilter === "all") {
-      // Exclude flexible trips from "all" - they only appear under "guided"
-      return sortedListings.filter(l => !(l.type === "TRIP" && l.is_flexible_date));
-    }
+    const isGuidedTrip = (listing: any) => listing.type === "TRIP" && (listing.is_flexible_date || listing.is_custom_date);
+
+    if (activeFilter === "all") return sortedListings;
+
     return sortedListings.filter(l => {
       if (activeFilter === "adventure") return l.type === "ADVENTURE PLACE";
-      if (activeFilter === "trip") return l.type === "TRIP" && !l.is_flexible_date;
+      if (activeFilter === "trip") return l.type === "TRIP" && !isGuidedTrip(l);
       if (activeFilter === "event") return l.type === "EVENT";
-      if (activeFilter === "guided") return l.type === "TRIP" && l.is_flexible_date;
+      if (activeFilter === "guided") return isGuidedTrip(l);
       return true;
     });
   }, [sortedListings, activeFilter]);
@@ -252,7 +252,7 @@ const Explore = () => {
                     name={listing.name} location={listing.location} country={listing.country}
                     imageUrl={listing.image_url} price={listing.price || listing.entry_fee || 0}
                     date={listing.date} isCustomDate={listing.is_custom_date}
-                    isFlexibleDate={listing.is_flexible_date} isOutdated={isOutdated}
+                     isFlexibleDate={Boolean(listing.is_flexible_date || listing.is_custom_date)} isOutdated={isOutdated}
                     isSaved={savedItems.has(listing.id)}
                     onSave={handleSave}
                     availableTickets={isTripsOrEvents ? listing.available_tickets : undefined}
