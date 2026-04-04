@@ -1223,11 +1223,14 @@ export type Database = {
           days_opened: string[] | null
           description: string | null
           email: string | null
+          event_category: string | null
+          exclusions: string[] | null
           flexible_end_date: string | null
           gallery_images: string[] | null
           id: string
           image_url: string
           images: string[] | null
+          inclusions: string[] | null
           is_custom_date: boolean | null
           is_flexible_date: boolean | null
           is_hidden: boolean | null
@@ -1258,11 +1261,14 @@ export type Database = {
           days_opened?: string[] | null
           description?: string | null
           email?: string | null
+          event_category?: string | null
+          exclusions?: string[] | null
           flexible_end_date?: string | null
           gallery_images?: string[] | null
           id: string
           image_url: string
           images?: string[] | null
+          inclusions?: string[] | null
           is_custom_date?: boolean | null
           is_flexible_date?: boolean | null
           is_hidden?: boolean | null
@@ -1293,11 +1299,14 @@ export type Database = {
           days_opened?: string[] | null
           description?: string | null
           email?: string | null
+          event_category?: string | null
+          exclusions?: string[] | null
           flexible_end_date?: string | null
           gallery_images?: string[] | null
           id?: string
           image_url?: string
           images?: string[] | null
+          inclusions?: string[] | null
           is_custom_date?: boolean | null
           is_flexible_date?: boolean | null
           is_hidden?: boolean | null
