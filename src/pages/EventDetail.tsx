@@ -218,13 +218,13 @@ const EventDetail = () => {
                 <div className="col-span-2 row-span-2 rounded-3xl overflow-hidden relative group">
                   <img src={allImages[0]} alt={event.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                  <div className="absolute bottom-6 left-6 right-6 z-20">
-                    <div className="space-y-3">
-                      <Button className="bg-[#FF7F50] hover:bg-[#FF7F50] border-none px-4 py-1.5 h-auto uppercase font-black tracking-[0.1em] text-[10px] rounded-full shadow-lg">Experience</Button>
-                      <h1 className="text-3xl font-black uppercase tracking-tighter leading-none text-white drop-shadow-2xl">{event.name}</h1>
-                      <div className="flex items-center gap-2 cursor-pointer group/map w-fit" onClick={openInMaps}>
-                        <MapPin className="h-4 w-4 text-white" />
-                        <span className="text-sm font-bold text-white uppercase tracking-wide">{[event.place, event.location, event.country].filter(Boolean).join(', ')}</span>
+                   <div className="absolute bottom-4 left-4 right-4 z-20">
+                    <div className="space-y-1.5">
+                      <span className="text-[9px] font-black uppercase tracking-widest text-primary-foreground/80 bg-primary/80 px-2 py-0.5 rounded-md">Experience</span>
+                      <h1 className="text-xl font-black uppercase tracking-tighter leading-none text-white drop-shadow-2xl">{event.name}</h1>
+                      <div className="flex items-center gap-1.5 cursor-pointer group/map w-fit" onClick={openInMaps}>
+                        <MapPin className="h-3.5 w-3.5 text-white" />
+                        <span className="text-xs font-bold text-white uppercase tracking-wide">{[event.place, event.location, event.country].filter(Boolean).join(', ')}</span>
                       </div>
                     </div>
                   </div>
