@@ -219,7 +219,7 @@ const CategoryDetail = () => {
           On 'sm' (640px+) it goes to 2 columns.
           This prevents cards with min-width: 320px from overlapping.
         */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-4">
           {loading ? (
             <div className="col-span-full"><TealLoader text="Loading listings..." /></div>
           ) : (
