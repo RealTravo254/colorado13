@@ -131,7 +131,7 @@ const App = () => {
                     <Route path="/category/:category" element={<CategoryDetail />} />
                     <Route path="/trip/:slug" element={<Suspense fallback={<TealLoader />}><TripDetail /></Suspense>} />
                     <Route path="/event/:slug" element={<Suspense fallback={<TealLoader />}><EventDetail /></Suspense>} />
-                    <Route path="/hotel/:slug" element={<Suspense fallback={<TealLoader />}><HotelDetail /></Suspense>} />
+                    {/* Hotel route removed */}
                     <Route path="/adventure/:slug" element={<Suspense fallback={<TealLoader />}><AdventurePlaceDetail /></Suspense>} />
                     <Route path="/attraction/:slug" element={<Suspense fallback={<TealLoader />}><AdventurePlaceDetail /></Suspense>} />
                     <Route path="/auth" element={<Auth />} />
