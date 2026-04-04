@@ -253,7 +253,8 @@ const Explore = () => {
                     imageUrl={listing.image_url} price={listing.price || listing.entry_fee || 0}
                     date={listing.date} isCustomDate={listing.is_custom_date}
                     isFlexibleDate={listing.is_flexible_date} isOutdated={isOutdated}
-                    isSaved={false}
+                    isSaved={savedItems.has(listing.id)}
+                    onSave={handleSave}
                     availableTickets={isTripsOrEvents ? listing.available_tickets : undefined}
                     bookedTickets={isTripsOrEvents ? bookingStats[listing.id] || 0 : undefined}
                     showBadge={true} priority={index < 4}
