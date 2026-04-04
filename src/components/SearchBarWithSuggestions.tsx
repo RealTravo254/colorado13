@@ -26,6 +26,7 @@ interface SearchBarProps {
   onBlur?: () => void;
   onBack?: () => void;
   showBackButton?: boolean;
+  categoryType?: "events" | undefined;
 }
 
 interface SearchResult {
