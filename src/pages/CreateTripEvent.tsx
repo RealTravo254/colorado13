@@ -11,7 +11,7 @@ import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { Calendar, MapPin, DollarSign, Users, Navigation, ArrowLeft, Camera, CheckCircle2, X, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Calendar, MapPin, DollarSign, Users, Navigation, ArrowLeft, Camera, CheckCircle2, X, Loader2, ChevronLeft, ChevronRight, Plus, Link2, Ticket } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CountrySelector } from "@/components/creation/CountrySelector";
 import { PhoneInput } from "@/components/creation/PhoneInput";
@@ -38,6 +38,11 @@ const StyledInput = ({ className = "", isInvalid = false, ...props }: React.Comp
 
 interface WorkingDays { Mon: boolean; Tue: boolean; Wed: boolean; Thu: boolean; Fri: boolean; Sat: boolean; Sun: boolean; }
 
+interface TicketType {
+  name: string;
+  price: number;
+}
+
 const EVENT_CATEGORIES = [
   "Roadtrips", "Music Events", "Children Events", "Pool Party", "Outdoor",
   "Cultural Events", "Food", "Training", "Dancing Events", "Educational",
@@ -63,7 +68,14 @@ const CreateTripEvent = () => {
     latitude: null as number | null, longitude: null as number | null,
     opening_hours: "00:00", closing_hours: "23:59", flexible_duration_months: "3",
     event_category: "" as string,
+    location_link: "",
+    allow_children: true,
   });
+
+  const [ticketTypes, setTicketTypes] = useState<TicketType[]>([]);
+  const [newTicketName, setNewTicketName] = useState("");
+  const [newTicketPrice, setNewTicketPrice] = useState("");
+  const [useTicketTypes, setUseTicketTypes] = useState(false);
 
   const [inclusions, setInclusions] = useState<string[]>([]);
   const [exclusions, setExclusions] = useState<string[]>([]);
@@ -86,7 +98,7 @@ const CreateTripEvent = () => {
 
   // Step validation
   const isStep1Complete = !!formData.name.trim() && !!formData.country && !!formData.place.trim() && !!formData.location.trim();
-  const isStep2Complete = (formData.is_custom_date || !!formData.date) && parseFloat(formData.price) >= 0 && parseInt(formData.available_tickets) > 0;
+  const isStep2Complete = (formData.is_custom_date || !!formData.date) && (useTicketTypes ? ticketTypes.length > 0 : parseFloat(formData.price) >= 0) && parseInt(formData.available_tickets) > 0;
   const isStep3Complete = !!formData.phone_number && galleryImages.length >= 5;
   const isStep4Complete = !!formData.description.trim();
 
@@ -105,9 +117,14 @@ const CreateTripEvent = () => {
       if (!formData.country) errors.push("country");
       if (!formData.place.trim()) errors.push("place");
       if (!formData.location.trim()) errors.push("location");
+      if (formData.location_link && !formData.location_link.startsWith("https://")) errors.push("location_link");
     } else if (currentStep === 2) {
       if (!formData.is_custom_date && !formData.date) errors.push("date");
-      if (!formData.price || parseFloat(formData.price) < 0) errors.push("price");
+      if (useTicketTypes) {
+        if (ticketTypes.length === 0) errors.push("ticket_types");
+      } else {
+        if (!formData.price || parseFloat(formData.price) < 0) errors.push("price");
+      }
       if (!formData.available_tickets || parseInt(formData.available_tickets) <= 0) errors.push("available_tickets");
     } else if (currentStep === 3) {
       if (!formData.phone_number) errors.push("phone_number");
@@ -165,20 +182,37 @@ const CreateTripEvent = () => {
 
   const removeImage = (index: number) => setGalleryImages(prev => prev.filter((_, i) => i !== index));
 
+  const addTicketType = () => {
+    if (!newTicketName.trim() || !newTicketPrice || parseFloat(newTicketPrice) < 0) {
+      toast({ title: "Invalid ticket", description: "Please enter a ticket name and valid price.", variant: "destructive" });
+      return;
+    }
+    setTicketTypes([...ticketTypes, { name: newTicketName.trim(), price: parseFloat(newTicketPrice) }]);
+    setNewTicketName("");
+    setNewTicketPrice("");
+    setValidationErrors(prev => prev.filter(e => e !== "ticket_types"));
+  };
+
+  const removeTicketType = (index: number) => setTicketTypes(prev => prev.filter((_, i) => i !== index));
+
   const handleSubmit = async () => {
     if (!user) { navigate("/auth"); return; }
-    // Validate all steps
     const allErrors: string[] = [];
     if (!formData.name.trim()) allErrors.push("name");
     if (!formData.country) allErrors.push("country");
     if (!formData.place.trim()) allErrors.push("place");
     if (!formData.location.trim()) allErrors.push("location");
     if (!formData.is_custom_date && !formData.date) allErrors.push("date");
-    if (!formData.price || parseFloat(formData.price) < 0) allErrors.push("price");
+    if (useTicketTypes) {
+      if (ticketTypes.length === 0) allErrors.push("ticket_types");
+    } else {
+      if (!formData.price || parseFloat(formData.price) < 0) allErrors.push("price");
+    }
     if (!formData.available_tickets || parseInt(formData.available_tickets) <= 0) allErrors.push("available_tickets");
     if (!formData.phone_number) allErrors.push("phone_number");
     if (!formData.description.trim()) allErrors.push("description");
     if (galleryImages.length < 5) allErrors.push("gallery");
+    if (formData.location_link && !formData.location_link.startsWith("https://")) allErrors.push("location_link");
 
     if (allErrors.length > 0) {
       setValidationErrors(allErrors);
@@ -214,7 +248,8 @@ const CreateTripEvent = () => {
         date: formData.is_custom_date ? new Date().toISOString().split('T')[0] : formData.date,
         is_custom_date: formData.is_custom_date, is_flexible_date: formData.is_custom_date,
         type: formData.type, image_url: uploadedUrls[0] || "", gallery_images: uploadedUrls,
-        price: parseFloat(formData.price), price_child: parseFloat(formData.price_child) || 0,
+        price: useTicketTypes ? (ticketTypes.length > 0 ? ticketTypes[0].price : 0) : parseFloat(formData.price),
+        price_child: useTicketTypes ? 0 : (parseFloat(formData.price_child) || 0),
         available_tickets: parseInt(formData.available_tickets) || 0,
         email: formData.email, phone_number: formData.phone_number, map_link: formData.map_link,
         opening_hours: formData.opening_hours || null, closing_hours: formData.closing_hours || null,
@@ -224,6 +259,9 @@ const CreateTripEvent = () => {
         inclusions: inclusions.length > 0 ? inclusions : null,
         exclusions: exclusions.length > 0 ? exclusions : null,
         event_category: formData.type === 'event' ? (formData.event_category || null) : null,
+        ticket_types: useTicketTypes ? ticketTypes : [],
+        allow_children: formData.allow_children,
+        location_link: formData.location_link || null,
       } as any]);
 
       if (error) throw error;
@@ -315,6 +353,14 @@ const CreateTripEvent = () => {
                     <StyledInput isInvalid={validationErrors.includes("location")} value={formData.location} onChange={(e) => { setFormData({...formData, location: e.target.value}); if(e.target.value) setValidationErrors(prev => prev.filter(err => err !== "location")); }} placeholder="e.g. Nanyuki Main Gate" />
                     {validationErrors.includes("location") && <p className="text-red-500 text-[10px] font-bold">⚠ Specific location is required</p>}
                   </div>
+                  <div className="space-y-2 md:col-span-2">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
+                      <Link2 className="h-3 w-3" /> Location Link (optional)
+                    </Label>
+                    <StyledInput isInvalid={validationErrors.includes("location_link")} value={formData.location_link} onChange={(e) => { setFormData({...formData, location_link: e.target.value}); if(!e.target.value || e.target.value.startsWith("https://")) setValidationErrors(prev => prev.filter(err => err !== "location_link")); }} placeholder="https://maps.google.com/..." />
+                    {validationErrors.includes("location_link") && <p className="text-red-500 text-[10px] font-bold">⚠ Link must start with https://</p>}
+                    <p className="text-[9px] text-muted-foreground">Paste a valid Google Maps or location link starting with https://</p>
+                  </div>
                 </div>
               </Card>
             </>
@@ -353,35 +399,104 @@ const CreateTripEvent = () => {
                 )}
               </Card>
 
-              <Card className="bg-white rounded-[32px] p-8 shadow-sm border border-slate-100">
-                <h2 className="text-xs font-black uppercase tracking-widest mb-6" style={{ color: COLORS.TEAL }}>Pricing & Logistics</h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="space-y-2">
-                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Adult Price (KSh) *</Label>
-                    <div className="relative"><DollarSign className="absolute left-4 top-3.5 h-4 w-4 text-slate-400" /><StyledInput isInvalid={validationErrors.includes("price")} type="number" className="pl-11" value={formData.price} onChange={(e) => { setFormData({...formData, price: e.target.value}); if(e.target.value && parseFloat(e.target.value) >= 0) setValidationErrors(prev => prev.filter(err => err !== "price")); }} /></div>
-                    {parseFloat(formData.price) > 0 && <p className="text-[9px] text-blue-500 font-bold mt-0.5">{usdHint(parseFloat(formData.price))}</p>}
-                    {validationErrors.includes("price") && <p className="text-red-500 text-[10px] font-bold">⚠ Enter a valid price</p>}
+              {/* Ticket Types / Pricing */}
+              <Card className="bg-white rounded-[32px] p-8 shadow-sm border border-slate-100 space-y-6">
+                <h2 className="text-xs font-black uppercase tracking-widest" style={{ color: COLORS.TEAL }}>Pricing & Tickets</h2>
+                
+                {/* Toggle: Across Price vs Custom Ticket Types */}
+                {formData.type === "event" && (
+                  <div className="flex items-center space-x-3 bg-slate-50 p-4 rounded-2xl">
+                    <Checkbox id="use_ticket_types" checked={useTicketTypes} onCheckedChange={(checked) => setUseTicketTypes(checked as boolean)} />
+                    <label htmlFor="use_ticket_types" className="text-[11px] font-black uppercase tracking-tight text-slate-500 cursor-pointer">
+                      Use custom ticket types (VIP, VVIP, Regular, etc.)
+                    </label>
                   </div>
-                  <div className="space-y-2">
-                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Child Price (KSh)</Label>
-                    <div className="relative"><DollarSign className="absolute left-4 top-3.5 h-4 w-4 text-slate-400" /><StyledInput type="number" min="0" className="pl-11" value={formData.price_child} onChange={(e) => setFormData({...formData, price_child: e.target.value})} /></div>
-                    <p className="text-[9px] text-muted-foreground">Set to 0 if not applicable for children</p>
-                    {parseFloat(formData.price_child) > 0 && <p className="text-[9px] text-blue-500 font-bold mt-0.5">{usdHint(parseFloat(formData.price_child))}</p>}
+                )}
+
+                {/* Allow Children Toggle */}
+                <div className="flex items-center space-x-3 bg-slate-50 p-4 rounded-2xl">
+                  <Checkbox id="allow_children" checked={formData.allow_children} onCheckedChange={(checked) => setFormData({...formData, allow_children: checked as boolean})} />
+                  <label htmlFor="allow_children" className="text-[11px] font-black uppercase tracking-tight text-slate-500 cursor-pointer">
+                    Allow children / child pricing
+                  </label>
+                </div>
+
+                {useTicketTypes ? (
+                  <div className="space-y-4">
+                    <p className="text-[10px] text-slate-400 font-bold uppercase">Add your ticket types with custom names and prices</p>
+                    
+                    {/* Add ticket type form */}
+                    <div className="flex gap-2 items-end">
+                      <div className="flex-1 space-y-1">
+                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Ticket Name</Label>
+                        <StyledInput value={newTicketName} onChange={(e) => setNewTicketName(e.target.value)} placeholder="e.g. VIP, Regular, VVIP" />
+                      </div>
+                      <div className="w-32 space-y-1">
+                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Price (KSh)</Label>
+                        <StyledInput type="number" min="0" value={newTicketPrice} onChange={(e) => setNewTicketPrice(e.target.value)} placeholder="0" />
+                      </div>
+                      <Button type="button" onClick={addTicketType} className="rounded-xl h-12 px-4" style={{ background: COLORS.TEAL }}>
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    
+                    {validationErrors.includes("ticket_types") && <p className="text-red-500 text-[10px] font-bold">⚠ Add at least one ticket type</p>}
+
+                    {/* Ticket types list */}
+                    <div className="space-y-2">
+                      {ticketTypes.map((ticket, i) => (
+                        <div key={i} className="flex items-center justify-between px-4 py-3 rounded-2xl bg-[#008080]/5 border border-[#008080]/20">
+                          <div className="flex items-center gap-3">
+                            <Ticket className="h-4 w-4 text-[#008080]" />
+                            <div>
+                              <span className="text-sm font-black text-slate-800 uppercase tracking-tight">{ticket.name}</span>
+                              <span className="text-xs text-slate-500 ml-2">KSh {ticket.price.toLocaleString()}</span>
+                              {ticket.price > 0 && <span className="text-[9px] text-blue-500 font-bold ml-2">{usdHint(ticket.price)}</span>}
+                            </div>
+                          </div>
+                          <button type="button" onClick={() => removeTicketType(i)} className="text-red-400 hover:text-red-600"><X className="h-4 w-4" /></button>
+                        </div>
+                      ))}
+                    </div>
                   </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Adult Price (KSh) *</Label>
+                      <div className="relative"><DollarSign className="absolute left-4 top-3.5 h-4 w-4 text-slate-400" /><StyledInput isInvalid={validationErrors.includes("price")} type="number" className="pl-11" value={formData.price} onChange={(e) => { setFormData({...formData, price: e.target.value}); if(e.target.value && parseFloat(e.target.value) >= 0) setValidationErrors(prev => prev.filter(err => err !== "price")); }} /></div>
+                      {parseFloat(formData.price) > 0 && <p className="text-[9px] text-blue-500 font-bold mt-0.5">{usdHint(parseFloat(formData.price))}</p>}
+                      {validationErrors.includes("price") && <p className="text-red-500 text-[10px] font-bold">⚠ Enter a valid price</p>}
+                    </div>
+                    {formData.allow_children && (
+                      <div className="space-y-2">
+                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Child Price (KSh)</Label>
+                        <div className="relative"><DollarSign className="absolute left-4 top-3.5 h-4 w-4 text-slate-400" /><StyledInput type="number" min="0" className="pl-11" value={formData.price_child} onChange={(e) => setFormData({...formData, price_child: e.target.value})} /></div>
+                        <p className="text-[9px] text-muted-foreground">Set to 0 if not applicable for children</p>
+                        {parseFloat(formData.price_child) > 0 && <p className="text-[9px] text-blue-500 font-bold mt-0.5">{usdHint(parseFloat(formData.price_child))}</p>}
+                      </div>
+                    )}
+                    <div className="space-y-2">
+                      <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Max Slots *</Label>
+                      <div className="relative"><Users className="absolute left-4 top-3.5 h-4 w-4 text-slate-400" /><StyledInput isInvalid={validationErrors.includes("available_tickets")} type="number" className="pl-11" value={formData.available_tickets} onChange={(e) => { setFormData({...formData, available_tickets: e.target.value}); if(e.target.value && parseInt(e.target.value) > 0) setValidationErrors(prev => prev.filter(err => err !== "available_tickets")); }} /></div>
+                      {validationErrors.includes("available_tickets") && <p className="text-red-500 text-[10px] font-bold">⚠ Enter number of slots (min 1)</p>}
+                    </div>
+                  </div>
+                )}
+
+                {useTicketTypes && (
                   <div className="space-y-2">
                     <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Max Slots *</Label>
                     <div className="relative"><Users className="absolute left-4 top-3.5 h-4 w-4 text-slate-400" /><StyledInput isInvalid={validationErrors.includes("available_tickets")} type="number" className="pl-11" value={formData.available_tickets} onChange={(e) => { setFormData({...formData, available_tickets: e.target.value}); if(e.target.value && parseInt(e.target.value) > 0) setValidationErrors(prev => prev.filter(err => err !== "available_tickets")); }} /></div>
                     {validationErrors.includes("available_tickets") && <p className="text-red-500 text-[10px] font-bold">⚠ Enter number of slots (min 1)</p>}
                   </div>
-                </div>
+                )}
               </Card>
 
-              {/* Inclusions & Exclusions - for fixed date trips and events */}
+              {/* Inclusions & Exclusions */}
               {(!formData.is_custom_date || formData.type === "event") && (
                 <Card className="bg-white rounded-[32px] p-8 shadow-sm border border-slate-100 space-y-6">
                   <h2 className="text-xs font-black uppercase tracking-widest" style={{ color: COLORS.TEAL }}>What's Included & Excluded</h2>
                   
-                  {/* Inclusions */}
                   <div className="space-y-3">
                     <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">✓ Inclusions</Label>
                     <div className="flex gap-2">
@@ -398,7 +513,6 @@ const CreateTripEvent = () => {
                     </div>
                   </div>
 
-                  {/* Exclusions */}
                   <div className="space-y-3">
                     <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">✗ Exclusions</Label>
                     <div className="flex gap-2">
