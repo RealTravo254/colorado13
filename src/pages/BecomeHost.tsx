@@ -310,38 +310,47 @@ const BecomeHost = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <HostCategoryCard 
-            title="Tours & Events"
-            subtitle="Trips, Sports & Events"
-            image="/images/category-trips.webp"
-            icon={<Plane className="h-8 w-8" />}
-            count={myContent.filter(i => i.contentType === 'trip' || i.contentType === 'event').length}
-            onManage={() => navigate("/host/trips")}
-            onAdd={() => navigate("/create-trip")}
-            accentColor={COLORS.TEAL}
-          />
+          {/* Tours & Events - visible for guides and companies, hidden for campsite-only */}
+          {hostingCategory !== 'campsite' && (
+            <HostCategoryCard 
+              title="Tours & Events"
+              subtitle="Trips, Sports & Events"
+              image="/images/category-trips.webp"
+              icon={<Plane className="h-8 w-8" />}
+              count={myContent.filter(i => i.contentType === 'trip' || i.contentType === 'event').length}
+              onManage={() => navigate("/host/trips")}
+              onAdd={() => navigate("/create-trip")}
+              accentColor={COLORS.TEAL}
+            />
+          )}
 
-          <HostCategoryCard 
-            title="Stays"
-            subtitle="Hotels & Accommodation"
-            image="/images/category-hotels.webp"
-            icon={<Building className="h-8 w-8" />}
-            count={myContent.filter(i => i.contentType === 'hotel').length}
-            onManage={() => navigate("/host/hotels")}
-            onAdd={() => navigate("/create-hotel")}
-            accentColor={COLORS.CORAL}
-          />
+          {/* Stays - visible for companies only */}
+          {hasCompany && (
+            <HostCategoryCard 
+              title="Stays"
+              subtitle="Hotels & Accommodation"
+              image="/images/category-hotels.webp"
+              icon={<Building className="h-8 w-8" />}
+              count={myContent.filter(i => i.contentType === 'hotel').length}
+              onManage={() => navigate("/host/hotels")}
+              onAdd={() => navigate("/create-hotel")}
+              accentColor={COLORS.CORAL}
+            />
+          )}
 
-          <HostCategoryCard 
-            title="Experiences"
-            subtitle="Outdoor & Adventure"
-            image="/images/category-campsite.webp"
-            icon={<Tent className="h-8 w-8" />}
-            count={myContent.filter(i => i.contentType === 'adventure').length}
-            onManage={() => navigate("/host/experiences")}
-            onAdd={() => navigate("/create-adventure")}
-            accentColor={COLORS.KHAKI_DARK}
-          />
+          {/* Experiences - visible for campsite hosts, hidden for companies and guides */}
+          {(hostingCategory === 'campsite' || (!hasCompany && hostingCategory !== 'guide')) && (
+            <HostCategoryCard 
+              title="Experiences"
+              subtitle="Outdoor & Adventure"
+              image="/images/category-campsite.webp"
+              icon={<Tent className="h-8 w-8" />}
+              count={myContent.filter(i => i.contentType === 'adventure').length}
+              onManage={() => navigate("/host/experiences")}
+              onAdd={() => navigate("/create-adventure")}
+              accentColor={COLORS.KHAKI_DARK}
+            />
+          )}
         </div>
       </main>
 
