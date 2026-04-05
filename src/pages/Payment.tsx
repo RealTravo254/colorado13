@@ -12,7 +12,6 @@ import { useHostVerificationStatus } from "@/hooks/useHostVerificationStatus";
 import { WithdrawalDialog } from "@/components/referral/WithdrawalDialog";
 import { WithdrawalDetailsSection } from "@/components/payment/WithdrawalDetailsSection";
 import { SEOHead } from "@/components/SEOHead";
-import { generateReferralLink } from "@/lib/referralUtils";
 import { useCurrency } from "@/contexts/CurrencyContext";
 
 export default function Payment() {
@@ -23,8 +22,6 @@ export default function Payment() {
   const { isVerifiedHost, status: verificationStatus, loading: verificationLoading } = useHostVerificationStatus();
   const [loading, setLoading] = useState(true);
   const [showWithdrawDialog, setShowWithdrawDialog] = useState(false);
-  const [referralLink, setReferralLink] = useState("");
-  const [linkCopied, setLinkCopied] = useState(false);
 
   const [stats, setStats] = useState({
     totalReferred: 0, totalBookings: 0, totalCommission: 0,
@@ -40,16 +37,6 @@ export default function Payment() {
     if (!verificationLoading) fetchData();
   }, [user, navigate, isVerifiedHost, verificationLoading]);
 
-  // Generate the user's referral base link
-  useEffect(() => {
-    if (isVerifiedHost && user) {
-      // Generate a generic referral link (homepage)
-      generateReferralLink("", "trip", "").then(link => {
-        // The link will be the homepage with ?ref= param for verified hosts
-        setReferralLink(link);
-      });
-    }
-  }, [isVerifiedHost, user]);
 
   const fetchData = async () => {
     try {
