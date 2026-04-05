@@ -147,7 +147,11 @@ const BookingPage = () => {
       const isFacilityOnly = searchParams.get("skipToFacility") === "true";
       
       if (type === "trip" || type === "event") {
-        totalAmount = (formData.num_adults * item.price) + (formData.num_children * (item.price_child || 0));
+        if (formData.ticketSelections && formData.ticketSelections.length > 0) {
+          formData.ticketSelections.forEach(t => totalAmount += t.price * t.quantity);
+        } else {
+          totalAmount = (formData.num_adults * item.price) + (formData.num_children * (item.price_child || 0));
+        }
       } else if (type === "adventure_place" || type === "adventure") {
         // In facility-only mode, don't charge entry fee
         if (!isFacilityOnly) {
