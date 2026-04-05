@@ -671,7 +671,7 @@ const CreateAdventure = () => {
         location: formData.locationName, place: formData.place, country: formData.country,
         description: formData.description, email: formData.email,
         phone_numbers: formData.phoneNumber ? [formData.phoneNumber] : [],
-        map_link: formData.latitude ? `https://www.google.com/maps?q=${formData.latitude},${formData.longitude}` : "",
+        map_link: formData.latitude ? `https://www.google.com/maps?q=${formData.latitude},${formData.longitude}` : (formData.locationLink || ""),
         latitude: formData.latitude, longitude: formData.longitude,
         opening_hours: formData.openingHours, closing_hours: formData.closingHours,
         days_opened: selectedDays, image_url: galleryUrls[0] ?? "", gallery_images: galleryUrls,
