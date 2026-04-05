@@ -286,24 +286,7 @@ const EventDetail = () => {
               )}
             </div>
 
-            {/* Operating Hours — no days_opened */}
-            {(event.opening_hours || event.closing_hours) && (
-              <div className="bg-white rounded-[28px] p-7 shadow-sm border border-slate-100">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="p-2 rounded-xl bg-teal-50"><Clock className="h-5 w-5 text-[#008080]" /></div>
-                  <div>
-                    <h2 className="text-xl font-black uppercase tracking-tight" style={{ color: COLORS.TEAL }}>Event Hours</h2>
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Operating Hours</p>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between bg-slate-50 p-4 rounded-2xl">
-                  <span className="text-[10px] font-black uppercase text-slate-400">Operating Hours</span>
-                  <span className="text-sm font-black text-slate-700">
-                    {event.opening_hours || "08:00"} - {event.closing_hours || "18:00"}
-                  </span>
-                </div>
-              </div>
-            )}
+            {/* Operating Hours - moved into price card */}
 
             {event.activities?.length > 0 && (
               <div className="bg-white rounded-[28px] p-7 shadow-sm border border-slate-100">
@@ -322,9 +305,9 @@ const EventDetail = () => {
               </div>
             )}
 
-            {/* Inclusions & Exclusions */}
+            {/* Inclusions & Exclusions - desktop only */}
             {((event.inclusions && event.inclusions.length > 0) || (event.exclusions && event.exclusions.length > 0)) && (
-              <div className="bg-white rounded-[28px] p-7 shadow-sm border border-slate-100">
+              <div className="hidden lg:block bg-white rounded-[28px] p-7 shadow-sm border border-slate-100">
                 <h2 className="text-xl font-black uppercase tracking-tight mb-5" style={{ color: COLORS.TEAL }}>Package Details</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {event.inclusions?.length > 0 && (
@@ -379,6 +362,16 @@ const EventDetail = () => {
                 </div>
               </div>
 
+              {/* Operating Hours inside price card */}
+              {(event.opening_hours || event.closing_hours) && (
+                <div className="mb-6 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] font-black uppercase text-slate-400 flex items-center gap-1"><Clock className="h-3 w-3" /> Event Hours</span>
+                    <span className="text-xs font-black text-slate-700">{event.opening_hours || "08:00"} - {event.closing_hours || "18:00"}</span>
+                  </div>
+                </div>
+              )}
+
               <div className="mb-8 p-4 bg-slate-50 rounded-2xl border border-slate-100">
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1"><Users className="h-3 w-3" /> Event Availability</span>
@@ -408,7 +401,6 @@ const EventDetail = () => {
                     <span className="text-slate-700">{formatPrice(event.price_child || 0)}</span>
                   </div>
                 )}
-                {/* Ticket Types */}
                 {event.ticket_types && Array.isArray(event.ticket_types) && event.ticket_types.length > 0 && (
                   <div className="pt-2 border-t border-slate-100">
                     <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-2">Ticket Types</p>
@@ -453,6 +445,41 @@ const EventDetail = () => {
                 )}
               </div>
             </div>
+
+            {/* Inclusions & Exclusions below price card on mobile */}
+            {((event.inclusions && event.inclusions.length > 0) || (event.exclusions && event.exclusions.length > 0)) && (
+              <div className="lg:hidden bg-white rounded-[28px] p-7 shadow-sm border border-slate-100">
+                <h2 className="text-xl font-black uppercase tracking-tight mb-5" style={{ color: COLORS.TEAL }}>Package Details</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  {event.inclusions?.length > 0 && (
+                    <div>
+                      <p className="text-[10px] font-black uppercase text-emerald-600 tracking-widest mb-3">✓ What's Included</p>
+                      <ul className="space-y-2">
+                        {event.inclusions.map((item: string, i: number) => (
+                          <li key={i} className="flex items-start gap-2 text-sm text-emerald-700">
+                            <span className="text-emerald-500 mt-0.5">✓</span>
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  {event.exclusions?.length > 0 && (
+                    <div>
+                      <p className="text-[10px] font-black uppercase text-red-500 tracking-widest mb-3">✗ Not Included</p>
+                      <ul className="space-y-2">
+                        {event.exclusions.map((item: string, i: number) => (
+                          <li key={i} className="flex items-start gap-2 text-sm text-red-600">
+                            <span className="text-red-400 mt-0.5">✗</span>
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
 
             <div className="lg:hidden bg-white rounded-[28px] p-7 shadow-sm border border-slate-100">
               <ReviewHeader event={event} />

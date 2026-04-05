@@ -6,13 +6,12 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { 
   ArrowLeft, DollarSign, Wallet, TrendingUp, Award, Percent, 
-  Copy, Share2, Link2, Users, ArrowUpRight, CheckCircle, Info, CreditCard
+  Link2, Users, ArrowUpRight, CreditCard
 } from "lucide-react";
 import { useHostVerificationStatus } from "@/hooks/useHostVerificationStatus";
 import { WithdrawalDialog } from "@/components/referral/WithdrawalDialog";
 import { WithdrawalDetailsSection } from "@/components/payment/WithdrawalDetailsSection";
 import { SEOHead } from "@/components/SEOHead";
-import { generateReferralLink } from "@/lib/referralUtils";
 import { useCurrency } from "@/contexts/CurrencyContext";
 
 export default function Payment() {
@@ -23,8 +22,6 @@ export default function Payment() {
   const { isVerifiedHost, status: verificationStatus, loading: verificationLoading } = useHostVerificationStatus();
   const [loading, setLoading] = useState(true);
   const [showWithdrawDialog, setShowWithdrawDialog] = useState(false);
-  const [referralLink, setReferralLink] = useState("");
-  const [linkCopied, setLinkCopied] = useState(false);
 
   const [stats, setStats] = useState({
     totalReferred: 0, totalBookings: 0, totalCommission: 0,
@@ -40,16 +37,6 @@ export default function Payment() {
     if (!verificationLoading) fetchData();
   }, [user, navigate, isVerifiedHost, verificationLoading]);
 
-  // Generate the user's referral base link
-  useEffect(() => {
-    if (isVerifiedHost && user) {
-      // Generate a generic referral link (homepage)
-      generateReferralLink("", "trip", "").then(link => {
-        // The link will be the homepage with ?ref= param for verified hosts
-        setReferralLink(link);
-      });
-    }
-  }, [isVerifiedHost, user]);
 
   const fetchData = async () => {
     try {
@@ -137,25 +124,6 @@ export default function Payment() {
 
   const handleWithdrawalSuccess = () => { setLoading(true); window.location.reload(); };
 
-  const handleCopyReferralLink = async () => {
-    if (!referralLink) return;
-    await navigator.clipboard.writeText(referralLink);
-    setLinkCopied(true);
-    toast({ title: "Referral link copied!" });
-    setTimeout(() => setLinkCopied(false), 2000);
-  };
-
-  const handleShareReferralLink = async () => {
-    if (!referralLink) return;
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: "Join Realtravo", text: "Check out Realtravo for amazing travel experiences!", url: referralLink });
-      } catch (_) {}
-    } else {
-      handleCopyReferralLink();
-    }
-  };
-
   if (loading || verificationLoading) return (
     <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="flex items-center gap-2">
@@ -177,12 +145,10 @@ export default function Payment() {
           <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Earnings, referrals & withdrawals</p>
         </div>
 
-        {/* Payment History Link */}
         <Button variant="outline" size="sm" className="mb-4 w-full rounded-xl text-[10px] font-black uppercase tracking-widest border-border" onClick={() => navigate("/payment-history")}>
           <CreditCard className="mr-2 h-3.5 w-3.5" /> View Payment History
         </Button>
 
-        {/* Balance Card */}
         <div className="bg-card rounded-xl p-4 border border-border mb-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -201,34 +167,18 @@ export default function Payment() {
           </div>
         </div>
 
-        {/* Withdrawal Details */}
         <WithdrawalDetailsSection userId={user?.id || ""} />
 
-        {/* Referral Link Card - Only for verified hosts */}
-        {isVerifiedHost && referralLink && (
+        {/* Referral info */}
+        {isVerifiedHost && (
           <div className="bg-gradient-to-br from-primary/5 to-primary/10 rounded-xl p-4 border border-primary/20 mb-4">
-            <div className="flex items-center gap-2 mb-3">
+            <div className="flex items-center gap-2 mb-2">
               <Link2 className="h-4 w-4 text-primary" />
-              <h3 className="text-xs font-black uppercase tracking-widest text-primary">Your Referral Link</h3>
+              <h3 className="text-xs font-black uppercase tracking-widest text-primary">Referral Program</h3>
             </div>
-            <p className="text-[10px] text-muted-foreground mb-3">
-              Share this link to earn commission on every booking made through it.
+            <p className="text-[10px] text-muted-foreground">
+              Share referral links from any listing's detail page to earn commissions. Commission rates are set per category by the admin.
             </p>
-            <div className="flex items-center gap-2 bg-background rounded-lg p-2 border border-border">
-              <p className="flex-1 text-xs font-mono text-foreground truncate">{referralLink}</p>
-              <Button size="sm" variant="ghost" onClick={handleCopyReferralLink} className="rounded-lg h-8 w-8 p-0 shrink-0">
-                {linkCopied ? <CheckCircle className="h-4 w-4 text-emerald-500" /> : <Copy className="h-4 w-4" />}
-              </Button>
-              <Button size="sm" variant="ghost" onClick={handleShareReferralLink} className="rounded-lg h-8 w-8 p-0 shrink-0">
-                <Share2 className="h-4 w-4" />
-              </Button>
-            </div>
-            <div className="flex items-start gap-1.5 mt-3">
-              <Info className="h-3 w-3 text-muted-foreground mt-0.5 shrink-0" />
-              <p className="text-[9px] text-muted-foreground">
-                You can also share referral links from any listing's detail page for item-specific tracking.
-              </p>
-            </div>
           </div>
         )}
 

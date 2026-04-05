@@ -202,19 +202,24 @@ const CategoryDetail = () => {
         }
       />
 
-      <div ref={searchRef} className={cn("bg-white dark:bg-background border-b z-50 sticky top-0", isSearchFocused && "z-[600]")}>
-        <div className="container px-4 py-3">
-          <SearchBarWithSuggestions 
-            value={searchQuery} 
-            onChange={setSearchQuery} 
-            onSubmit={() => setFilteredItems(applyFilters(sortedItems, searchQuery))} 
-            onFocus={() => setIsSearchFocused(true)} 
-            onBlur={() => setIsSearchFocused(false)} 
-            onBack={() => { setIsSearchFocused(false); setSearchQuery(""); }} 
-            showBackButton={isSearchFocused}
-            categoryType={category === "events" ? "events" : undefined}
-            showEventCategories={true}
-          />
+      <div ref={searchRef} className={cn("bg-card border-b z-50 sticky top-0", isSearchFocused && "z-[600]")}>
+        <div className="container px-4 py-3 flex items-center gap-3">
+          <button onClick={() => window.history.back()} className="md:hidden shrink-0 p-2 rounded-lg hover:bg-muted transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+          </button>
+          <div className="flex-1">
+            <SearchBarWithSuggestions 
+              value={searchQuery} 
+              onChange={setSearchQuery} 
+              onSubmit={() => setFilteredItems(applyFilters(sortedItems, searchQuery))} 
+              onFocus={() => setIsSearchFocused(true)} 
+              onBlur={() => setIsSearchFocused(false)} 
+              onBack={() => { setIsSearchFocused(false); setSearchQuery(""); }} 
+              showBackButton={isSearchFocused}
+              categoryType={category === "events" ? "events" : undefined}
+              showEventCategories={category === "events"}
+            />
+          </div>
         </div>
       </div>
 
