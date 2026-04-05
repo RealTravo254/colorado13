@@ -494,8 +494,8 @@ const Index = () => {
       {/* Hero — full width on mobile, horizontally padded on desktop, no border radius */}
       {!isSearchFocused && (
         <div ref={searchRef} className="w-full md:px-6 lg:px-10">
-          {/* Image container — taller to fit text + search + category cards all inside */}
-          <div className="relative w-full overflow-hidden" style={{ height: 'clamp(300px, 48vh, 420px)' }}>
+          {/* Image container — mobile tall enough for content, desktop compact fixed height */}
+          <div className="relative w-full overflow-hidden h-[72vw] sm:h-[60vw] md:h-[400px] lg:h-[420px] xl:h-[440px]">
             <div className="absolute inset-0 bg-foreground/80" />
             <picture>
               <source srcSet="/images/hero-background.webp" type="image/webp" />
@@ -516,7 +516,7 @@ const Index = () => {
                 <p className="text-primary-foreground/70 text-xs md:text-sm font-semibold uppercase tracking-widest text-center mb-2">
                   {t('hero.tagline')}
                 </p>
-                <h1 className="text-primary-foreground text-3xl md:text-5xl font-extrabold text-center mb-4 md:mb-6 leading-tight tracking-tight">
+                <h1 className="text-primary-foreground text-3xl md:text-4xl lg:text-5xl font-extrabold text-center mb-3 md:mb-4 leading-tight tracking-tight">
                   {t('hero.title')}
                 </h1>
                 <div onClick={() => navigate('/explore')} className="cursor-pointer w-full">
@@ -532,18 +532,19 @@ const Index = () => {
                 </div>
               </div>
 
-              {/* Category cards — pinned to bottom of image, full image width */}
-              <div className="w-full pb-4 pt-3">
-                <div className="grid grid-cols-4 gap-2 md:gap-4 w-full">
+              {/* Category cards — pinned to bottom of image, full image width, compact on desktop */}
+              <div className="w-full pb-3 pt-2">
+                <div className="grid grid-cols-4 gap-2 md:gap-3 w-full">
                   {CATEGORIES.map((cat) => (
-                    <CategoryCard
-                      key={cat.title}
-                      icon={cat.icon}
-                      title={cat.title}
-                      description=""
-                      onClick={() => navigate(cat.path)}
-                      bgImage={cat.bgImage}
-                    />
+                    <div key={cat.title} className="h-[22vw] sm:h-[18vw] md:h-[110px] lg:h-[120px]">
+                      <CategoryCard
+                        icon={cat.icon}
+                        title={cat.title}
+                        description=""
+                        onClick={() => navigate(cat.path)}
+                        bgImage={cat.bgImage}
+                      />
+                    </div>
                   ))}
                 </div>
               </div>
