@@ -139,8 +139,8 @@ const Index = () => {
   const searchRef = useRef<HTMLDivElement>(null);
   const [scrollableRows, setScrollableRows] = useState<{
     trips: any[]; hotels: any[]; attractions: any[];
-    campsites: any[]; events: any[]; accommodations: any[];
-  }>({ trips: [], hotels: [], attractions: [], campsites: [], events: [], accommodations: [] });
+    campsites: any[]; events: any[]; accommodations: any[]; guidedTrips: any[];
+  }>({ trips: [], hotels: [], attractions: [], campsites: [], events: [], accommodations: [], guidedTrips: [] });
   const [nearbyPlacesHotels, setNearbyPlacesHotels] = useState<any[]>([]);
   const [loadingScrollable, setLoadingScrollable] = useState(true);
   const [loadingNearby, setLoadingNearby] = useState(true);
