@@ -12,6 +12,7 @@ interface GeneralFacilitiesDisplayProps {
 export const GeneralFacilitiesDisplay = ({ facilityIds }: GeneralFacilitiesDisplayProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [showAll, setShowAll] = useState(false);
+  const [mobileShowAll, setMobileShowAll] = useState(false);
 
   if (!facilityIds || facilityIds.length === 0) return null;
 
@@ -27,7 +28,6 @@ export const GeneralFacilitiesDisplay = ({ facilityIds }: GeneralFacilitiesDispl
     : facilities.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   const MOBILE_INITIAL = 6;
-  const [mobileShowAll, setMobileShowAll] = useState(false);
 
   return (
     <section className="bg-background rounded-3xl p-4 md:p-6 shadow-sm border border-border">
