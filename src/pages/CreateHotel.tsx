@@ -348,7 +348,9 @@ const CreateHotel = () => {
     description: "", email: "", phoneNumber: "", establishmentType: "hotel",
     latitude: null as number | null, longitude: null as number | null,
     openingHours: "00:00", closingHours: "23:59", generalBookingLink: "",
+    locationLink: "",
   });
+  const [locationMode, setLocationMode] = useState<'link' | 'gps' | null>(null);
 
   const isAccommodationOnly = formData.establishmentType === "accommodation_only";
 
