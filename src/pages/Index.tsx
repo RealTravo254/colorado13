@@ -491,59 +491,62 @@ const Index = () => {
         </div>
       )}
 
-      {/* Hero — full width on mobile, constrained to content area on desktop (no border radius) */}
+      {/* Hero — full width on mobile, padded/contained on desktop */}
       {!isSearchFocused && (
-        <div
-          ref={searchRef}
-          className="relative w-full h-[44vh] md:h-[38vh] overflow-hidden md:max-w-[calc(100%-var(--sidebar-width,0px))] md:ml-auto"
-        >
-          <div className="absolute inset-0 bg-foreground/80" />
-          <picture>
-            <source srcSet="/images/hero-background.webp" type="image/webp" />
-            <img
-              src="/images/hero-background.webp"
-              alt="Travel destination"
-              fetchPriority="high" decoding="async" loading="eager"
-              width={1920} height={1080}
-              className="absolute inset-0 w-full h-full object-cover opacity-60"
-            />
-          </picture>
-          <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/80" />
+        <div ref={searchRef} className="w-full md:px-6 lg:px-10">
+          {/* Image area — full width mobile, rounded-xl on desktop with constrained width */}
+          <div className="relative w-full h-[44vh] md:h-[42vh] overflow-hidden md:rounded-2xl">
+            <div className="absolute inset-0 bg-foreground/80" />
+            <picture>
+              <source srcSet="/images/hero-background.webp" type="image/webp" />
+              <img
+                src="/images/hero-background.webp"
+                alt="Travel destination"
+                fetchPriority="high" decoding="async" loading="eager"
+                width={1920} height={1080}
+                className="absolute inset-0 w-full h-full object-cover opacity-60"
+              />
+            </picture>
+            <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/80" />
 
-          {/* Content - centered text + search + category cards */}
-          <div className="absolute inset-0 flex flex-col items-center justify-center px-4">
-            <div className="container mx-auto px-4 md:px-6">
-              <p className="text-primary-foreground/70 text-xs md:text-sm font-semibold uppercase tracking-widest text-center mb-2">
-                {t('hero.tagline')}
-              </p>
-              <h1 className="text-primary-foreground text-3xl md:text-5xl font-extrabold text-center mb-4 md:mb-6 leading-tight tracking-tight">
-                {t('hero.title')}
-              </h1>
-              <div onClick={() => navigate('/explore')} className="cursor-pointer mb-3 md:mb-4">
-                <SearchBarWithSuggestions
-                  value="" onChange={() => {}}
-                  onSubmit={() => navigate('/explore')}
-                  onSuggestionSearch={() => navigate('/explore')}
-                  onFocus={() => navigate('/explore')}
-                  onBlur={() => {}}
-                  onBack={() => {}}
-                  showBackButton={false}
-                />
-              </div>
-              {/* Category cards below search bar, overlapping hero bottom on desktop */}
-              <div className="max-w-3xl mx-auto md:translate-y-8 lg:translate-y-12">
-                <div className="grid grid-cols-4 gap-1.5 md:gap-4">
-                  {CATEGORIES.map((cat) => (
-                    <CategoryCard
-                      key={cat.title}
-                      icon={cat.icon}
-                      title={cat.title}
-                      description=""
-                      onClick={() => navigate(cat.path)}
-                      bgImage={cat.bgImage}
-                    />
-                  ))}
+            {/* Text + search — vertically centered inside image, stops before category cards */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center px-4 pb-4">
+              <div className="w-full max-w-3xl mx-auto">
+                <p className="text-primary-foreground/70 text-xs md:text-sm font-semibold uppercase tracking-widest text-center mb-2">
+                  {t('hero.tagline')}
+                </p>
+                <h1 className="text-primary-foreground text-3xl md:text-5xl font-extrabold text-center mb-4 md:mb-6 leading-tight tracking-tight">
+                  {t('hero.title')}
+                </h1>
+                <div onClick={() => navigate('/explore')} className="cursor-pointer">
+                  <SearchBarWithSuggestions
+                    value="" onChange={() => {}}
+                    onSubmit={() => navigate('/explore')}
+                    onSuggestionSearch={() => navigate('/explore')}
+                    onFocus={() => navigate('/explore')}
+                    onBlur={() => {}}
+                    onBack={() => {}}
+                    showBackButton={false}
+                  />
                 </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Category cards — outside overflow-hidden, fully visible, overlapping hero bottom */}
+          <div className="relative z-10 -mt-10 md:-mt-12 px-4 md:px-0 pb-2">
+            <div className="max-w-3xl mx-auto">
+              <div className="grid grid-cols-4 gap-1.5 md:gap-4">
+                {CATEGORIES.map((cat) => (
+                  <CategoryCard
+                    key={cat.title}
+                    icon={cat.icon}
+                    title={cat.title}
+                    description=""
+                    onClick={() => navigate(cat.path)}
+                    bgImage={cat.bgImage}
+                  />
+                ))}
               </div>
             </div>
           </div>
