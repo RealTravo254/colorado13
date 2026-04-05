@@ -494,59 +494,51 @@ const Index = () => {
       {/* Hero — full width on mobile, horizontally padded on desktop, no border radius */}
       {!isSearchFocused && (
         <div ref={searchRef} className="w-full md:px-6 lg:px-10">
-          {/* Outer wrapper — NO overflow-hidden, height driven by content */}
-          <div className="relative w-full">
-            {/* Background: absolutely fills outer wrapper. Uses its own overflow-hidden to crop the img */}
-            <div className="absolute inset-0 overflow-hidden">
-              <div className="absolute inset-0 bg-foreground/80" />
-              <img
-                src="/images/hero-background.webp"
-                alt="Travel destination"
-                fetchPriority="high" decoding="async" loading="eager"
-                width={1920} height={1080}
-                className="absolute inset-0 w-full h-full object-cover opacity-60"
-              />
-              <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/55" />
+          {/* Hero image container — inline-block so height = content, bg image stretches with it */}
+          <div
+            className="relative w-full flex flex-col px-4 md:px-8 pt-8 md:pt-10 pb-5 md:pb-6"
+            style={{ backgroundImage: 'url(/images/hero-background.webp)', backgroundSize: 'cover', backgroundPosition: 'center' }}
+          >
+            {/* Dark overlay */}
+            <div className="absolute inset-0 bg-black/50" />
+            {/* Gradient */}
+            <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/60" />
+
+            {/* Tagline + title + search */}
+            <div className="relative z-10 flex flex-col items-center w-full max-w-3xl mx-auto mb-4 md:mb-5">
+              <p className="text-white/70 text-xs md:text-sm font-semibold uppercase tracking-widest text-center mb-2">
+                {t('hero.tagline')}
+              </p>
+              <h1 className="text-white text-3xl md:text-4xl lg:text-5xl font-extrabold text-center mb-4 leading-tight tracking-tight">
+                {t('hero.title')}
+              </h1>
+              <div onClick={() => navigate('/explore')} className="cursor-pointer w-full">
+                <SearchBarWithSuggestions
+                  value="" onChange={() => {}}
+                  onSubmit={() => navigate('/explore')}
+                  onSuggestionSearch={() => navigate('/explore')}
+                  onFocus={() => navigate('/explore')}
+                  onBlur={() => {}}
+                  onBack={() => {}}
+                  showBackButton={false}
+                />
+              </div>
             </div>
 
-            {/* Content layer — drives the height, z-index above background */}
-            <div className="relative z-10 flex flex-col px-4 md:px-8 pt-8 md:pt-10 pb-5 md:pb-6">
-              {/* Tagline + title + search */}
-              <div className="flex flex-col items-center w-full max-w-3xl mx-auto mb-4 md:mb-5">
-                <p className="text-primary-foreground/70 text-xs md:text-sm font-semibold uppercase tracking-widest text-center mb-2">
-                  {t('hero.tagline')}
-                </p>
-                <h1 className="text-primary-foreground text-3xl md:text-4xl lg:text-5xl font-extrabold text-center mb-4 leading-tight tracking-tight">
-                  {t('hero.title')}
-                </h1>
-                <div onClick={() => navigate('/explore')} className="cursor-pointer w-full">
-                  <SearchBarWithSuggestions
-                    value="" onChange={() => {}}
-                    onSubmit={() => navigate('/explore')}
-                    onSuggestionSearch={() => navigate('/explore')}
-                    onFocus={() => navigate('/explore')}
-                    onBlur={() => {}}
-                    onBack={() => {}}
-                    showBackButton={false}
-                  />
-                </div>
-              </div>
-
-              {/* Category cards — rectangular, fixed small height, flexible width, fully inside image */}
-              <div className="w-full">
-                <div className="grid grid-cols-4 gap-2 md:gap-3 w-full">
-                  {CATEGORIES.map((cat) => (
-                    <div key={cat.title} className="h-20 md:h-24">
-                      <CategoryCard
-                        icon={cat.icon}
-                        title={cat.title}
-                        description=""
-                        onClick={() => navigate(cat.path)}
-                        bgImage={cat.bgImage}
-                      />
-                    </div>
-                  ))}
-                </div>
+            {/* Category cards — relative z-10 so they render above overlays, fully inside image */}
+            <div className="relative z-10 w-full">
+              <div className="grid grid-cols-4 gap-2 md:gap-3 w-full">
+                {CATEGORIES.map((cat) => (
+                  <div key={cat.title} className="h-20 md:h-24">
+                    <CategoryCard
+                      icon={cat.icon}
+                      title={cat.title}
+                      description=""
+                      onClick={() => navigate(cat.path)}
+                      bgImage={cat.bgImage}
+                    />
+                  </div>
+                ))}
               </div>
             </div>
           </div>
