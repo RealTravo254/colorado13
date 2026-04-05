@@ -491,9 +491,12 @@ const Index = () => {
         </div>
       )}
 
-      {/* Hero */}
+      {/* Hero — full width on mobile, constrained to content area on desktop (no border radius) */}
       {!isSearchFocused && (
-        <div ref={searchRef} className="relative w-full h-[44vh] md:h-[38vh] overflow-hidden">
+        <div
+          ref={searchRef}
+          className="relative w-full h-[44vh] md:h-[38vh] overflow-hidden md:max-w-[calc(100%-var(--sidebar-width,0px))] md:ml-auto"
+        >
           <div className="absolute inset-0 bg-foreground/80" />
           <picture>
             <source srcSet="/images/hero-background.webp" type="image/webp" />
