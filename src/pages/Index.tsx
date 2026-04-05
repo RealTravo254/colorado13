@@ -503,8 +503,8 @@ const Index = () => {
             }}
           >
             {/* Overlays */}
-            <div className="absolute inset-0 bg-black/50" />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/60" />
+            <div className="absolute inset-0 bg-black/25" />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/30" />
 
             {/* Tagline + title + search */}
             <div className="relative z-10 flex flex-col items-center w-full max-w-3xl mx-auto mb-4 md:mb-5">
@@ -541,7 +541,7 @@ const Index = () => {
                     height: '36px',
                   }}
                 >
-                  <div className="absolute inset-0 rounded-lg bg-black/50" />
+                  <div className="absolute inset-0 rounded-lg bg-black/25" />
                   <cat.icon className="relative z-10 h-3 w-3 text-white shrink-0" />
                   <span className="relative z-10 text-white text-[10px] md:text-[11px] font-bold leading-none whitespace-nowrap">
                     {cat.title}
@@ -746,4 +746,4 @@ const Index = () => {
   );
 };
 
-export default Index;121
+export default Index;
