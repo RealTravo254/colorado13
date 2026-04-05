@@ -538,7 +538,7 @@ const Index = () => {
                     backgroundImage: `url(${cat.bgImage})`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
-                    height: '36px',
+                    height: 'clamp(47px, 6vw, 72px)',
                   }}
                 >
                   <div className="absolute inset-0 rounded-lg bg-black/10" />
