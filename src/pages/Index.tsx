@@ -184,6 +184,7 @@ const Index = () => {
   const featuredCampsitesRef = useRef<HTMLDivElement>(null);
   const featuredEventsRef = useRef<HTMLDivElement>(null);
   const featuredTripsRef = useRef<HTMLDivElement>(null);
+  const guidedTripsRef = useRef<HTMLDivElement>(null);
 
   const [scrollPositions, setScrollPositions] = useState<Record<string, number>>({});
 
