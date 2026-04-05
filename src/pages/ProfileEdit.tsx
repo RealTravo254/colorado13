@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { User, Calendar, Globe, Phone, ArrowLeft, CheckCircle2, ShieldCheck, Camera, Lock, Eye, EyeOff } from "lucide-react";
+import { User, Calendar, Globe, Phone, ArrowLeft, ShieldCheck, Camera, Lock, Eye, EyeOff } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -55,7 +55,7 @@ const ProfileEdit = () => {
   const [sendingCode, setSendingCode] = useState(false);
   const [verifyingCode, setVerifyingCode] = useState(false);
   const [originalPhone, setOriginalPhone] = useState("");
-  const [currentPassword, setCurrentPassword] = useState("");
+  
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [showNewPassword, setShowNewPassword] = useState(false);
