@@ -124,19 +124,17 @@ export default function Payment() {
 
   const handleWithdrawalSuccess = () => { setLoading(true); window.location.reload(); };
 
-
-        {/* Referral info - share from listing pages */}
-        {isVerifiedHost && (
-          <div className="bg-gradient-to-br from-primary/5 to-primary/10 rounded-xl p-4 border border-primary/20 mb-4">
-            <div className="flex items-center gap-2 mb-2">
-              <Link2 className="h-4 w-4 text-primary" />
-              <h3 className="text-xs font-black uppercase tracking-widest text-primary">Referral Program</h3>
-            </div>
-            <p className="text-[10px] text-muted-foreground">
-              Share referral links from any listing's detail page to earn commissions. Commission rates are set per category by the admin.
-            </p>
-          </div>
-        )}
+  const referralInfoCard = isVerifiedHost ? (
+    <div className="bg-gradient-to-br from-primary/5 to-primary/10 rounded-xl p-4 border border-primary/20 mb-4">
+      <div className="flex items-center gap-2 mb-2">
+        <Link2 className="h-4 w-4 text-primary" />
+        <h3 className="text-xs font-black uppercase tracking-widest text-primary">Referral Program</h3>
+      </div>
+      <p className="text-[10px] text-muted-foreground">
+        Share referral links from any listing's detail page to earn commissions. Commission rates are set per category by the admin.
+      </p>
+    </div>
+  ) : null;
 
         {/* Not verified host prompt */}
         {!isVerifiedHost && !verificationLoading && (
