@@ -700,7 +700,7 @@ const CreateTripEvent = () => {
                 exclusions,
                 ticketTypes: useTicketTypes ? ticketTypes : [],
                 allowChildren: formData.allow_children,
-                activityNames,
+                activities: activityNames.map(name => ({ name, price: 0, images: [] as File[], previewUrls: [] as string[] })),
               }}
               creatorEmail={user?.email}
             />
