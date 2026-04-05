@@ -81,6 +81,9 @@ const CreateTripEvent = () => {
   const [exclusions, setExclusions] = useState<string[]>([]);
   const [newInclusion, setNewInclusion] = useState("");
   const [newExclusion, setNewExclusion] = useState("");
+  const [activityNames, setActivityNames] = useState<string[]>([]);
+  const [newActivityName, setNewActivityName] = useState("");
+  const [locationMode, setLocationMode] = useState<'link' | 'gps' | null>(null);
 
   const [workingDays, setWorkingDays] = useState<WorkingDays>({ Mon: true, Tue: true, Wed: true, Thu: true, Fri: true, Sat: true, Sun: true });
   const [galleryImages, setGalleryImages] = useState<File[]>([]);
@@ -262,6 +265,7 @@ const CreateTripEvent = () => {
         ticket_types: useTicketTypes ? ticketTypes : [],
         allow_children: formData.allow_children,
         location_link: formData.location_link || null,
+        activities: activityNames.length > 0 ? activityNames.map(name => ({ name, price: 0 })) : [],
       } as any]);
 
       if (error) throw error;
@@ -353,15 +357,39 @@ const CreateTripEvent = () => {
                     <StyledInput isInvalid={validationErrors.includes("location")} value={formData.location} onChange={(e) => { setFormData({...formData, location: e.target.value}); if(e.target.value) setValidationErrors(prev => prev.filter(err => err !== "location")); }} placeholder="e.g. Nanyuki Main Gate" />
                     {validationErrors.includes("location") && <p className="text-red-500 text-[10px] font-bold">⚠ Specific location is required</p>}
                   </div>
-                  <div className="space-y-2 md:col-span-2">
+                </div>
+              </Card>
+
+              {/* Access Location Section - Link OR GPS */}
+              <Card className="bg-white rounded-[32px] p-8 shadow-sm border border-slate-100 space-y-4">
+                <h2 className="text-xs font-black uppercase tracking-widest" style={{ color: COLORS.TEAL }}>Access Location</h2>
+                <p className="text-[10px] text-slate-400 font-bold">Choose one: paste a map link OR capture your GPS location</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <button type="button" onClick={() => setLocationMode('link')}
+                    className={`p-4 rounded-2xl text-center transition-all font-black text-xs uppercase tracking-tight ${locationMode === 'link' ? 'bg-[#008080] text-white shadow-lg' : 'bg-slate-50 border border-slate-200 text-slate-600 hover:bg-slate-100'}`}>
+                    <Link2 className="h-5 w-5 mx-auto mb-1" /> Paste Link
+                  </button>
+                  <button type="button" onClick={() => setLocationMode('gps')}
+                    className={`p-4 rounded-2xl text-center transition-all font-black text-xs uppercase tracking-tight ${locationMode === 'gps' ? 'bg-[#008080] text-white shadow-lg' : 'bg-slate-50 border border-slate-200 text-slate-600 hover:bg-slate-100'}`}>
+                    <Navigation className="h-5 w-5 mx-auto mb-1" /> Use GPS
+                  </button>
+                </div>
+                {locationMode === 'link' && (
+                  <div className="space-y-2">
                     <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
-                      <Link2 className="h-3 w-3" /> Location Link (optional)
+                      <Link2 className="h-3 w-3" /> Location Link
                     </Label>
                     <StyledInput isInvalid={validationErrors.includes("location_link")} value={formData.location_link} onChange={(e) => { setFormData({...formData, location_link: e.target.value}); if(!e.target.value || e.target.value.startsWith("https://")) setValidationErrors(prev => prev.filter(err => err !== "location_link")); }} placeholder="https://maps.google.com/..." />
                     {validationErrors.includes("location_link") && <p className="text-red-500 text-[10px] font-bold">⚠ Link must start with https://</p>}
-                    <p className="text-[9px] text-muted-foreground">Paste a valid Google Maps or location link starting with https://</p>
                   </div>
-                </div>
+                )}
+                {locationMode === 'gps' && (
+                  <div className="p-4 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/50">
+                    <Button type="button" onClick={getCurrentLocation} className="w-full h-14 rounded-2xl shadow-lg font-black uppercase text-[11px] tracking-widest text-white active:scale-95 transition-all" style={{ background: formData.map_link ? COLORS.TEAL : COLORS.CORAL }}>
+                      <Navigation className="h-5 w-5 mr-3" />{formData.map_link ? '✓ Location Captured' : 'Tap to Capture GPS Location'}
+                    </Button>
+                  </div>
+                )}
               </Card>
             </>
           )}
@@ -541,7 +569,7 @@ const CreateTripEvent = () => {
                   <MapPin className="h-5 w-5" style={{ color: COLORS.TEAL }} />
                 </div>
                 <div>
-                  <h2 className="text-sm font-black uppercase tracking-tight" style={{ color: COLORS.TEAL }}>Contact & GPS Location</h2>
+                  <h2 className="text-sm font-black uppercase tracking-tight" style={{ color: COLORS.TEAL }}>Contact Details</h2>
                   <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">How guests can reach you</p>
                 </div>
               </div>
@@ -559,11 +587,6 @@ const CreateTripEvent = () => {
                   <div className={validationErrors.includes("phone_number") ? "rounded-xl ring-1 ring-red-500" : ""}><PhoneInput value={formData.phone_number} onChange={(val) => { setFormData({...formData, phone_number: val}); if(val) setValidationErrors(prev => prev.filter(err => err !== "phone_number")); }} country={formData.country} placeholder="712345678" /></div>
                   {validationErrors.includes("phone_number") && <p className="text-red-500 text-[10px] font-bold">⚠ Phone number is required</p>}
                 </div>
-              </div>
-              <div className="p-4 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/50">
-                <Button type="button" onClick={getCurrentLocation} className="w-full h-14 rounded-2xl shadow-lg font-black uppercase text-[11px] tracking-widest text-white active:scale-95 transition-all" style={{ background: formData.map_link ? COLORS.TEAL : COLORS.CORAL }}>
-                  <Navigation className="h-5 w-5 mr-3" />{formData.map_link ? '✓ Location Captured' : 'Tap to Capture GPS Location'}
-                </Button>
               </div>
 
               {/* Gallery */}
@@ -633,6 +656,26 @@ const CreateTripEvent = () => {
                 </p>
                 {validationErrors.includes("description") && <p className="text-red-500 text-[10px] font-bold mt-1">⚠ Description is required</p>}
               </Card>
+
+              {/* Activities */}
+              <Card className="bg-white rounded-[32px] p-8 shadow-sm border border-slate-100 space-y-4">
+                <h2 className="text-xs font-black uppercase tracking-widest" style={{ color: COLORS.TEAL }}>Activities (Optional)</h2>
+                <p className="text-[10px] text-slate-400 font-bold">Add activities visitors can enjoy during this experience</p>
+                <div className="flex gap-2">
+                  <StyledInput value={newActivityName} onChange={(e) => setNewActivityName(e.target.value)} placeholder="e.g. Hiking, Swimming, Game Drive" onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); if (newActivityName.trim()) { setActivityNames([...activityNames, newActivityName.trim()]); setNewActivityName(""); } } }} />
+                  <Button type="button" onClick={() => { if (newActivityName.trim()) { setActivityNames([...activityNames, newActivityName.trim()]); setNewActivityName(""); } }} className="rounded-xl shrink-0" style={{ background: COLORS.TEAL }}>
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {activityNames.map((name, i) => (
+                    <span key={i} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#008080]/10 text-[#008080] text-xs font-bold border border-[#008080]/20">
+                      {name}
+                      <button type="button" onClick={() => setActivityNames(activityNames.filter((_, idx) => idx !== i))} className="hover:text-red-500"><X className="h-3 w-3" /></button>
+                    </span>
+                  ))}
+                </div>
+              </Card>
             </>
           )}
 
@@ -657,6 +700,7 @@ const CreateTripEvent = () => {
                 exclusions,
                 ticketTypes: useTicketTypes ? ticketTypes : [],
                 allowChildren: formData.allow_children,
+                activities: activityNames.map(name => ({ name, price: 0, images: [] as string[], previewUrls: [] as string[] })),
               }}
               creatorEmail={user?.email}
             />

@@ -348,7 +348,9 @@ const CreateHotel = () => {
     description: "", email: "", phoneNumber: "", establishmentType: "hotel",
     latitude: null as number | null, longitude: null as number | null,
     openingHours: "00:00", closingHours: "23:59", generalBookingLink: "",
+    locationLink: "",
   });
+  const [locationMode, setLocationMode] = useState<'link' | 'gps' | null>(null);
 
   const isAccommodationOnly = formData.establishmentType === "accommodation_only";
 
@@ -604,18 +606,34 @@ const CreateHotel = () => {
               </div>
               {!isAccommodationOnly && (
                 <>
-                  <div className={cn("p-4 rounded-[24px] border-2 transition-colors",
-                    showErrors && !formData.latitude ? "border-red-500 bg-red-50" : "border-dashed border-slate-200 bg-slate-50/50")}>
-                    <Button type="button" onClick={() => {
-                      navigator.geolocation.getCurrentPosition(
-                        (pos) => setFormData({ ...formData, latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
-                        () => toast({ title: "Location Error", description: "Unable to get location.", variant: "destructive" })
-                      );
-                    }} className="w-full rounded-2xl px-6 h-14 font-black uppercase text-[11px] tracking-widest text-white shadow-lg active:scale-95 transition-all"
-                      style={{ background: formData.latitude ? COLORS.TEAL : COLORS.CORAL }}>
-                      <Navigation className="h-5 w-5 mr-3" />
-                      {formData.latitude ? "✓ Location Captured" : "Tap to Capture GPS Location"}
-                    </Button>
+                  <div className="space-y-3">
+                    <p className="text-[10px] text-slate-400 font-bold">Choose one: paste a map link OR capture GPS</p>
+                    <div className="grid grid-cols-2 gap-3">
+                      <button type="button" onClick={() => setLocationMode('link')}
+                        className={`p-3 rounded-2xl text-center font-black text-xs uppercase tracking-tight transition-all ${locationMode === 'link' ? 'bg-[#008080] text-white shadow-lg' : 'bg-slate-50 border border-slate-200 text-slate-600 hover:bg-slate-100'}`}>
+                        Paste Link
+                      </button>
+                      <button type="button" onClick={() => setLocationMode('gps')}
+                        className={`p-3 rounded-2xl text-center font-black text-xs uppercase tracking-tight transition-all ${locationMode === 'gps' ? 'bg-[#008080] text-white shadow-lg' : 'bg-slate-50 border border-slate-200 text-slate-600 hover:bg-slate-100'}`}>
+                        Use GPS
+                      </button>
+                    </div>
+                    {locationMode === 'link' && (
+                      <Input value={formData.locationLink} onChange={(e) => setFormData({...formData, locationLink: e.target.value})}
+                        placeholder="https://maps.google.com/..." className="rounded-xl h-12 font-bold" />
+                    )}
+                    {locationMode === 'gps' && (
+                      <Button type="button" onClick={() => {
+                        navigator.geolocation.getCurrentPosition(
+                          (pos) => setFormData({ ...formData, latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
+                          () => toast({ title: "Location Error", description: "Unable to get location.", variant: "destructive" })
+                        );
+                      }} className="w-full rounded-2xl px-6 h-14 font-black uppercase text-[11px] tracking-widest text-white shadow-lg active:scale-95 transition-all"
+                        style={{ background: formData.latitude ? COLORS.TEAL : COLORS.CORAL }}>
+                        <Navigation className="h-5 w-5 mr-3" />
+                        {formData.latitude ? "✓ Location Captured" : "Tap to Capture GPS Location"}
+                      </Button>
+                    )}
                   </div>
                   <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-2 bg-slate-50/80 rounded-2xl p-4">

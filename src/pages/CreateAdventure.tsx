@@ -487,7 +487,9 @@ const CreateAdventure = () => {
     openingHours: "00:00", closingHours: "23:59",
     entranceFeeType: "free", adultPrice: "0", childPrice: "0",
     latitude: null as number | null, longitude: null as number | null,
+    locationLink: "",
   });
+  const [locationMode, setLocationMode] = useState<'link' | 'gps' | null>(null);
 
   const [workingDays, setWorkingDays] = useState({
     Mon: true, Tue: true, Wed: true, Thu: true, Fri: true, Sat: true, Sun: true,
@@ -514,7 +516,7 @@ const CreateAdventure = () => {
 
   // Step validation
   const isStep1Complete = !!formData.registrationName.trim() && !!formData.registrationNumber.trim() && !!formData.country;
-  const isStep2Complete = !!formData.locationName.trim() && !!formData.place.trim() && !!formData.latitude;
+  const isStep2Complete = !!formData.locationName.trim() && !!formData.place.trim() && (!!formData.latitude || !!formData.locationLink.trim());
   const isStep3Complete = !!formData.description.trim();
   const isStep4Complete = true; // Operating hours have defaults
   const isStep5Complete = facilities.every(f => f.saved);
@@ -538,9 +540,9 @@ const CreateAdventure = () => {
         return false;
       }
     } else if (currentStep === 2) {
-      if (!formData.locationName.trim() || !formData.place.trim() || !formData.latitude) {
+      if (!formData.locationName.trim() || !formData.place.trim() || (!formData.latitude && !formData.locationLink.trim())) {
         setShowErrors(true);
-        toast({ title: "Complete this step", description: "Fill location and capture GPS", variant: "destructive" });
+        toast({ title: "Complete this step", description: "Fill location and provide a link or GPS", variant: "destructive" });
         return false;
       }
     } else if (currentStep === 3) {
@@ -669,7 +671,7 @@ const CreateAdventure = () => {
         location: formData.locationName, place: formData.place, country: formData.country,
         description: formData.description, email: formData.email,
         phone_numbers: formData.phoneNumber ? [formData.phoneNumber] : [],
-        map_link: formData.latitude ? `https://www.google.com/maps?q=${formData.latitude},${formData.longitude}` : "",
+        map_link: formData.latitude ? `https://www.google.com/maps?q=${formData.latitude},${formData.longitude}` : (formData.locationLink || ""),
         latitude: formData.latitude, longitude: formData.longitude,
         opening_hours: formData.openingHours, closing_hours: formData.closingHours,
         days_opened: selectedDays, image_url: galleryUrls[0] ?? "", gallery_images: galleryUrls,
@@ -765,13 +767,30 @@ const CreateAdventure = () => {
                     className={cn("rounded-xl h-12 font-bold", isMissing(formData.place) && "border-red-500 bg-red-50")} />
                 </div>
               </div>
-              <div className={cn("p-4 rounded-2xl border-2 transition-all", isMissing(formData.latitude) ? "border-red-500 bg-red-50" : "bg-[#F0E68C]/10 border-[#F0E68C]/30")}>
-                <Button type="button" onClick={getCurrentLocation}
-                  className="w-full text-white rounded-2xl px-6 h-14 font-black uppercase text-[11px] tracking-widest shadow-lg active:scale-95 transition-all"
-                  style={{ background: formData.latitude ? COLORS.TEAL : COLORS.KHAKI_DARK }}>
-                  <Navigation className="h-5 w-5 mr-3" />
-                  {formData.latitude ? "✓ Location Captured" : "Tap to Auto-Capture GPS"}
-                </Button>
+              <div className="space-y-3">
+                <p className="text-[10px] text-slate-400 font-bold">Choose one: paste a map link OR capture GPS</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <button type="button" onClick={() => setLocationMode('link')}
+                    className={cn("p-3 rounded-2xl text-center font-black text-xs uppercase tracking-tight transition-all", locationMode === 'link' ? 'bg-[#008080] text-white shadow-lg' : 'bg-slate-50 border border-slate-200 text-slate-600 hover:bg-slate-100')}>
+                    Paste Link
+                  </button>
+                  <button type="button" onClick={() => setLocationMode('gps')}
+                    className={cn("p-3 rounded-2xl text-center font-black text-xs uppercase tracking-tight transition-all", locationMode === 'gps' ? 'bg-[#008080] text-white shadow-lg' : 'bg-slate-50 border border-slate-200 text-slate-600 hover:bg-slate-100')}>
+                    Use GPS
+                  </button>
+                </div>
+                {locationMode === 'link' && (
+                  <Input value={formData.locationLink} onChange={(e) => setFormData({...formData, locationLink: e.target.value})}
+                    placeholder="https://maps.google.com/..." className="rounded-xl h-12 font-bold" />
+                )}
+                {locationMode === 'gps' && (
+                  <Button type="button" onClick={getCurrentLocation}
+                    className="w-full text-white rounded-2xl px-6 h-14 font-black uppercase text-[11px] tracking-widest shadow-lg active:scale-95 transition-all"
+                    style={{ background: formData.latitude ? COLORS.TEAL : COLORS.KHAKI_DARK }}>
+                    <Navigation className="h-5 w-5 mr-3" />
+                    {formData.latitude ? "✓ Location Captured" : "Tap to Auto-Capture GPS"}
+                  </Button>
+                )}
               </div>
             </div>
           </Card>
