@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { User, Calendar, Globe, Phone, ArrowLeft, CheckCircle2, ShieldCheck, Camera } from "lucide-react";
+import { User, Calendar, Globe, Phone, ArrowLeft, CheckCircle2, ShieldCheck, Camera, Lock, Eye, EyeOff } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CountrySelector } from "@/components/creation/CountrySelector";
+import { PasswordStrength } from "@/components/ui/password-strength";
 
 const COLORS = {
   TEAL: "#008080",

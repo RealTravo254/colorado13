@@ -13,7 +13,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { 
   ChevronRight, User, Briefcase, CreditCard, Shield, 
   LogOut, UserCog, LogIn,
-  CalendarCheck, Settings, LayoutDashboard, Receipt, Users
+  CalendarCheck, Settings, LayoutDashboard, Users
 } from "lucide-react";
 
 const ACCENT = "#c2185b";
