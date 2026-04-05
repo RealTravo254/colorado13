@@ -292,21 +292,21 @@ export const SearchBarWithSuggestions = React.forwardRef<HTMLDivElement, SearchB
               {/* History / Trending / Most Popular Section (Shown when input is empty) */}
               {!value.trim() && (
                 <div className="p-2 min-h-[100px]">
-                  {/* Event Category Quick Filters - shown for events category or when showEventCategories is true */}
-                  {shouldShowEventCategories && (
+                  {/* Location Suggestions */}
+                  {locationSuggestions.length > 0 && (
                     <div className="mb-4">
                       <div className="flex items-center gap-2 px-5 py-3">
-                        <Calendar className="h-4 w-4 text-primary" />
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Event Types</p>
+                        <MapPin className="h-4 w-4 text-primary" />
+                        <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">Popular Locations</p>
                       </div>
                       <div className="flex flex-wrap gap-2 px-4">
-                        {EVENT_CATEGORIES.map((cat) => (
+                        {locationSuggestions.map((loc) => (
                           <Badge
-                            key={cat}
-                            onClick={() => { onChange(cat); setShowSuggestions(false); onSubmit(); }}
+                            key={loc.location}
+                            onClick={() => { onChange(loc.location); setShowSuggestions(false); onSubmit(); }}
                             className="cursor-pointer bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 py-2 px-3 rounded-xl text-[10px] font-bold transition-colors"
                           >
-                            {cat}
+                            {loc.location}
                           </Badge>
                         ))}
                       </div>
