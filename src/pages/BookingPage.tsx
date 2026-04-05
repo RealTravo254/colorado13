@@ -247,6 +247,9 @@ const BookingPage = () => {
     };
     
     if (type === "trip" || type === "event") {
+      const parsedTicketTypes = Array.isArray(item.ticket_types) 
+        ? (item.ticket_types as any[]).map((t: any) => ({ name: t.name, price: Number(t.price) }))
+        : [];
       return {
         ...baseProps,
         bookingType: type,
@@ -259,6 +262,8 @@ const BookingPage = () => {
         totalCapacity: item.available_tickets || 0,
         slotLimitType: item.slot_limit_type || (item.is_flexible_date ? 'per_booking' : 'inventory'),
         isFlexibleDate: item.is_flexible_date || false,
+        ticketTypes: parsedTicketTypes,
+        allowChildren: item.allow_children !== false,
       };
     }
     

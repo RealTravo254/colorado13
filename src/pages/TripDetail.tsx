@@ -407,15 +407,29 @@ const TripDetail = () => {
                   </span>
                 </div>
                 <div className="flex justify-between text-xs font-bold uppercase tracking-tight">
-                  <span className="text-slate-400">Child (Under 12)</span>
-                  <span className="text-slate-700">
-                    {event.allow_children === false ? (
-                      <span className="text-red-500">Not Available</span>
-                    ) : (
-                      formatPrice(event.price_child || 0)
-                    )}
+                  <span className="text-slate-400">Children Allowed</span>
+                  <span className={event.allow_children === false ? "text-red-500 font-black" : "text-emerald-600 font-black"}>
+                    {event.allow_children === false ? "No" : "Yes"}
                   </span>
                 </div>
+                {event.allow_children !== false && (
+                  <div className="flex justify-between text-xs font-bold uppercase tracking-tight">
+                    <span className="text-slate-400">Child (Under 12)</span>
+                    <span className="text-slate-700">{formatPrice(event.price_child || 0)}</span>
+                  </div>
+                )}
+                {/* Ticket Types */}
+                {event.ticket_types && Array.isArray(event.ticket_types) && event.ticket_types.length > 0 && (
+                  <div className="pt-2 border-t border-slate-100">
+                    <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-2">Ticket Types</p>
+                    {event.ticket_types.map((ticket: any, i: number) => (
+                      <div key={i} className="flex justify-between text-xs font-bold uppercase tracking-tight py-1">
+                        <span className="text-slate-500">{ticket.name}</span>
+                        <span className="text-slate-700">{formatPrice(Number(ticket.price))}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <Button
