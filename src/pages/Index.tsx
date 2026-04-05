@@ -626,7 +626,16 @@ const Index = () => {
               {displayEvents.map((event, i) => renderCard(event, "EVENT", i, { isTrip: true, categoryColor: "hsl(340, 75%, 50%)" }))}
             </ScrollSection>
 
-            {/* Nearest */}
+            {/* Get Your Guide - Guided Trips */}
+            <ScrollSection
+              title="Get Your Guide" viewAllPath="/category/guided"
+              accentColor="hsl(260, 70%, 55%)" scrollRef={guidedTripsRef}
+              onScroll={handleScroll('guidedTrips')}
+              hasItems={displayGuidedTrips.length > 0} loading={loadingScrollable}
+            >
+              {displayGuidedTrips.map((trip, i) => renderCard(trip, "TRIP", i, { isTrip: true, categoryColor: "hsl(260, 70%, 55%)" }))}
+            </ScrollSection>
+
             {position && sortedNearbyPlaces.length > 0 && (
               <section className="mb-4 md:mb-8">
                 <div className="flex items-center gap-2 mb-3 md:mb-4">
