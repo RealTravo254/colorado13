@@ -147,7 +147,14 @@ const BecomeHost = () => {
     }
   };
 
-  if (loading) return <div className="min-h-screen bg-[#F8F9FA] animate-pulse" />;
+  if (loading) return (
+    <div className="min-h-screen bg-[#F8F9FA] flex flex-col items-center justify-center">
+      <div className="flex flex-col items-center gap-4">
+        <div className="h-10 w-10 border-4 border-[#008080] border-t-transparent rounded-full animate-spin" />
+        <p className="text-xs font-black uppercase tracking-widest text-slate-400">Checking your host status...</p>
+      </div>
+    </div>
+  );
 
   // Show hosting type selection
   if (showTypeSelection) {

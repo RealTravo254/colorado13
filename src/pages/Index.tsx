@@ -628,7 +628,7 @@ const Index = () => {
 
             {/* Get Your Guide - Guided Trips */}
             <ScrollSection
-              title="Get Your Guide" viewAllPath="/category/guided"
+              title="Guided Tours & Activities" viewAllPath="/category/guided"
               accentColor="hsl(260, 70%, 55%)" scrollRef={guidedTripsRef}
               onScroll={handleScroll('guidedTrips')}
               hasItems={displayGuidedTrips.length > 0} loading={loadingScrollable}
