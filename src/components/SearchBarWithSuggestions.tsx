@@ -50,6 +50,12 @@ interface LocationSuggestion {
   type: string;
 }
 
+const EVENT_CATEGORIES = [
+  "Music & Concerts", "Sports", "Festival", "Comedy", "Art & Culture",
+  "Food & Drink", "Networking", "Workshop", "Conference", "Charity",
+  "Nightlife", "Theater", "Outdoor", "Family"
+];
+
 
 export const SearchBarWithSuggestions = React.forwardRef<HTMLDivElement, SearchBarProps>(({ value, onChange, onSubmit, onSuggestionSearch, onFocus, onBlur, onBack, showBackButton = false, categoryType, showEventCategories = false }, _ref) => {
   const { user } = useAuth();
@@ -292,8 +298,26 @@ export const SearchBarWithSuggestions = React.forwardRef<HTMLDivElement, SearchB
               {/* History / Trending / Most Popular Section (Shown when input is empty) */}
               {!value.trim() && (
                 <div className="p-2 min-h-[100px]">
-                  {/* Location Suggestions */}
-                  {locationSuggestions.length > 0 && (
+                  {/* Location Suggestions OR Event Categories */}
+                  {showEventCategories ? (
+                    <div className="mb-4">
+                      <div className="flex items-center gap-2 px-5 py-3">
+                        <Calendar className="h-4 w-4 text-primary" />
+                        <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">Event Categories</p>
+                      </div>
+                      <div className="flex flex-wrap gap-2 px-4">
+                        {EVENT_CATEGORIES.map((cat) => (
+                          <Badge
+                            key={cat}
+                            onClick={() => { onChange(cat); setShowSuggestions(false); onSubmit(); }}
+                            className="cursor-pointer bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 py-2 px-3 rounded-xl text-[10px] font-bold transition-colors"
+                          >
+                            {cat}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  ) : locationSuggestions.length > 0 ? (
                     <div className="mb-4">
                       <div className="flex items-center gap-2 px-5 py-3">
                         <MapPin className="h-4 w-4 text-primary" />
@@ -311,7 +335,7 @@ export const SearchBarWithSuggestions = React.forwardRef<HTMLDivElement, SearchB
                         ))}
                       </div>
                     </div>
-                  )}
+                  ) : null}
 
                   {/* Most Popular Section */}
                   {mostPopular.length > 0 && (

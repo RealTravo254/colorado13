@@ -10,7 +10,6 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Input validation schema
 const bookingConfirmationSchema = z.object({
   bookingId: z.string().uuid("Invalid booking ID format"),
   email: z.string().email("Invalid email format").max(255, "Email too long"),
@@ -23,25 +22,121 @@ const bookingConfirmationSchema = z.object({
   paymentStatus: z.string().optional(),
 });
 
-// HTML escape function to prevent XSS
 function escapeHtml(unsafe: string): string {
   if (typeof unsafe !== 'string') return '';
-  return unsafe
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+  return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 }
 
-// Format date helper
 function formatDate(dateStr: string): string {
   try {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-  } catch {
-    return dateStr;
+    return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  } catch { return dateStr; }
+}
+
+function buildDetailsHTML(bookingDetails: any, guestName: string, guestEmail: string, guestPhone: string, bookingType: string, itemName: string, visitDate: string | null, totalAmount: number, bookingId: string, isPaid: boolean): string {
+  const details = typeof bookingDetails === 'string' ? JSON.parse(bookingDetails) : (bookingDetails || {});
+  const safeGuestName = escapeHtml(guestName);
+  const safeItemName = escapeHtml(itemName);
+  const typeDisplay = escapeHtml(bookingType).charAt(0).toUpperCase() + escapeHtml(bookingType).slice(1);
+  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(bookingId)}`;
+  
+  const totalPeople = (Number(details.adults) || 0) + (Number(details.children) || 0);
+
+  // Ticket types
+  let ticketHTML = '';
+  if (details.ticketSelections && Array.isArray(details.ticketSelections) && details.ticketSelections.length > 0) {
+    ticketHTML = `<div style="background:#f0fdf4;padding:15px;border-radius:8px;margin:15px 0;">
+      <h3 style="color:#008080;font-size:14px;margin-bottom:10px;text-transform:uppercase;">Ticket Types</h3>
+      <table style="width:100%;border-collapse:collapse;">
+        <tr style="border-bottom:1px solid #ddd;"><th style="text-align:left;padding:6px 0;">Type</th><th style="text-align:center;">Qty</th><th style="text-align:right;">Price</th></tr>
+        ${details.ticketSelections.map((t: any) => `<tr style="border-bottom:1px dashed #eee;"><td style="padding:6px 0;">${escapeHtml(t.name || 'General')}</td><td style="text-align:center;">${t.quantity}</td><td style="text-align:right;">KES ${(Number(t.price) * Number(t.quantity)).toLocaleString()}</td></tr>`).join('')}
+      </table>
+    </div>`;
   }
+
+  // Facilities
+  let facilitiesHTML = '';
+  if (details.selectedFacilities && Array.isArray(details.selectedFacilities) && details.selectedFacilities.length > 0) {
+    facilitiesHTML = `<div style="background:#f8f9fa;padding:15px;border-radius:8px;margin:15px 0;">
+      <h3 style="color:#008080;font-size:14px;margin-bottom:10px;text-transform:uppercase;">Facilities Booked</h3>
+      <ul style="list-style:none;padding:0;margin:0;">
+        ${details.selectedFacilities.map((f: any) => {
+          const name = escapeHtml(typeof f === 'string' ? f : f.name || '');
+          const dateRange = f.startDate && f.endDate ? ` <span style="color:#666;">(${formatDate(f.startDate)} - ${formatDate(f.endDate)}, ${Math.max(1, Math.ceil((new Date(f.endDate).getTime() - new Date(f.startDate).getTime()) / 86400000))} days)</span>` : '';
+          const price = f.price ? ` - KES ${Number(f.price).toLocaleString()}/day` : '';
+          return name ? `<li style="padding:8px 0;border-bottom:1px dashed #ddd;"><strong>${name}</strong>${dateRange}${price}</li>` : '';
+        }).filter(Boolean).join('')}
+      </ul>
+    </div>`;
+  }
+
+  // Activities
+  let activitiesHTML = '';
+  if (details.selectedActivities && Array.isArray(details.selectedActivities) && details.selectedActivities.length > 0) {
+    activitiesHTML = `<div style="background:#fff5f0;padding:15px;border-radius:8px;margin:15px 0;">
+      <h3 style="color:#FF7F50;font-size:14px;margin-bottom:10px;text-transform:uppercase;">Activities</h3>
+      <ul style="list-style:none;padding:0;margin:0;">
+        ${details.selectedActivities.map((a: any) => {
+          const name = escapeHtml(typeof a === 'string' ? a : a.name || '');
+          const people = a.numberOfPeople ? ` (${a.numberOfPeople} ${a.numberOfPeople === 1 ? 'person' : 'people'})` : '';
+          const price = a.price ? ` - KES ${Number(a.price).toLocaleString()}/person` : '';
+          return name ? `<li style="padding:8px 0;border-bottom:1px dashed #ddd;"><strong>${name}</strong>${people}${price}</li>` : '';
+        }).filter(Boolean).join('')}
+      </ul>
+    </div>`;
+  }
+
+  // Entry fee line
+  let entryFeeHTML = '';
+  if (details.adults || details.children) {
+    entryFeeHTML = `<p><strong>Guests:</strong> ${Number(details.adults) || 0} Adults, ${Number(details.children) || 0} Children (${totalPeople} total)</p>`;
+  }
+  if (details.rooms) {
+    entryFeeHTML += `<p><strong>Rooms:</strong> ${Number(details.rooms)}</p>`;
+  }
+
+  return `<!DOCTYPE html><html><head><style>
+    body{font-family:Arial,sans-serif;line-height:1.6;color:#333;}
+    .container{max-width:600px;margin:0 auto;padding:20px;}
+    .header{background:#008080;color:white;padding:20px;text-align:center;border-radius:8px 8px 0 0;}
+    .content{background:#f9f9f9;padding:30px;border-radius:0 0 8px 8px;}
+    .detail-box{background:white;padding:20px;margin:20px 0;border-radius:8px;border-left:4px solid #008080;}
+    .footer{text-align:center;margin-top:30px;color:#666;font-size:14px;}
+    h1{margin:0;font-size:24px;}h2{color:#008080;font-size:20px;margin-top:0;}
+    .amount{font-size:28px;color:#008080;font-weight:bold;}
+    .status-badge{display:inline-block;padding:8px 16px;border-radius:20px;font-weight:bold;margin-top:10px;}
+    .status-pending{background:#FFF3CD;color:#856404;}.status-paid{background:#D4EDDA;color:#155724;}
+    .qr-code{text-align:center;margin:20px 0;}.qr-code img{border:2px solid #008080;border-radius:8px;padding:10px;background:white;}
+    .info-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed #eee;}
+    .info-label{color:#666;font-size:13px;}.info-value{font-weight:bold;font-size:13px;}
+  </style></head><body><div class="container">
+    <div class="header"><h1>${isPaid ? '✅ Booking Confirmed!' : '📋 Booking Submitted'}</h1></div>
+    <div class="content">
+      <p>Dear ${safeGuestName},</p>
+      <p>${isPaid ? 'Great news! Your payment has been received and your booking is now confirmed.' : 'Thank you for your booking! Your reservation is pending payment confirmation.'}</p>
+      <div class="detail-box">
+        <h2>Booking Summary</h2>
+        <div style="margin-bottom:12px;">
+          <div class="info-row"><span class="info-label">Booking ID</span><span class="info-value">${escapeHtml(bookingId)}</span></div>
+          <div class="info-row"><span class="info-label">Category</span><span class="info-value">${typeDisplay}</span></div>
+          <div class="info-row"><span class="info-label">Item</span><span class="info-value">${safeItemName}</span></div>
+          <div class="info-row"><span class="info-label">Guest Name</span><span class="info-value">${safeGuestName}</span></div>
+          <div class="info-row"><span class="info-label">Email</span><span class="info-value">${escapeHtml(guestEmail)}</span></div>
+          ${guestPhone ? `<div class="info-row"><span class="info-label">Phone</span><span class="info-value">${escapeHtml(guestPhone)}</span></div>` : ''}
+          ${visitDate ? `<div class="info-row"><span class="info-label">Visit Date</span><span class="info-value">${escapeHtml(formatDate(String(visitDate)))}</span></div>` : ''}
+          ${totalPeople > 0 ? `<div class="info-row"><span class="info-label">Total People</span><span class="info-value">${totalPeople}</span></div>` : ''}
+        </div>
+        ${entryFeeHTML}
+        <hr style="margin:20px 0;border:none;border-top:1px solid #ddd;">
+        <p class="amount">Total: KES ${Number(totalAmount).toLocaleString()}</p>
+        <span class="status-badge ${isPaid ? 'status-paid' : 'status-pending'}">${isPaid ? 'Payment Confirmed' : 'Payment Pending'}</span>
+      </div>
+      ${ticketHTML}${facilitiesHTML}${activitiesHTML}
+      ${isPaid ? `<div class="qr-code"><h3>Your Booking QR Code</h3><p>Show this at the venue for quick check-in:</p><img src="${qrCodeUrl}" alt="Booking QR Code" width="200" height="200" /></div>` : `<div class="detail-box"><h2>Payment Instructions</h2><p>To confirm your booking, please complete the payment process.</p></div>`}
+      <p>Thank you for choosing us!</p>
+    </div>
+    <div class="footer"><p>This is an automated confirmation email. Please do not reply to this message.</p></div>
+  </div></body></html>`;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -51,17 +146,13 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const rawData = await req.json();
-    
     let validatedData;
     try {
       validatedData = bookingConfirmationSchema.parse(rawData);
     } catch (validationError) {
       if (validationError instanceof z.ZodError) {
-        console.error("Validation error:", validationError.errors);
-        return new Response(
-          JSON.stringify({ error: "Invalid input", details: validationError.errors }),
-          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+        return new Response(JSON.stringify({ error: "Invalid input", details: validationError.errors }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
       throw validationError;
     }
@@ -75,185 +166,105 @@ const handler = async (req: Request): Promise<Response> => {
 
     const { data: booking, error: bookingError } = await supabaseClient
       .from('bookings')
-      .select('id, guest_email, payment_status, total_amount')
+      .select('id, guest_email, guest_phone, payment_status, total_amount, item_id, booking_type')
       .eq('id', bookingId)
       .single();
 
     if (bookingError || !booking) {
-      console.error("Booking not found:", bookingId);
-      return new Response(
-        JSON.stringify({ error: "Booking not found" }),
-        { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return new Response(JSON.stringify({ error: "Booking not found" }),
+        { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    // Use the email from the booking record if available, otherwise use the provided email
     const recipientEmail = booking.guest_email || email;
-    
     if (!recipientEmail) {
-      console.error("No email found for booking:", bookingId);
-      return new Response(
-        JSON.stringify({ error: "No email found for booking" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return new Response(JSON.stringify({ error: "No email found" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
-
-    console.log(`Sending booking confirmation to: ${recipientEmail} for booking: ${bookingId}`);
-
-    const safeGuestName = escapeHtml(guestName);
-    const safeItemName = escapeHtml(itemName);
-    const safeBookingType = escapeHtml(bookingType);
 
     const isPaid = paymentStatus === 'paid' || paymentStatus === 'completed' || booking.payment_status === 'paid' || booking.payment_status === 'completed';
-    const typeDisplay = safeBookingType.charAt(0).toUpperCase() + safeBookingType.slice(1);
-    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(bookingId)}`;
+    const guestPhone = bookingDetails?.phone || booking.guest_phone || '';
 
-    // Generate detailed breakdown HTML
-    let detailsHTML = '';
-    let facilitiesHTML = '';
-    let activitiesHTML = '';
-    
-    if (bookingDetails) {
-      const details = typeof bookingDetails === 'string' ? JSON.parse(bookingDetails) : bookingDetails;
-      
-      // Guest count
-      if (details.adults || details.children) {
-        detailsHTML += `<p><strong>Guests:</strong> ${Number(details.adults) || 0} Adults, ${Number(details.children) || 0} Children</p>`;
-      }
-      if (details.rooms) {
-        detailsHTML += `<p><strong>Rooms:</strong> ${Number(details.rooms) || 0}</p>`;
-      }
-      
-      // Facilities with date ranges
-      if (details.selectedFacilities && Array.isArray(details.selectedFacilities) && details.selectedFacilities.length > 0) {
-        facilitiesHTML = `
-          <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0;">
-            <h3 style="color: #008080; font-size: 14px; margin-bottom: 10px; text-transform: uppercase;">Facilities Booked</h3>
-            <ul style="list-style: none; padding: 0; margin: 0;">
-              ${details.selectedFacilities.map((f: any) => {
-                const name = escapeHtml(typeof f === 'string' ? f : f.name || '');
-                const dateRange = f.startDate && f.endDate 
-                  ? ` <span style="color: #666;">(${formatDate(f.startDate)} - ${formatDate(f.endDate)})</span>`
-                  : '';
-                const price = f.price ? ` - KES ${Number(f.price).toLocaleString()}/day` : '';
-                return name ? `<li style="padding: 8px 0; border-bottom: 1px dashed #ddd;"><strong>${name}</strong>${dateRange}${price}</li>` : '';
-              }).filter(Boolean).join('')}
-            </ul>
-          </div>
-        `;
-      }
-      
-      // Activities with number of people
-      if (details.selectedActivities && Array.isArray(details.selectedActivities) && details.selectedActivities.length > 0) {
-        activitiesHTML = `
-          <div style="background: #fff5f0; padding: 15px; border-radius: 8px; margin: 15px 0;">
-            <h3 style="color: #FF7F50; font-size: 14px; margin-bottom: 10px; text-transform: uppercase;">Activities</h3>
-            <ul style="list-style: none; padding: 0; margin: 0;">
-              ${details.selectedActivities.map((a: any) => {
-                const name = escapeHtml(typeof a === 'string' ? a : a.name || '');
-                const people = a.numberOfPeople ? ` <span style="color: #666;">(${a.numberOfPeople} ${a.numberOfPeople === 1 ? 'person' : 'people'})</span>` : '';
-                const price = a.price ? ` - KES ${Number(a.price).toLocaleString()}/person` : '';
-                return name ? `<li style="padding: 8px 0; border-bottom: 1px dashed #ddd;"><strong>${name}</strong>${people}${price}</li>` : '';
-              }).filter(Boolean).join('')}
-            </ul>
-          </div>
-        `;
-      }
-    }
+    // Build and send guest email
+    const emailHTML = buildDetailsHTML(bookingDetails, guestName, recipientEmail, guestPhone, bookingType, itemName, visitDate || null, totalAmount, bookingId, isPaid);
 
-    const emailHTML = `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <style>
-            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { background: #008080; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
-            .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px; }
-            .detail-box { background: white; padding: 20px; margin: 20px 0; border-radius: 8px; border-left: 4px solid #008080; }
-            .footer { text-align: center; margin-top: 30px; color: #666; font-size: 14px; }
-            h1 { margin: 0; font-size: 24px; }
-            h2 { color: #008080; font-size: 20px; margin-top: 0; }
-            .amount { font-size: 28px; color: #008080; font-weight: bold; }
-            .status-badge { display: inline-block; padding: 8px 16px; border-radius: 20px; font-weight: bold; margin-top: 10px; }
-            .status-pending { background: #FFF3CD; color: #856404; }
-            .status-paid { background: #D4EDDA; color: #155724; }
-            .qr-code { text-align: center; margin: 20px 0; }
-            .qr-code img { border: 2px solid #008080; border-radius: 8px; padding: 10px; background: white; }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <div class="header">
-              <h1>${isPaid ? '✅ Booking Confirmed!' : '📋 Booking Submitted'}</h1>
-            </div>
-            <div class="content">
-              <p>Dear ${safeGuestName},</p>
-              <p>${isPaid ? 'Great news! Your payment has been received and your booking is now confirmed.' : 'Thank you for your booking! Your reservation is pending payment confirmation.'}</p>
-              
-              <div class="detail-box">
-                <h2>Booking Details</h2>
-                <p><strong>Booking ID:</strong> ${escapeHtml(bookingId)}</p>
-                <p><strong>Booking Type:</strong> ${typeDisplay}</p>
-                <p><strong>Guest Name:</strong> ${safeGuestName}</p>
-                <p><strong>Item:</strong> ${safeItemName}</p>
-                ${visitDate ? `<p><strong>Visit Date:</strong> ${escapeHtml(formatDate(String(visitDate)))}</p>` : ''}
-                ${detailsHTML}
-                <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">
-                <p class="amount">Total: KES ${Number(totalAmount).toLocaleString()}</p>
-                <span class="status-badge ${isPaid ? 'status-paid' : 'status-pending'}">${isPaid ? 'Payment Confirmed' : 'Payment Pending'}</span>
-              </div>
-
-              ${facilitiesHTML}
-              ${activitiesHTML}
-
-              ${isPaid ? `
-              <div class="qr-code">
-                <h3>Your Booking QR Code</h3>
-                <p>Show this at the venue for quick check-in:</p>
-                <img src="${qrCodeUrl}" alt="Booking QR Code" width="200" height="200" />
-              </div>
-              ` : `
-              <div class="detail-box">
-                <h2>Payment Instructions</h2>
-                <p>To confirm your booking, please complete the payment process. You should receive an M-Pesa prompt on your phone.</p>
-              </div>
-              `}
-
-              <p>Thank you for choosing us!</p>
-            </div>
-            <div class="footer">
-              <p>This is an automated confirmation email. Please do not reply to this message.</p>
-            </div>
-          </div>
-        </body>
-      </html>
-    `;
-
-    const { data, error } = await resend.emails.send({
+    const { error: sendError } = await resend.emails.send({
       from: "Realtravo <onboarding@resend.dev>",
       to: [recipientEmail],
-      subject: `Booking ${isPaid ? 'Confirmed' : 'Submitted'} - ${safeItemName}`,
+      subject: `Booking ${isPaid ? 'Confirmed' : 'Submitted'} - ${escapeHtml(itemName)}`,
       html: emailHTML,
     });
 
-    if (error) {
-      console.error("Error sending booking confirmation email:", error);
-      throw error;
+    if (sendError) {
+      console.error("Error sending guest email:", sendError);
+    } else {
+      console.log("Guest booking email sent to:", recipientEmail);
     }
 
-    console.log("Booking confirmation email sent successfully:", data);
+    // Send host notification email
+    try {
+      let tableName = 'trips';
+      if (booking.booking_type === 'hotel') tableName = 'hotels';
+      else if (booking.booking_type === 'adventure' || booking.booking_type === 'adventure_place') tableName = 'adventure_places';
 
-    return new Response(JSON.stringify({ success: true, data }), {
-      status: 200,
-      headers: { "Content-Type": "application/json", ...corsHeaders },
+      const { data: item } = await supabaseClient.from(tableName).select('created_by').eq('id', booking.item_id).single();
+      
+      if (item?.created_by) {
+        const { data: host } = await supabaseClient.from('profiles').select('email, name').eq('id', item.created_by).single();
+        
+        if (host?.email) {
+          const safeHostName = escapeHtml(host.name || 'Host');
+          const details = typeof bookingDetails === 'string' ? JSON.parse(bookingDetails) : (bookingDetails || {});
+          const totalPeople = (Number(details.adults) || 0) + (Number(details.children) || 0);
+
+          const hostHTML = `<!DOCTYPE html><html><head><style>
+            body{font-family:Arial,sans-serif;line-height:1.6;color:#333;}
+            .container{max-width:600px;margin:0 auto;padding:20px;}
+            .header{background:#008080;color:white;padding:20px;text-align:center;border-radius:8px 8px 0 0;}
+            .content{background:#f9f9f9;padding:30px;border-radius:0 0 8px 8px;}
+            .detail-box{background:white;padding:20px;margin:20px 0;border-radius:8px;border-left:4px solid #008080;}
+            h1{margin:0;font-size:24px;}h2{color:#008080;font-size:20px;margin-top:0;}
+            .amount{font-size:28px;color:#008080;font-weight:bold;}
+          </style></head><body><div class="container">
+            <div class="header"><h1>🎉 New Booking Received!</h1></div>
+            <div class="content">
+              <p>Dear ${safeHostName},</p>
+              <p>You have received a new booking for <strong>${escapeHtml(itemName)}</strong>.</p>
+              <div class="detail-box">
+                <h2>Booking Details</h2>
+                <p><strong>Booking ID:</strong> ${escapeHtml(bookingId)}</p>
+                <p><strong>Guest:</strong> ${escapeHtml(guestName)}</p>
+                <p><strong>Email:</strong> ${escapeHtml(recipientEmail)}</p>
+                ${guestPhone ? `<p><strong>Phone:</strong> ${escapeHtml(guestPhone)}</p>` : ''}
+                ${visitDate ? `<p><strong>Visit Date:</strong> ${escapeHtml(formatDate(String(visitDate)))}</p>` : ''}
+                ${totalPeople > 0 ? `<p><strong>Total People:</strong> ${totalPeople} (${Number(details.adults) || 0} adults, ${Number(details.children) || 0} children)</p>` : ''}
+                <hr style="margin:20px 0;border:none;border-top:1px solid #ddd;">
+                <p class="amount">Amount: KES ${Number(totalAmount).toLocaleString()}</p>
+                <p><strong>Payment:</strong> ${isPaid ? '✅ Paid' : '⏳ Pending'}</p>
+              </div>
+              <p>Please prepare to welcome your guest. View full details in your dashboard.</p>
+            </div>
+          </div></body></html>`;
+
+          await resend.emails.send({
+            from: "Realtravo <onboarding@resend.dev>",
+            to: [host.email],
+            subject: `New Booking - ${escapeHtml(itemName)}`,
+            html: hostHTML,
+          });
+          console.log("Host notification email sent to:", host.email);
+        }
+      }
+    } catch (hostError) {
+      console.error("Failed to send host notification:", hostError);
+    }
+
+    return new Response(JSON.stringify({ success: true }), {
+      status: 200, headers: { "Content-Type": "application/json", ...corsHeaders },
     });
   } catch (error: any) {
-    console.error("Error in send-booking-confirmation function:", error);
-    return new Response(
-      JSON.stringify({ error: error.message || "An error occurred" }),
-      { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
-    );
+    console.error("Error in send-booking-confirmation:", error);
+    return new Response(JSON.stringify({ error: error.message || "An error occurred" }),
+      { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } });
   }
 };
 

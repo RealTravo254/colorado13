@@ -26,9 +26,6 @@ interface Notification {
   created_at: string;
 }
 
-const ACCENT = "#c2185b";
-const ACCENT_BG = "rgba(194, 24, 91, 0.08)";
-
 const NOTIFICATION_SOUND_URL = "/audio/notification.mp3";
 
 const categorizeNotifications = (notifications: Notification[]) => {
@@ -162,9 +159,8 @@ export const NotificationBell = () => {
             <Bell className="h-5 w-5 stroke-[2.5px] transition-transform group-hover:rotate-12" />
             {unreadCount > 0 && (
               <Badge
-                className="absolute -top-1 -right-1 h-5 min-w-[20px] px-1 flex items-center justify-center border-2 border-white text-[10px] font-black z-[50]"
+                className="absolute -top-1 -right-1 h-5 min-w-[20px] px-1 flex items-center justify-center border-2 border-white text-[10px] font-black z-[50] bg-destructive text-destructive-foreground"
                 style={{ 
-                  backgroundColor: "#FF0000", 
                   boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
                   pointerEvents: 'none'
                 }}
@@ -175,14 +171,14 @@ export const NotificationBell = () => {
           </button>
         </SheetTrigger>
         
-        <SheetContent className="w-[85vw] max-w-sm sm:max-w-md p-0 border-none flex flex-col" style={{ background: "linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)" }}>
-          {/* Dark Header */}
+        <SheetContent className="w-[85vw] max-w-sm sm:max-w-md p-0 border-none flex flex-col bg-primary">
+          {/* Dark Header - uses primary color */}
           <div className="px-6 pt-6 pb-4">
             <SheetHeader>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] mb-1">Stay Updated</p>
-                  <SheetTitle className="text-xl font-bold tracking-tight text-white">
+                  <p className="text-[10px] font-black text-primary-foreground/40 uppercase tracking-[0.2em] mb-1">Stay Updated</p>
+                  <SheetTitle className="text-xl font-bold tracking-tight text-primary-foreground">
                     Inbox
                   </SheetTitle>
                 </div>
@@ -191,7 +187,7 @@ export const NotificationBell = () => {
                     variant="ghost"
                     size="sm"
                     onClick={markAllAsRead}
-                    className="text-[10px] font-bold uppercase tracking-widest text-white/50 hover:text-white hover:bg-white/10"
+                    className="text-[10px] font-bold uppercase tracking-widest text-primary-foreground/50 hover:text-primary-foreground hover:bg-primary-foreground/10"
                   >
                     Clear All
                   </Button>
@@ -201,52 +197,52 @@ export const NotificationBell = () => {
           </div>
 
           {/* White rounded content area */}
-          <div className="flex-1 overflow-hidden bg-white rounded-t-3xl">
+          <div className="flex-1 overflow-hidden bg-background rounded-t-3xl">
             <ScrollArea className="h-full p-4">
               {notifications.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-20 text-center">
-                  <div className="p-5 rounded-2xl mb-4" style={{ backgroundColor: ACCENT_BG }}>
-                    <Bell className="h-8 w-8" style={{ color: ACCENT }} />
+                  <div className="p-5 rounded-2xl mb-4 bg-primary/10">
+                    <Bell className="h-8 w-8 text-primary" />
                   </div>
-                  <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400">All caught up!</p>
+                  <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">All caught up!</p>
                 </div>
               ) : (
                 <div className="space-y-5">
                   {categorizedNotifications.map(group => (
                     <div key={group.title} className="space-y-2">
-                      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 px-2">
+                      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground px-2">
                         {group.title}
                       </p>
                       
-                      <div className="bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm divide-y divide-slate-50">
+                      <div className="bg-card rounded-2xl overflow-hidden border border-border shadow-sm divide-y divide-border/50">
                         {group.notifications.map((notification) => {
                           return (
                             <button
                               key={notification.id}
                               onClick={() => handleNotificationClick(notification)}
-                              className="w-full text-left px-4 py-3 hover:bg-slate-50/80 transition-all group flex items-center justify-between gap-3"
+                              className="w-full text-left px-4 py-3 hover:bg-muted/50 transition-all group flex items-center justify-between gap-3"
                             >
                               <div className="flex items-center gap-3 flex-1 min-w-0">
-                                <div className="p-2 rounded-xl flex-shrink-0" style={{ backgroundColor: notification.is_read ? "rgba(100,116,139,0.08)" : ACCENT_BG }}>
+                                <div className={`p-2 rounded-xl flex-shrink-0 ${notification.is_read ? "bg-muted" : "bg-primary/10"}`}>
                                   {!notification.is_read ? (
-                                    <Clock className="h-4 w-4" style={{ color: ACCENT }} />
+                                    <Clock className="h-4 w-4 text-primary" />
                                   ) : (
-                                    <CheckCircle2 className="h-4 w-4 text-slate-400" />
+                                    <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
                                   )}
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                  <h4 className={`text-sm font-semibold truncate ${notification.is_read ? 'text-slate-600' : 'text-slate-800'}`}>
+                                  <h4 className={`text-sm font-semibold truncate ${notification.is_read ? 'text-muted-foreground' : 'text-foreground'}`}>
                                     {notification.title}
                                   </h4>
-                                  <p className="text-xs text-slate-500 truncate">
+                                  <p className="text-xs text-muted-foreground truncate">
                                     {notification.message}
                                   </p>
-                                  <span className="text-[9px] font-medium text-slate-400 uppercase tracking-wider">
+                                  <span className="text-[9px] font-medium text-muted-foreground uppercase tracking-wider">
                                     {format(new Date(notification.created_at), 'h:mm a')}
                                   </span>
                                 </div>
                               </div>
-                              <ChevronRight className="h-4 w-4 text-slate-300 group-hover:text-slate-500 transition-transform group-hover:translate-x-0.5 flex-shrink-0" />
+                              <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-transform group-hover:translate-x-0.5 flex-shrink-0" />
                             </button>
                           );
                         })}
@@ -259,11 +255,11 @@ export const NotificationBell = () => {
           </div>
 
           {/* Cancel button at bottom */}
-          <div className="bg-white px-4 pb-4 pt-2">
+          <div className="bg-background px-4 pb-4 pt-2">
             <Button 
               variant="outline" 
               onClick={() => setIsOpen(false)} 
-              className="w-full py-3 rounded-2xl text-sm font-bold text-slate-600 border-slate-200 hover:bg-slate-50"
+              className="w-full py-3 rounded-2xl text-sm font-bold text-muted-foreground border-border hover:bg-muted"
             >
               Cancel
             </Button>
