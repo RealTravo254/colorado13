@@ -37,13 +37,15 @@ export const Header = ({ onSearchClick, showSearchIcon = true, className, __from
 
   if (!__fromLayout) return null;
 
-  const headerIconStyles = "h-9 w-9 rounded-xl flex items-center justify-center transition-all duration-200 active:scale-90 text-white hover:bg-white/20";
+  // Updated styles: No background/border on small screens (default), 
+  // background added only on md (tablet/desktop) screens.
+  const headerIconStyles = "h-9 w-9 flex items-center justify-center transition-all duration-200 active:scale-90 text-white md:rounded-xl md:hover:bg-white/20";
 
   return (
-    <header className={`z-[100] items-center absolute top-0 md:fixed md:top-0 left-0 right-0 flex py-3 md:bg-[#008080] ${className || ''}`}
-      style={{}}
-    >
+    <header className={`z-[100] fixed top-0 left-0 right-0 flex py-3 transition-colors md:bg-[#008080] ${className || ''}`}>
       <div className="container mx-auto px-4 flex items-center justify-between h-full">
+        
+        {/* Left Side: Menu Trigger */}
         <div className="flex items-center gap-2">
           <Sheet open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
             <SheetTrigger asChild>
@@ -60,6 +62,7 @@ export const Header = ({ onSearchClick, showSearchIcon = true, className, __from
           </Link>
         </div>
 
+        {/* Center: Desktop Navigation */}
         <nav className="hidden lg:flex items-center gap-6">
           {[
             { to: "/", icon: <Home className="h-4 w-4" />, label: t('nav.home') },
@@ -73,13 +76,14 @@ export const Header = ({ onSearchClick, showSearchIcon = true, className, __from
           ))}
         </nav>
 
-        <div className="flex items-center gap-2">
+        {/* Right Side: Icons & Profile */}
+        <div className="flex items-center gap-1 md:gap-2">
           {/* Explore icon */}
           <button onClick={() => navigate('/explore')} className={headerIconStyles} aria-label="Explore">
             <Search className="h-5 w-5" />
           </button>
 
-          {/* Become Host with popover */}
+          {/* Become Host - Hidden on Mobile */}
           <Popover open={hostPopoverOpen} onOpenChange={setHostPopoverOpen}>
             <PopoverTrigger asChild>
               <button className="hidden md:flex h-9 px-3 rounded-xl items-center gap-2 transition-all font-semibold text-xs text-white bg-white/20 hover:bg-white/30">
@@ -117,22 +121,26 @@ export const Header = ({ onSearchClick, showSearchIcon = true, className, __from
             </PopoverContent>
           </Popover>
 
-          <div className="[&_button]:text-white [&_button]:h-9 [&_button]:w-9">
+          {/* Notification Bell - Logic for transparent mobile background */}
+          <div className="[&_button]:text-white [&_button]:h-9 [&_button]:w-9 [&_button]:bg-transparent md:[&_button]:bg-white/20 md:[&_button]:rounded-xl">
             <NotificationBell />
           </div>
 
           {/* Account button */}
           {user ? (
             <AccountSheet>
-              <button className="hidden md:flex h-9 px-4 rounded-xl items-center gap-2 transition-all font-semibold text-xs text-[#008080] bg-white hover:brightness-95">
-                <User className="h-4 w-4" /><span>{t('nav.profile')}</span>
+              {/* On mobile, we keep the icon simple; on desktop, it gets the white background pills */}
+              <button className="flex h-9 w-9 md:w-auto md:px-4 rounded-xl items-center justify-center md:justify-start gap-2 transition-all font-semibold text-xs text-white md:text-[#008080] md:bg-white md:hover:brightness-95">
+                <User className="h-5 w-5 md:h-4 md:w-4" />
+                <span className="hidden md:inline">{t('nav.profile')}</span>
               </button>
             </AccountSheet>
           ) : (
             <Popover open={accountPopoverOpen} onOpenChange={setAccountPopoverOpen}>
               <PopoverTrigger asChild>
-                <button className="hidden md:flex h-9 px-4 rounded-xl items-center gap-2 transition-all font-semibold text-xs text-[#008080] bg-white hover:brightness-95">
-                  <User className="h-4 w-4" /><span>{t('nav.login')}</span>
+                <button className="flex h-9 w-9 md:w-auto md:px-4 rounded-xl items-center justify-center md:justify-start gap-2 transition-all font-semibold text-xs text-white md:text-[#008080] md:bg-white md:hover:brightness-95">
+                  <User className="h-5 w-5 md:h-4 md:w-4" />
+                  <span className="hidden md:inline">{t('nav.login')}</span>
                 </button>
               </PopoverTrigger>
               <PopoverContent className="w-64 p-4" align="end">
