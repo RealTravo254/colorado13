@@ -55,6 +55,11 @@ const ProfileEdit = () => {
   const [sendingCode, setSendingCode] = useState(false);
   const [verifyingCode, setVerifyingCode] = useState(false);
   const [originalPhone, setOriginalPhone] = useState("");
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [changingPassword, setChangingPassword] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -198,9 +203,9 @@ const ProfileEdit = () => {
           <Button className="bg-[#FF7F50] hover:bg-[#FF7F50] border-none px-4 py-1.5 h-auto uppercase font-black tracking-[0.15em] text-[10px] rounded-full shadow-lg mb-4">
             Account Settings
           </Button>
-          <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter leading-none text-slate-900">
-            Edit Profile
-          </h1>
+           <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter leading-none text-slate-900">
+             Profile & Security
+           </h1>
         </div>
 
         <div className="bg-white rounded-[28px] p-8 shadow-sm border border-slate-100">
@@ -350,6 +355,74 @@ const ProfileEdit = () => {
                   </div>
                 </div>
               )}
+            </div>
+
+            {/* Password Change Section */}
+            <div className="border-t border-slate-100 pt-8 space-y-4">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="bg-[#008080]/10 p-2.5 rounded-xl">
+                  <Lock className="h-5 w-5 text-[#008080]" />
+                </div>
+                <Label className="text-[10px] font-black text-[#008080] uppercase tracking-[0.2em]">Change Password</Label>
+              </div>
+              <p className="text-xs text-slate-400">Leave blank if you don't want to change your password.</p>
+              
+              <div className="space-y-3">
+                <div className="relative">
+                  <Input
+                    type={showNewPassword ? "text" : "password"}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="New password"
+                    className="bg-slate-50 border-none rounded-2xl h-14 px-6 font-bold focus-visible:ring-1 focus-visible:ring-[#008080] pr-12"
+                  />
+                  <button type="button" onClick={() => setShowNewPassword(!showNewPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
+                    {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+                {newPassword && <PasswordStrength password={newPassword} />}
+                {newPassword && (
+                  <Input
+                    type="password"
+                    value={confirmNewPassword}
+                    onChange={(e) => setConfirmNewPassword(e.target.value)}
+                    placeholder="Confirm new password"
+                    className="bg-slate-50 border-none rounded-2xl h-14 px-6 font-bold focus-visible:ring-1 focus-visible:ring-[#008080]"
+                  />
+                )}
+                {newPassword && (
+                  <Button
+                    type="button"
+                    disabled={changingPassword || !newPassword}
+                    onClick={async () => {
+                      if (newPassword.length < 8) {
+                        toast({ title: "Error", description: "Password must be at least 8 characters", variant: "destructive" });
+                        return;
+                      }
+                      if (newPassword !== confirmNewPassword) {
+                        toast({ title: "Error", description: "Passwords don't match", variant: "destructive" });
+                        return;
+                      }
+                      setChangingPassword(true);
+                      try {
+                        const { error } = await supabase.auth.updateUser({ password: newPassword });
+                        if (error) throw error;
+                        toast({ title: "Password Updated", description: "Your password has been changed successfully." });
+                        setNewPassword("");
+                        setConfirmNewPassword("");
+                      } catch (error: any) {
+                        toast({ title: "Error", description: error.message, variant: "destructive" });
+                      } finally {
+                        setChangingPassword(false);
+                      }
+                    }}
+                    className="w-full h-12 rounded-2xl font-black uppercase text-[10px] tracking-widest text-white"
+                    style={{ background: COLORS.TEAL }}
+                  >
+                    {changingPassword ? "Updating..." : "Update Password"}
+                  </Button>
+                )}
+              </div>
             </div>
 
             <div className="pt-6 flex flex-col md:flex-row gap-4">
