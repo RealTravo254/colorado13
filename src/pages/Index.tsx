@@ -533,17 +533,17 @@ const Index = () => {
                 <div
                   key={cat.title}
                   onClick={() => navigate(cat.path)}
-                  className="cursor-pointer rounded-lg relative w-full flex items-center justify-center gap-1.5 px-2"
+                  className="cursor-pointer rounded-lg relative w-full flex flex-col items-center justify-center gap-1 px-2 py-2 md:py-4"
                   style={{
                     backgroundImage: `url(${cat.bgImage})`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
-                    height: 'clamp(47px, 6vw, 72px)',
+                    height: 'clamp(60px, 8vw, 144px)',
                   }}
                 >
                   <div className="absolute inset-0 rounded-lg bg-black/10" />
-                  <cat.icon className="relative z-10 h-3 w-3 text-white shrink-0" />
-                  <span className="relative z-10 text-white text-[10px] md:text-[11px] font-bold leading-none whitespace-nowrap">
+                  <cat.icon className="relative z-10 h-3 w-3 md:h-6 md:w-6 text-white shrink-0" />
+                  <span className="relative z-10 text-white text-[10px] md:text-sm font-bold leading-none whitespace-nowrap">
                     {cat.title}
                   </span>
                 </div>
