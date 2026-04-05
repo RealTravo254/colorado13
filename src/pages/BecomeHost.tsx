@@ -317,14 +317,28 @@ const BecomeHost = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Tours & Events - visible for guides and companies, hidden for campsite-only */}
-          {hostingCategory !== 'campsite' && (
+          {/* Fixed Trips & Events - visible for companies only */}
+          {hasCompany && companyStatus === 'approved' && (
             <HostCategoryCard 
-              title="Tours & Events"
-              subtitle="Trips, Sports & Events"
+              title="Fixed Trips & Events"
+              subtitle="Fixed-Date Tours & Events"
               image="/images/category-trips.webp"
               icon={<Plane className="h-8 w-8" />}
-              count={myContent.filter(i => i.contentType === 'trip' || i.contentType === 'event').length}
+              count={myContent.filter(i => (i.contentType === 'trip' || i.contentType === 'event') && !i.is_flexible_date && !i.is_custom_date).length}
+              onManage={() => navigate("/host/trips")}
+              onAdd={() => navigate("/create-trip")}
+              accentColor={COLORS.TEAL}
+            />
+          )}
+
+          {/* Flexible Trips - visible for guides only */}
+          {hostingCategory === 'guide' && verificationStatus === 'approved' && (
+            <HostCategoryCard 
+              title="Guided Tours"
+              subtitle="Flexible & Custom-Date Trips"
+              image="/images/category-trips.webp"
+              icon={<Map className="h-8 w-8" />}
+              count={myContent.filter(i => (i.contentType === 'trip' || i.contentType === 'event')).length}
               onManage={() => navigate("/host/trips")}
               onAdd={() => navigate("/create-trip")}
               accentColor={COLORS.TEAL}
@@ -332,7 +346,7 @@ const BecomeHost = () => {
           )}
 
           {/* Stays - visible for companies only */}
-          {hasCompany && (
+          {hasCompany && companyStatus === 'approved' && (
             <HostCategoryCard 
               title="Stays"
               subtitle="Hotels & Accommodation"
@@ -345,11 +359,25 @@ const BecomeHost = () => {
             />
           )}
 
-          {/* Experiences - visible for campsite hosts, hidden for companies and guides */}
-          {(hostingCategory === 'campsite' || (!hasCompany && hostingCategory !== 'guide')) && (
+          {/* Events - visible for guides and campsite hosts */}
+          {(hostingCategory === 'guide' || hostingCategory === 'campsite') && (
             <HostCategoryCard 
-              title="Experiences"
-              subtitle="Outdoor & Adventure"
+              title="Events"
+              subtitle="Sports & Social Events"
+              image="/images/category-campsite.webp"
+              icon={<Users className="h-8 w-8" />}
+              count={myContent.filter(i => i.contentType === 'event').length}
+              onManage={() => navigate("/host/trips")}
+              onAdd={() => navigate("/create-trip")}
+              accentColor={COLORS.KHAKI_DARK}
+            />
+          )}
+
+          {/* Campsite/Adventure - visible for campsite hosts only */}
+          {hostingCategory === 'campsite' && (
+            <HostCategoryCard 
+              title="Campsite / Adventure"
+              subtitle="Outdoor & Adventure Places"
               image="/images/category-campsite.webp"
               icon={<Tent className="h-8 w-8" />}
               count={myContent.filter(i => i.contentType === 'adventure').length}
