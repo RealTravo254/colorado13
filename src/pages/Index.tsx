@@ -494,14 +494,16 @@ const Index = () => {
       {/* Hero — full width on mobile, horizontally padded on desktop, no border radius */}
       {!isSearchFocused && (
         <div ref={searchRef} className="w-full md:px-6 lg:px-10">
-          {/* Hero image container — inline-block so height = content, bg image stretches with it */}
           <div
             className="relative w-full flex flex-col px-4 md:px-8 pt-8 md:pt-10 pb-5 md:pb-6"
-            style={{ backgroundImage: 'url(/images/hero-background.webp)', backgroundSize: 'cover', backgroundPosition: 'center' }}
+            style={{
+              backgroundImage: 'url(/images/hero-background.webp)',
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+            }}
           >
-            {/* Dark overlay */}
+            {/* Overlays */}
             <div className="absolute inset-0 bg-black/50" />
-            {/* Gradient */}
             <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/60" />
 
             {/* Tagline + title + search */}
@@ -525,21 +527,28 @@ const Index = () => {
               </div>
             </div>
 
-            {/* Category cards — relative z-10 so they render above overlays, fully inside image */}
-            <div className="relative z-10 w-full">
-              <div className="grid grid-cols-4 gap-2 md:gap-3 w-full">
-                {CATEGORIES.map((cat) => (
-                  <div key={cat.title} className="h-20 md:h-24">
-                    <CategoryCard
-                      icon={cat.icon}
-                      title={cat.title}
-                      description=""
-                      onClick={() => navigate(cat.path)}
-                      bgImage={cat.bgImage}
-                    />
+            {/* Category cards — inside image, rectangular, small fixed height, full width */}
+            <div className="relative z-10 w-full grid grid-cols-4 gap-2 md:gap-3">
+              {CATEGORIES.map((cat) => (
+                <div
+                  key={cat.title}
+                  className="h-16 md:h-20 w-full cursor-pointer overflow-hidden rounded-xl relative"
+                  onClick={() => navigate(cat.path)}
+                  style={{
+                    backgroundImage: `url(${cat.bgImage})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                  }}
+                >
+                  <div className="absolute inset-0 bg-black/40" />
+                  <div className="relative z-10 h-full flex flex-col items-center justify-center gap-1 px-1">
+                    <cat.icon className="h-4 w-4 md:h-5 md:w-5 text-white shrink-0" />
+                    <span className="text-white text-[10px] md:text-xs font-bold text-center leading-tight">
+                      {cat.title}
+                    </span>
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
