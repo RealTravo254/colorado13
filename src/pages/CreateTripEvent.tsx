@@ -700,6 +700,7 @@ const CreateTripEvent = () => {
                 exclusions,
                 ticketTypes: useTicketTypes ? ticketTypes : [],
                 allowChildren: formData.allow_children,
+                activityNames,
               }}
               creatorEmail={user?.email}
             />
