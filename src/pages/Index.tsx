@@ -10,7 +10,7 @@ import { SearchBarWithSuggestions } from "@/components/SearchBarWithSuggestions"
 import { useSearchFocus } from "@/components/PageLayout";
 import { ListingCard } from "@/components/ListingCard";
 import { Calendar, Tent, Compass, MapPin, ChevronLeft, ChevronRight, Loader2, Navigation, Home, Heart, Ticket, Trophy, Star, Search as SearchIcon } from "lucide-react";
-import { FEATURED_COUNTIES } from "@/lib/kenyaCounties";
+import { FEATURED_COUNTIES, COUNTY_IMAGES } from "@/lib/kenyaCounties";
 import {
   AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription,
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
