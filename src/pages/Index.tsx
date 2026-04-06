@@ -435,6 +435,7 @@ const Index = () => {
           isCustomDate={item.is_custom_date} isFlexibleDate={item.is_flexible_date}
           isOutdated={isOutdated}
           isSaved={savedItems.has(item.id)}
+          hideSave={true}
           hidePrice={opts.hidePrice ?? false}
           showBadge={true} priority={index === 0}
           activities={item.activities} distance={itemDistance}
