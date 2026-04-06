@@ -319,8 +319,8 @@ const BecomeHost = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Fixed Trips - visible for companies only */}
-          {hasCompany && companyStatus === 'approved' && (
+          {/* Fixed Trips - visible for companies or legacy verified users */}
+          {((hasCompany && companyStatus === 'approved') || (verificationStatus === 'approved' && !hostingCategory)) && (
             <HostCategoryCard 
               title="Fixed Trips"
               subtitle="Fixed-Date Tours"
@@ -333,8 +333,8 @@ const BecomeHost = () => {
             />
           )}
 
-          {/* Flexible/Guided Trips - visible for guides only */}
-          {hostingCategory === 'guide' && verificationStatus === 'approved' && (
+          {/* Flexible/Guided Trips - visible for guides or legacy verified users */}
+          {((hostingCategory === 'guide' && verificationStatus === 'approved') || (verificationStatus === 'approved' && !hostingCategory)) && (
             <HostCategoryCard 
               title="Guided Tours"
               subtitle="Flexible & Custom-Date Trips"
@@ -347,8 +347,8 @@ const BecomeHost = () => {
             />
           )}
 
-          {/* Stays - visible for companies only */}
-          {hasCompany && companyStatus === 'approved' && (
+          {/* Stays - visible for companies or legacy verified users */}
+          {((hasCompany && companyStatus === 'approved') || (verificationStatus === 'approved' && !hostingCategory)) && (
             <HostCategoryCard 
               title="Stays"
               subtitle="Hotels & Accommodation"
@@ -361,10 +361,11 @@ const BecomeHost = () => {
             />
           )}
 
-          {/* Events - visible for all host types */}
+          {/* Events - visible for all verified host types */}
           {((hasCompany && companyStatus === 'approved') || 
             (hostingCategory === 'guide' && verificationStatus === 'approved') || 
-            hostingCategory === 'campsite') && (
+            hostingCategory === 'campsite' ||
+            (verificationStatus === 'approved' && !hostingCategory)) && (
             <HostCategoryCard 
               title="Events"
               subtitle="Sports & Social Events"
@@ -377,8 +378,8 @@ const BecomeHost = () => {
             />
           )}
 
-          {/* Campsite/Adventure - visible for campsite hosts only */}
-          {hostingCategory === 'campsite' && (
+          {/* Campsite/Adventure - visible for campsite hosts or legacy verified users */}
+          {(hostingCategory === 'campsite' || (verificationStatus === 'approved' && !hostingCategory)) && (
             <HostCategoryCard 
               title="Campsite / Adventure"
               subtitle="Outdoor & Adventure Places"
