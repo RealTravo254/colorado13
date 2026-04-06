@@ -660,6 +660,16 @@ const Index = () => {
               {displayGuidedTrips.map((trip, i) => renderCard(trip, "TRIP", i, { isTrip: true, categoryColor: "hsl(260, 70%, 55%)" }))}
             </ScrollSection>
 
+            {/* Adventure Places */}
+            <ScrollSection
+              title="Adventure Places" viewAllPath="/category/campsite"
+              accentColor="hsl(142, 70%, 35%)" scrollRef={adventurePlacesRef}
+              onScroll={handleScroll('adventurePlaces')}
+              hasItems={displayCampsites.length > 0} loading={loadingScrollable}
+            >
+              {displayCampsites.map((place, i) => renderCard(place, "ADVENTURE PLACE", i, { hidePrice: true, categoryColor: "hsl(142, 70%, 35%)" }))}
+            </ScrollSection>
+
             {position && sortedNearbyPlaces.length > 0 && (
               <section className="mb-4 md:mb-8">
                 <div className="flex items-center gap-2 mb-3 md:mb-4">
