@@ -10,7 +10,7 @@ import { SearchBarWithSuggestions } from "@/components/SearchBarWithSuggestions"
 import { useSearchFocus } from "@/components/PageLayout";
 import { ListingCard } from "@/components/ListingCard";
 import { Calendar, Tent, Compass, MapPin, ChevronLeft, ChevronRight, Loader2, Navigation, Home, Heart, Ticket, Trophy, Star, Search as SearchIcon } from "lucide-react";
-import { FEATURED_COUNTIES } from "@/lib/kenyaCounties";
+import { FEATURED_COUNTIES, COUNTY_IMAGES } from "@/lib/kenyaCounties";
 import {
   AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription,
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
@@ -608,7 +608,7 @@ const Index = () => {
                     >
                       <div className="relative overflow-hidden aspect-square bg-muted rounded-none">
                         <img
-                          src={`https://source.unsplash.com/400x400/?${county},kenya,landscape`}
+                          src={COUNTY_IMAGES[county] || `/images/counties/${county.toLowerCase().replace(/['\s]/g, '-')}.jpg`}
                           alt={county}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                           loading="lazy"
