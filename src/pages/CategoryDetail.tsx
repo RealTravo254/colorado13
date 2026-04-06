@@ -194,9 +194,9 @@ const CategoryDetail = () => {
   }, []);
 
   useEffect(() => {
-    const filtered = applyFilters(sortedItems, searchQuery);
+    const filtered = applyFilters(sortedItems, searchQuery, selectedCounty);
     setFilteredItems(filtered);
-  }, [sortedItems, searchQuery, applyFilters]);
+  }, [sortedItems, searchQuery, selectedCounty, applyFilters]);
 
   if (!config) return <div className="p-10 text-center">Category not found</div>;
 
