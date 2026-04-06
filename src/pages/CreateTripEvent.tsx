@@ -65,7 +65,7 @@ const CreateTripEvent = () => {
 
   // Auto-detect type from route
   const isEventRoute = location.pathname === "/create-event";
-  const isFixedType = true; // type is now determined by route
+  
 
   const [formData, setFormData] = useState({
     name: "", description: "", location: "", place: "", country: "", date: "",
