@@ -12,34 +12,56 @@ export const KENYA_COUNTIES = [
   "Vihiga", "Wajir", "West Pokot"
 ];
 
-// County images (placeholder paths - can be updated with real images)
+// County images stored locally
 export const COUNTY_IMAGES: Record<string, string> = {
-  "Nairobi": "/images/counties/nairobi.jpg",
-  "Mombasa": "/images/counties/mombasa.jpg",
-  "Nakuru": "/images/counties/nakuru.jpg",
-  "Kisumu": "/images/counties/kisumu.jpg",
+  "Baringo": "/images/counties/baringo.jpg",
+  "Bomet": "/images/counties/bomet.jpg",
+  "Bungoma": "/images/counties/bungoma.jpg",
+  "Busia": "/images/counties/busia.jpg",
+  "Elgeyo-Marakwet": "/images/counties/elgeyo-marakwet.jpg",
+  "Embu": "/images/counties/embu.jpg",
+  "Garissa": "/images/counties/garissa.jpg",
+  "Homa Bay": "/images/counties/homa-bay.jpg",
+  "Isiolo": "/images/counties/isiolo.jpg",
   "Kajiado": "/images/counties/kajiado.jpg",
-  "Narok": "/images/counties/narok.jpg",
+  "Kakamega": "/images/counties/kakamega.jpg",
+  "Kericho": "/images/counties/kericho.jpg",
+  "Kiambu": "/images/counties/kiambu.jpg",
   "Kilifi": "/images/counties/kilifi.jpg",
+  "Kirinyaga": "/images/counties/kirinyaga.jpg",
+  "Kisii": "/images/counties/kisii.jpg",
+  "Kisumu": "/images/counties/kisumu.jpg",
+  "Kitui": "/images/counties/kitui.jpg",
   "Kwale": "/images/counties/kwale.jpg",
   "Laikipia": "/images/counties/laikipia.jpg",
-  "Samburu": "/images/counties/samburu.jpg",
-  "Taita-Taveta": "/images/counties/taita-taveta.jpg",
   "Lamu": "/images/counties/lamu.jpg",
+  "Machakos": "/images/counties/machakos.jpg",
+  "Makueni": "/images/counties/machakos.jpg",
+  "Mandera": "/images/counties/mandera.jpg",
   "Marsabit": "/images/counties/marsabit.jpg",
   "Meru": "/images/counties/meru.jpg",
+  "Migori": "/images/counties/migori.jpg",
+  "Mombasa": "/images/counties/mombasa.jpg",
+  "Murang'a": "/images/counties/muranga.jpg",
+  "Nairobi": "/images/counties/nairobi.jpg",
+  "Nakuru": "/images/counties/nakuru.jpg",
+  "Nandi": "/images/counties/nandi.jpg",
+  "Narok": "/images/counties/narok.jpg",
+  "Nyamira": "/images/counties/nyamira.jpg",
+  "Nyandarua": "/images/counties/nyandarua.jpg",
   "Nyeri": "/images/counties/nyeri.jpg",
-  "Kiambu": "/images/counties/kiambu.jpg",
-  "Machakos": "/images/counties/machakos.jpg",
+  "Samburu": "/images/counties/samburu.jpg",
+  "Siaya": "/images/counties/siaya.jpg",
+  "Taita-Taveta": "/images/counties/taita-taveta.jpg",
+  "Tana River": "/images/counties/tana-river.jpg",
+  "Tharaka-Nithi": "/images/counties/tharaka-nithi.jpg",
+  "Trans-Nzoia": "/images/counties/trans-nzoia.jpg",
   "Turkana": "/images/counties/turkana.jpg",
-  "Baringo": "/images/counties/baringo.jpg",
-  "Embu": "/images/counties/embu.jpg",
+  "Uasin Gishu": "/images/counties/uasin-gishu.jpg",
+  "Vihiga": "/images/counties/vihiga.jpg",
+  "Wajir": "/images/counties/wajir.jpg",
+  "West Pokot": "/images/counties/west-pokot.jpg",
 };
 
-// Featured counties to show on the index page
-export const FEATURED_COUNTIES = [
-  "Nairobi", "Mombasa", "Nakuru", "Narok", "Kajiado",
-  "Kilifi", "Kwale", "Laikipia", "Samburu", "Taita-Taveta",
-  "Lamu", "Marsabit", "Meru", "Nyeri", "Kisumu",
-  "Kiambu", "Machakos", "Turkana", "Baringo", "Embu"
-];
+// All 47 counties featured on the index page
+export const FEATURED_COUNTIES = [...KENYA_COUNTIES];
