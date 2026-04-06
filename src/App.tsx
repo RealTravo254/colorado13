@@ -43,7 +43,7 @@ const AdminVerification = lazy(() => import("./pages/AdminVerification"));
 const AdminReferralSettings = lazy(() => import("./pages/AdminReferralSettings"));
 const QRScanner = lazy(() => import("./pages/QRScanner"));
 const CreateTripEvent = lazy(() => import("./pages/CreateTripEvent"));
-const CreateHotel = lazy(() => import("./pages/CreateHotel"));
+
 const CreateAdventure = lazy(() => import("./pages/CreateAdventure"));
 const ProfileEdit = lazy(() => import("./pages/ProfileEdit"));
 const EditListing = lazy(() => import("./pages/EditListing"));
