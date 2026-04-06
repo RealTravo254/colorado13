@@ -219,7 +219,7 @@ const CategoryDetail = () => {
             <SearchBarWithSuggestions 
               value={searchQuery} 
               onChange={setSearchQuery} 
-              onSubmit={() => setFilteredItems(applyFilters(sortedItems, searchQuery))} 
+              onSubmit={() => setFilteredItems(applyFilters(sortedItems, searchQuery, selectedCounty))} 
               onFocus={() => setIsSearchFocused(true)} 
               onBlur={() => setIsSearchFocused(false)} 
               onBack={() => { setIsSearchFocused(false); setSearchQuery(""); }} 
