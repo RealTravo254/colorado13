@@ -591,45 +591,10 @@ const Index = () => {
       <main className="w-full">
         <div className={`w-full ${isSearchFocused ? 'hidden' : ''}`}>
 
-          {/* View toggle */}
-          <div className="container mx-auto px-4 md:px-6 pt-3 pb-1 md:pt-4 md:pb-2">
-            <div className="flex items-center gap-0.5 bg-muted rounded-full p-0.5 w-fit">
-              <button
-                onClick={() => setListingViewMode('top_destinations')}
-                className={`px-2.5 py-1 rounded-full text-[10px] font-bold transition-all ${
-                  listingViewMode === 'top_destinations'
-                    ? 'bg-primary text-primary-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                {t('sections.topDestinations')}
-              </button>
-              <button
-                onClick={!locationLoading ? handleMyLocationTap : undefined}
-                className={`px-2.5 py-1 rounded-full text-[10px] font-bold transition-all flex items-center gap-1 ${
-                  listingViewMode === 'my_location'
-                    ? 'bg-primary text-primary-foreground shadow-sm'
-                    : 'text-muted-foreground hover:text-foreground'
-                } ${locationLoading ? 'opacity-70 cursor-wait' : ''}`}
-              >
-                {locationLoading ? <Loader2 className="h-2.5 w-2.5 animate-spin" /> : <MapPin className="h-2.5 w-2.5" />}
-                {locationLoading ? t('sections.finding') : t('sections.nearMe')}
-              </button>
-            </div>
-          </div>
-
           <div className="container mx-auto px-4 md:px-6 py-3 md:py-5 space-y-2 md:space-y-4">
-            {/* Top Visited Counties */}
+            {/* Counties */}
             <section className="mb-4 md:mb-8">
-              <div className="flex items-center justify-between mb-3 md:mb-4 rounded-lg px-3 py-2" style={{ backgroundColor: "hsl(142, 70%, 35%, 0.1)" }}>
-                <h2 className="text-base sm:text-xl md:text-2xl font-extrabold tracking-tight" style={{ color: "hsl(142, 70%, 35%)" }}>
-                  Top Visited Counties
-                </h2>
-                <Link to="/category/campsite" className="text-xs md:text-sm font-semibold shrink-0" style={{ color: "hsl(142, 70%, 35%)" }}>
-                  View All →
-                </Link>
-              </div>
-              <div ref={countiesRef} className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide scroll-smooth snap-x snap-mandatory">
+              <div ref={countiesRef} className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide scroll-smooth snap-x snap-mandatory">
                 {FEATURED_COUNTIES.map((county) => {
                   const counts = countyCounts[county] || { adventures: 0, guidedTrips: 0 };
                   const total = counts.adventures + counts.guidedTrips;
@@ -637,54 +602,25 @@ const Index = () => {
                   return (
                     <div
                       key={county}
-                      onClick={() => navigate(`/category/campsite?county=${encodeURIComponent(county)}`)}
-                      className="flex-shrink-0 w-[36vw] sm:w-[180px] md:w-[200px] snap-start cursor-pointer group"
+                      onClick={() => navigate(`/county/${encodeURIComponent(county)}`)}
+                      className="flex-shrink-0 w-[28vw] sm:w-[120px] md:w-[140px] snap-start cursor-pointer group"
                     >
-                      <div className="relative rounded-2xl overflow-hidden aspect-[3/4] bg-slate-200">
+                      <div className="relative overflow-hidden aspect-square bg-muted rounded-none">
                         <img
-                          src={`https://source.unsplash.com/400x500/?${county},kenya,landscape`}
+                          src={`https://source.unsplash.com/400x400/?${county},kenya,landscape`}
                           alt={county}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                           loading="lazy"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-                        <div className="absolute bottom-0 left-0 right-0 p-3">
-                          <h3 className="text-white font-extrabold text-sm leading-tight">{county}</h3>
-                          <p className="text-white/70 text-[10px] font-bold mt-0.5">{displayCount} listings</p>
+                        <div className="absolute bottom-0 left-0 right-0 p-2">
+                          <h3 className="text-white font-extrabold text-[10px] sm:text-xs leading-tight">{county}</h3>
+                          <p className="text-white/70 text-[8px] font-bold mt-0.5">{displayCount} listings</p>
                         </div>
                       </div>
                     </div>
                   );
                 })}
-              </div>
-            </section>
-
-            {/* Category Grid: 2x2 on mobile */}
-            <section className="mb-4 md:mb-8">
-              <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-3">
-                Browse by Category
-              </h2>
-              <div className="grid grid-cols-2 gap-3">
-                {[
-                  { title: "Sports & Events", path: "/category/events", color: "hsl(340, 75%, 50%)", items: displayEvents, icon: Trophy },
-                  { title: "Fixed Trips", path: "/category/trips", color: "hsl(25, 90%, 50%)", items: displayTrips, icon: Calendar },
-                  { title: "Guided Tours", path: "/category/guided", color: "hsl(260, 70%, 55%)", items: displayGuidedTrips, icon: Compass },
-                  { title: "Adventures", path: "/category/campsite", color: "hsl(142, 70%, 35%)", items: displayCampsites, icon: Tent },
-                ].map((cat) => (
-                  <button
-                    key={cat.title}
-                    onClick={() => navigate(cat.path)}
-                    className="relative overflow-hidden rounded-2xl bg-card border border-border p-4 text-left hover:shadow-lg transition-all active:scale-95 group"
-                  >
-                    <div className="h-9 w-9 rounded-xl flex items-center justify-center mb-2" style={{ backgroundColor: `${cat.color}15` }}>
-                      <cat.icon className="h-4 w-4" style={{ color: cat.color }} />
-                    </div>
-                    <h3 className="text-xs font-extrabold text-foreground leading-tight">{cat.title}</h3>
-                    <p className="text-[10px] text-muted-foreground font-bold mt-0.5">
-                      {loadingScrollable ? "..." : `${cat.items.length}+ listings`}
-                    </p>
-                  </button>
-                ))}
               </div>
             </section>
 
