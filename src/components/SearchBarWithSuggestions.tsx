@@ -108,7 +108,7 @@ export const SearchBarWithSuggestions = React.forwardRef<HTMLDivElement, SearchB
       addLocations(tripsLoc.data, "trip");
       addLocations(adventureLoc.data, "adventure");
       addLocations(hotelsLoc.data, "hotel");
-      const sorted = Array.from(locationMap.entries())
+      const sorted = Object.entries(locationMap)
         .map(([location, info]) => ({ location, count: info.count, type: info.type }))
         .sort((a, b) => b.count - a.count)
         .slice(0, 12);
