@@ -334,6 +334,26 @@ const Index = () => {
     getUserId().then(setUserId);
   }, [cardLimit, fetchScrollableRows, fetchAllData]);
 
+  // Fetch county counts for adventure places and guided trips
+  useEffect(() => {
+    const fetchCountyCounts = async () => {
+      const [adventuresRes, guidedRes] = await Promise.all([
+        supabase.from("adventure_places").select("place").eq("approval_status", "approved").eq("is_hidden", false),
+        supabase.from("trips").select("place").eq("approval_status", "approved").eq("is_hidden", false).eq("type", "trip").or("is_flexible_date.eq.true,is_custom_date.eq.true"),
+      ]);
+      const counts: Record<string, { adventures: number; guidedTrips: number }> = {};
+      FEATURED_COUNTIES.forEach(c => { counts[c] = { adventures: 0, guidedTrips: 0 }; });
+      (adventuresRes.data || []).forEach((item: any) => {
+        if (counts[item.place]) counts[item.place].adventures++;
+      });
+      (guidedRes.data || []).forEach((item: any) => {
+        if (counts[item.place]) counts[item.place].guidedTrips++;
+      });
+      setCountyCounts(counts);
+    };
+    fetchCountyCounts();
+  }, []);
+
   useEffect(() => {
     const hasScrollableData = scrollableRows.trips.length > 0 || scrollableRows.campsites.length > 0 || scrollableRows.events.length > 0;
     if (!loading && !loadingScrollable && listings.length > 0 && hasScrollableData) {
