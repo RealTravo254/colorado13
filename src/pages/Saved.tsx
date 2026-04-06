@@ -175,6 +175,37 @@ const Saved = () => {
     setDeletingId(null);
   };
 
+  // If not logged in and not embedded, show full-page login prompt
+  if (!user && !authLoading && !isEmbeddedInSheet) {
+    return (
+      <div className="min-h-screen bg-[#F4F7FA] pb-24 font-sans">
+        <Header />
+        <div className="container mx-auto px-4 py-12">
+          <header className="mb-8">
+            <h1 className="text-3xl font-bold tracking-tight text-foreground mb-2">Saved Places</h1>
+            <p className="text-muted-foreground text-sm">Your curated collection of adventures and stays.</p>
+          </header>
+          <div className="flex flex-col items-center justify-center py-20 bg-white rounded-[40px] border border-slate-100">
+            <div className="p-5 rounded-2xl bg-primary/10 mb-6">
+              <Heart className="h-10 w-10 text-primary" />
+            </div>
+            <h2 className="text-xl font-bold text-foreground mb-2">Sign in to see your saved items</h2>
+            <p className="text-sm text-muted-foreground mb-6 text-center max-w-sm">Log in or create an account to save your favourite adventures, stays and events.</p>
+            <Button
+              onClick={() => navigate('/auth')}
+              className="rounded-xl text-sm font-bold gap-2 px-8 py-3"
+            >
+              <LogIn className="h-4 w-4" />
+              Log In / Sign Up
+            </Button>
+          </div>
+        </div>
+        <Footer />
+        <MobileBottomBar />
+      </div>
+    );
+  }
+
   return (
     <div className={isEmbeddedInSheet ? "min-h-full bg-background" : "min-h-screen bg-[#F4F7FA] pb-24 font-sans"}>
       {!isEmbeddedInSheet && <Header />}
@@ -187,7 +218,7 @@ const Saved = () => {
           </header>
         )}
 
-        {/* Login banner for non-logged users */}
+        {/* Login banner for non-logged users (embedded sheet) */}
         {!user && !authLoading && (
           <div className="mb-6 bg-primary/5 border border-primary/20 rounded-2xl p-4 flex items-center gap-4">
             <div className="p-3 rounded-xl bg-primary/10 shrink-0">

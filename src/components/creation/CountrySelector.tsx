@@ -2,14 +2,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 const EAST_AFRICAN_COUNTRIES = [
   { name: "Kenya", code: "KE", flag: "🇰🇪" },
-  { name: "Uganda", code: "UG", flag: "🇺🇬" },
-  { name: "Tanzania", code: "TZ", flag: "🇹🇿" },
-  { name: "Rwanda", code: "RW", flag: "🇷🇼" },
-  { name: "Burundi", code: "BI", flag: "🇧🇮" },
-  { name: "South Sudan", code: "SS", flag: "🇸🇸" },
-  { name: "Ethiopia", code: "ET", flag: "🇪🇹" },
-  { name: "Somalia", code: "SO", flag: "🇸🇴" },
-  { name: "Djibouti", code: "DJ", flag: "🇩🇯" },
 ];
 
 interface CountrySelectorProps {
