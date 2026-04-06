@@ -11,7 +11,7 @@ const AdminBookings = () => {
   const { type, id } = useParams();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const { toast } = useToast(); 
   const [bookings, setBookings] = useState<any[]>([]);
   const [item, setItem] = useState<any>(null);
   const [loading, setLoading] = useState(true);
