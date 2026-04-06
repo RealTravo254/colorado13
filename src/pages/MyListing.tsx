@@ -212,11 +212,13 @@ const MyListing = () => {
   const isGuideApproved = verificationStatus === "approved" && hostingCategory === "guide";
   const isCompanyApproved = hasCompany && companyStatus === "approved";
   const isCampsite = hostingCategory === "campsite";
+  // Legacy verified users without hosting_category get full access
+  const isLegacyVerified = verificationStatus === "approved" && !hostingCategory;
 
-  const showTrips = isGuideApproved || isCompanyApproved;
-  const showHotels = isCompanyApproved;
-  const showAdventures = isCampsite;
-  const showEvents = isGuideApproved || isCompanyApproved || isCampsite;
+  const showTrips = isGuideApproved || isCompanyApproved || isLegacyVerified;
+  const showHotels = isCompanyApproved || isLegacyVerified;
+  const showAdventures = isCampsite || isLegacyVerified;
+  const showEvents = isGuideApproved || isCompanyApproved || isCampsite || isLegacyVerified;
 
   const renderListings = (category: string) => {
     const items = myContent.filter(item => item.type === category);
