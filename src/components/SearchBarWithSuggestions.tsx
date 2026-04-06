@@ -95,7 +95,7 @@ export const SearchBarWithSuggestions = React.forwardRef<HTMLDivElement, SearchB
         supabase.from("adventure_places").select("location").eq("approval_status", "approved").eq("is_hidden", false).limit(50),
         supabase.from("hotels").select("location").eq("approval_status", "approved").eq("is_hidden", false).limit(50),
       ]);
-      const locationMap = new Map<string, { count: number; type: string }>();
+      const locationMap: Map<string, { count: number; type: string }> = new Map();
       const addLocations = (data: any[] | null, type: string) => {
         (data || []).forEach((item: any) => {
           if (item.location) {
