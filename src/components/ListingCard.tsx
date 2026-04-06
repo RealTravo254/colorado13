@@ -36,6 +36,7 @@ export interface ListingCardProps {
   isOutdated?: boolean;
   onSave?: (id: string, type: string) => void;
   isSaved?: boolean;
+  hideSave?: boolean;
   amenities?: string[];
   activities?: any[];
   hidePrice?: boolean;
@@ -61,7 +62,7 @@ export interface ListingCardProps {
 
 const ListingCardComponent = ({
   id, type, name, imageUrl, location, price, date,
-  isOutdated = false, activities, onSave, isSaved = false,
+  isOutdated = false, activities, onSave, isSaved = false, hideSave = false,
   availableTickets = 0, bookedTickets = 0,
   priority = false, compact = false, avgRating, reviewCount, place,
   isFlexibleDate = false, hidePrice = false, description, categoryColor,
@@ -223,17 +224,19 @@ const ListingCardComponent = ({
         </div>
 
         {/* Save button */}
-        <div className="absolute top-2 right-2 z-20">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onSave?.(id, type);
-            }}
-            className="h-7 w-7 rounded-full bg-white/80 backdrop-blur-sm shadow flex items-center justify-center transition-all hover:bg-white active:scale-90"
-          >
-            <Heart className={cn("h-3.5 w-3.5", isSaved ? "fill-red-500 text-red-500" : "text-slate-600")} />
-          </button>
-        </div>
+        {!hideSave && (
+          <div className="absolute top-2 right-2 z-20">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onSave?.(id, type);
+              }}
+              className="h-7 w-7 rounded-full bg-white/80 backdrop-blur-sm shadow flex items-center justify-center transition-all hover:bg-white active:scale-90"
+            >
+              <Heart className={cn("h-3.5 w-3.5", isSaved ? "fill-red-500 text-red-500" : "text-slate-600")} />
+            </button>
+          </div>
+        )}
 
         {/* Navigation arrows (desktop only, on hover) */}
         {allSlideImages.length > 1 && (

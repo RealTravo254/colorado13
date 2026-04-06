@@ -78,6 +78,7 @@ const PaymentHistory = lazy(() => import("./pages/PaymentHistory"));
 const AdminPaymentVerification = lazy(() => import("./pages/AdminPaymentVerification"));
 const AccountsOverview = lazy(() => import("./pages/admin/AccountsOverview"));
 const Explore = lazy(() => import("./pages/Explore"));
+const CountyDetail = lazy(() => import("./pages/CountyDetail"));
 
 
 const queryClient = new QueryClient({
@@ -131,6 +132,7 @@ const App = () => {
                     <Route path="/contact" element={<Contact />} />
                     <Route path="/about" element={<About />} />
                     <Route path="/category/:category" element={<CategoryDetail />} />
+                    <Route path="/county/:county" element={<CountyDetail />} />
                     <Route path="/trip/:slug" element={<Suspense fallback={<TealLoader />}><TripDetail /></Suspense>} />
                     <Route path="/event/:slug" element={<Suspense fallback={<TealLoader />}><EventDetail /></Suspense>} />
                     {/* Hotel route removed */}
