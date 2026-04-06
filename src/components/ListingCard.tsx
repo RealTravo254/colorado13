@@ -36,6 +36,7 @@ export interface ListingCardProps {
   isOutdated?: boolean;
   onSave?: (id: string, type: string) => void;
   isSaved?: boolean;
+  hideSave?: boolean;
   amenities?: string[];
   activities?: any[];
   hidePrice?: boolean;
