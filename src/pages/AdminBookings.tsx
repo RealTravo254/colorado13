@@ -9,7 +9,7 @@ import { Calendar, Mail, Phone, User, ArrowLeft, Hash, CreditCard, Users, CheckC
 
 const AdminBookings = () => {
   const { type, id } = useParams();
-  const { user } = useAuth(); 
+  const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [bookings, setBookings] = useState<any[]>([]);
