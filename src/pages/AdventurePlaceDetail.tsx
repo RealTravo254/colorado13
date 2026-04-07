@@ -365,13 +365,24 @@ const AdventurePlaceDetail = () => {
                 )}
 
                 {place.entry_fee && place.entry_fee > 0 ? (
-                  <div className="flex items-start gap-3">
-                    <Circle className="h-5 w-5 text-slate-700 mt-0.5 flex-shrink-0" />
-                    <div>
-                      <p className="text-sm font-bold text-slate-900">Entry fee from {formatPrice(Number(place.entry_fee))}</p>
-                      <p className="text-xs text-slate-500">Per adult admission</p>
+                  <>
+                    <div className="flex items-start gap-3">
+                      <Circle className="h-5 w-5 text-slate-700 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <p className="text-sm font-bold text-slate-900">Adult entry from {formatPrice(Number(place.entry_fee))}</p>
+                        <p className="text-xs text-slate-500">Per adult admission</p>
+                      </div>
                     </div>
-                  </div>
+                    {place.child_entry_fee !== undefined && place.child_entry_fee > 0 && (
+                      <div className="flex items-start gap-3">
+                        <Circle className="h-5 w-5 text-slate-700 mt-0.5 flex-shrink-0" />
+                        <div>
+                          <p className="text-sm font-bold text-slate-900">Child entry {formatPrice(Number(place.child_entry_fee))}</p>
+                          <p className="text-xs text-slate-500">Per child admission</p>
+                        </div>
+                      </div>
+                    )}
+                  </>
                 ) : (
                   <div className="flex items-start gap-3">
                     <Circle className="h-5 w-5 text-emerald-600 mt-0.5 flex-shrink-0" />
@@ -390,14 +401,22 @@ const AdventurePlaceDetail = () => {
                   </div>
                 </div>
 
-                {(place.phone_numbers?.length > 0 || place.email) && (
+                {place.phone_numbers?.length > 0 && (
                   <div className="flex items-start gap-3">
                     <Phone className="h-5 w-5 text-slate-700 mt-0.5 flex-shrink-0" />
                     <div>
-                      <p className="text-sm font-bold text-slate-900">Contact available</p>
-                      <p className="text-xs text-slate-500">
-                        {place.phone_numbers?.[0] || place.email}
-                      </p>
+                      <p className="text-sm font-bold text-slate-900">Phone</p>
+                      <p className="text-xs text-slate-500">{place.phone_numbers[0]}</p>
+                    </div>
+                  </div>
+                )}
+
+                {place.email && (
+                  <div className="flex items-start gap-3">
+                    <Mail className="h-5 w-5 text-slate-700 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-sm font-bold text-slate-900">Email</p>
+                      <a href={`mailto:${place.email}`} className="text-xs text-teal-600 hover:underline">{place.email}</a>
                     </div>
                   </div>
                 )}
@@ -425,10 +444,13 @@ const AdventurePlaceDetail = () => {
               <div className="flex justify-between items-start mb-4">
                 <div>
                   <p className="text-xs text-slate-500 mb-0.5">From</p>
-                  {place.entry_fee && place.entry_fee > 0 ? (
+                {place.entry_fee && place.entry_fee > 0 ? (
                     <div>
                       <span className="text-2xl font-black text-slate-900">{formatPrice(Number(place.entry_fee))}</span>
-                      <span className="text-xs text-slate-500 ml-1">per person</span>
+                      <span className="text-xs text-slate-500 ml-1">per adult</span>
+                      {place.child_entry_fee !== undefined && place.child_entry_fee > 0 && (
+                        <p className="text-sm text-slate-600 mt-1">Child: {formatPrice(Number(place.child_entry_fee))}</p>
+                      )}
                     </div>
                   ) : (
                     <span className="text-lg font-bold text-emerald-600">Free Entry</span>
@@ -447,19 +469,6 @@ const AdventurePlaceDetail = () => {
               >
                 Check availability
               </Button>
-
-              {/* Trust badges */}
-              <div className="mt-4 space-y-2">
-                <div className="flex items-start gap-2">
-                  <div className="h-5 w-5 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Circle className="h-3 w-3 text-emerald-600 fill-emerald-600" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold text-slate-800">Reserve now & pay later</p>
-                    <p className="text-[10px] text-slate-500">Keep your plans flexible</p>
-                  </div>
-                </div>
-              </div>
 
               <div className="grid grid-cols-3 gap-2 mt-4">
                 <UtilityButton
@@ -559,27 +568,6 @@ const AdventurePlaceDetail = () => {
                 Check availability
               </Button>
 
-              {/* Trust badges */}
-              <div className="space-y-3 pt-3 border-t border-slate-100">
-                <div className="flex items-start gap-2">
-                  <div className="h-5 w-5 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Circle className="h-3 w-3 text-emerald-600 fill-emerald-600" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold text-slate-800">Free cancellation</p>
-                    <p className="text-[11px] text-slate-500">Cancel in advance for a full refund</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-2">
-                  <div className="h-5 w-5 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Circle className="h-3 w-3 text-emerald-600 fill-emerald-600" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold text-slate-800">Reserve now & pay later</p>
-                    <p className="text-[11px] text-slate-500">Keep your plans flexible — book your spot and pay nothing today</p>
-                  </div>
-                </div>
-              </div>
 
               {/* Rating */}
               <div className="flex items-center gap-2 pt-3 border-t border-slate-100">

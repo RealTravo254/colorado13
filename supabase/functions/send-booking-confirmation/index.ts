@@ -188,7 +188,7 @@ const handler = async (req: Request): Promise<Response> => {
     const emailHTML = buildDetailsHTML(bookingDetails, guestName, recipientEmail, guestPhone, bookingType, itemName, visitDate || null, totalAmount, bookingId, isPaid);
 
     const { error: sendError } = await resend.emails.send({
-      from: "Realtravo <onboarding@resend.dev>",
+      from: "Realtravo <noreply@realtravo.com>",
       to: [recipientEmail],
       subject: `Booking ${isPaid ? 'Confirmed' : 'Submitted'} - ${escapeHtml(itemName)}`,
       html: emailHTML,
@@ -246,7 +246,7 @@ const handler = async (req: Request): Promise<Response> => {
           </div></body></html>`;
 
           await resend.emails.send({
-            from: "Realtravo <onboarding@resend.dev>",
+            from: "Realtravo <noreply@realtravo.com>",
             to: [host.email],
             subject: `New Booking - ${escapeHtml(itemName)}`,
             html: hostHTML,

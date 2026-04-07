@@ -268,7 +268,7 @@ export const SearchBarWithSuggestions = React.forwardRef<HTMLDivElement, SearchB
         <div ref={wrapperRef} className="relative w-full max-w-4xl mx-auto" style={{ isolation: 'isolate' }}>
           <div className="flex items-center gap-3">
             {showBackButton && (
-              <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full bg-card shadow-sm border border-border hover:bg-muted hover:text-primary">
+              <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full bg-card shadow-sm border border-border hover:bg-muted hover:text-primary md:hidden">
                 <Home className="h-5 w-5" />
               </Button>
             )}

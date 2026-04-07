@@ -81,7 +81,7 @@ const CountyDetail = () => {
       <Header className="hidden md:flex" showSearchIcon={showSearchIcon}
         onSearchClick={() => searchRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })} />
 
-      <div ref={searchRef} className={cn("bg-card border-b z-50 sticky top-0 md:static", isSearchFocusedLocal && "z-[600]")}>
+      <div ref={searchRef} className={cn("bg-card border-b z-50 sticky top-0 md:relative", isSearchFocusedLocal && "z-[600]")}>
         <div className="container px-4 py-3 flex items-center gap-3">
           <button onClick={() => window.history.back()} className="md:hidden shrink-0 p-2 rounded-lg hover:bg-muted transition-colors">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
