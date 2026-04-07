@@ -96,7 +96,7 @@ export default function CompleteProfile() {
       }
 
       // Update profile
-      const updateData: Record<string, any> = {
+      const updateData: { name: string; profile_completed: boolean; phone_number?: string } = {
         name: name.trim(),
         profile_completed: true,
       };
