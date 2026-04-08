@@ -358,7 +358,7 @@ const CORAL = "#FF7F50";
       )}
 
       {/* Facility-only mode: Activities step */}
-      {currentStepId === "activities" && (
+       {currentStepId === "activities" && (
         <div className="space-y-4">
           <p className="text-sm text-muted-foreground mb-4">Add any activities to your booking? (Optional)</p>
           {activities.map((activity) => {
@@ -385,6 +385,13 @@ const CORAL = "#FF7F50";
                     )}
                   </div>
                 </div>
+                {isSelected && selected && (
+                  <div className="mt-2 text-right">
+                    <span className="text-sm font-bold" style={{ color: TEAL }}>
+                      {formatPrice(activity.price * (selected.numberOfPeople || 1))}
+                    </span>
+                  </div>
+                )}
               </div>
             );
           })}
@@ -493,79 +500,93 @@ const CORAL = "#FF7F50";
  
        {/* Extras Step (Activities & Facilities) - no images */}
        {currentStepId === "extras" && (
-         <div className="space-y-6">
-           {activities.length > 0 && (
-             <div>
-               <h3 className="font-black text-sm uppercase tracking-tight mb-3" style={{ color: TEAL }}>Activities</h3>
-               <div className="space-y-3">
-                 {activities.map((activity) => {
-                   const isSelected = selectedActivities.some((a) => a.name === activity.name);
-                   const selected = selectedActivities.find((a) => a.name === activity.name);
-                   return (
-                     <div key={activity.name} className={cn("p-4 border rounded-2xl cursor-pointer transition-all", isSelected && "border-2 border-[#008080] bg-[#008080]/5")} onClick={() => toggleActivity(activity)}>
-                      <div className="flex items-center gap-3">
-                          <div className="flex-1 flex justify-between items-center">
-                            <div>
-                              <p className="font-bold text-sm">{activity.name}</p>
-                              <p className="text-xs text-muted-foreground">{formatPrice(activity.price)} per person</p>
+          <div className="space-y-6">
+            {activities.length > 0 && (
+              <div>
+                <h3 className="font-black text-sm uppercase tracking-tight mb-3" style={{ color: TEAL }}>Activities</h3>
+                <div className="space-y-3">
+                  {activities.map((activity) => {
+                    const isSelected = selectedActivities.some((a) => a.name === activity.name);
+                    const selected = selectedActivities.find((a) => a.name === activity.name);
+                    return (
+                      <div key={activity.name} className={cn("p-4 border rounded-2xl cursor-pointer transition-all", isSelected && "border-2 border-[#008080] bg-[#008080]/5")} onClick={() => toggleActivity(activity)}>
+                       <div className="flex items-center gap-3">
+                           <div className="flex-1 flex justify-between items-center">
+                             <div>
+                               <p className="font-bold text-sm">{activity.name}</p>
+                               <p className="text-xs text-muted-foreground">{formatPrice(activity.price)} per person</p>
+                             </div>
+                             {isSelected && (
+                               <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                                 <Button variant="outline" size="icon" className="h-8 w-8 rounded-xl" onClick={() => updateActivityPeople(activity.name, (selected?.numberOfPeople || 1) - 1)}>
+                                   <Minus className="h-3 w-3" />
+                                 </Button>
+                                 <span className="w-6 text-center font-bold">{selected?.numberOfPeople || 1}</span>
+                                 <Button variant="outline" size="icon" className="h-8 w-8 rounded-xl" onClick={() => updateActivityPeople(activity.name, (selected?.numberOfPeople || 1) + 1)}>
+                                   <Plus className="h-3 w-3" />
+                                 </Button>
+                               </div>
+                             )}
+                           </div>
+                         </div>
+                         {isSelected && selected && (
+                           <div className="mt-2 text-right">
+                             <span className="text-sm font-bold" style={{ color: TEAL }}>
+                               {formatPrice(activity.price * (selected.numberOfPeople || 1))}
+                             </span>
+                           </div>
+                         )}
+                       </div>
+                     );
+                  })}
+                </div>
+              </div>
+            )}
+ 
+            {facilities.length > 0 && (
+              <div>
+                <h3 className="font-black text-sm uppercase tracking-tight mb-3" style={{ color: TEAL }}>Facilities</h3>
+                <div className="space-y-3">
+                  {facilities.map((facility) => {
+                    const isSelected = selectedFacilities.some((f) => f.name === facility.name);
+                    const selected = selectedFacilities.find((f) => f.name === facility.name);
+                    return (
+                      <div key={facility.name} className={cn("p-4 border rounded-2xl cursor-pointer transition-all", isSelected && "border-2 border-[#008080] bg-[#008080]/5")} onClick={() => toggleFacility(facility)}>
+                         <div className="flex items-center gap-3">
+                           <div className="flex-1 flex justify-between items-center">
+                             <div>
+                               <p className="font-bold text-sm">{facility.name}</p>
+                               <p className="text-xs text-muted-foreground">{formatPrice(facility.price)} per day</p>
+                             </div>
+                           </div>
+                         </div>
+                        {isSelected && (
+                          <div className="mt-3 space-y-2" onClick={(e) => e.stopPropagation()}>
+                            <div className="grid grid-cols-2 gap-2">
+                              <div>
+                                <Label className="text-[10px] font-black uppercase text-slate-400">Start Date</Label>
+                                <Input type="date" className="rounded-xl" value={selected?.startDate || ""} min={format(new Date(), "yyyy-MM-dd")} onChange={(e) => updateFacilityDates(facility.name, e.target.value, selected?.endDate)} />
+                              </div>
+                              <div>
+                                <Label className="text-[10px] font-black uppercase text-slate-400">End Date</Label>
+                                <Input type="date" className="rounded-xl" value={selected?.endDate || ""} min={selected?.startDate || format(new Date(), "yyyy-MM-dd")} onChange={(e) => updateFacilityDates(facility.name, selected?.startDate, e.target.value)} />
+                              </div>
                             </div>
-                            {isSelected && (
-                              <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-                                <Button variant="outline" size="icon" className="h-8 w-8 rounded-xl" onClick={() => updateActivityPeople(activity.name, (selected?.numberOfPeople || 1) - 1)}>
-                                  <Minus className="h-3 w-3" />
-                                </Button>
-                                <span className="w-6 text-center font-bold">{selected?.numberOfPeople || 1}</span>
-                                <Button variant="outline" size="icon" className="h-8 w-8 rounded-xl" onClick={() => updateActivityPeople(activity.name, (selected?.numberOfPeople || 1) + 1)}>
-                                  <Plus className="h-3 w-3" />
-                                </Button>
+                            {selected?.startDate && selected?.endDate && (
+                              <div className="text-sm font-bold" style={{ color: TEAL }}>
+                                {Math.max(1, Math.ceil((new Date(selected.endDate).getTime() - new Date(selected.startDate).getTime()) / (1000 * 60 * 60 * 24)))} nights — {formatPrice(facility.price * Math.max(1, Math.ceil((new Date(selected.endDate).getTime() - new Date(selected.startDate).getTime()) / (1000 * 60 * 60 * 24))))}
                               </div>
                             )}
                           </div>
-                        </div>
+                        )}
                       </div>
                     );
-                 })}
-               </div>
-             </div>
-           )}
- 
-           {facilities.length > 0 && (
-             <div>
-               <h3 className="font-black text-sm uppercase tracking-tight mb-3" style={{ color: TEAL }}>Facilities</h3>
-               <div className="space-y-3">
-                 {facilities.map((facility) => {
-                   const isSelected = selectedFacilities.some((f) => f.name === facility.name);
-                   const selected = selectedFacilities.find((f) => f.name === facility.name);
-                   return (
-                     <div key={facility.name} className={cn("p-4 border rounded-2xl cursor-pointer transition-all", isSelected && "border-2 border-[#008080] bg-[#008080]/5")} onClick={() => toggleFacility(facility)}>
-                        <div className="flex items-center gap-3">
-                          <div className="flex-1 flex justify-between items-center">
-                            <div>
-                              <p className="font-bold text-sm">{facility.name}</p>
-                              <p className="text-xs text-muted-foreground">{formatPrice(facility.price)} per day</p>
-                            </div>
-                          </div>
-                        </div>
-                       {isSelected && (
-                         <div className="mt-3 grid grid-cols-2 gap-2" onClick={(e) => e.stopPropagation()}>
-                           <div>
-                             <Label className="text-[10px] font-black uppercase text-slate-400">Start Date</Label>
-                             <Input type="date" className="rounded-xl" value={selected?.startDate || ""} onChange={(e) => updateFacilityDates(facility.name, e.target.value, selected?.endDate)} />
-                           </div>
-                           <div>
-                             <Label className="text-[10px] font-black uppercase text-slate-400">End Date</Label>
-                             <Input type="date" className="rounded-xl" value={selected?.endDate || ""} onChange={(e) => updateFacilityDates(facility.name, selected?.startDate, e.target.value)} />
-                           </div>
-                         </div>
-                       )}
-                     </div>
-                   );
-                 })}
-               </div>
-             </div>
-           )}
-         </div>
-       )}
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
  
        {/* Guest Details Step */}
        {currentStepId === "details" && (
