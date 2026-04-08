@@ -7,7 +7,6 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  // Handle CORS preflight
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -23,23 +22,52 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     const body = await req.json();
-    const { 
-      email, 
-      amount, 
-      bookingData,
-      callbackUrl 
-    } = body;
+    const { email, amount, bookingData, callbackUrl } = body;
 
     if (!email || !amount) {
       throw new Error("Email and amount are required");
     }
 
-    // Amount should be in kobo (smallest currency unit) for NGN, but for KES it's already in cents
-    // Paystack requires amount in smallest unit
-    const amountInCents = Math.round(amount * 100);
+    // First, cleanup stale pending bookings for this item
+    await supabase.rpc('cleanup_stale_pending_bookings');
 
-    // Generate a unique reference
+    const amountInCents = Math.round(amount * 100);
     const reference = `PAY_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+
+    // Create a PENDING booking to lock slots and prevent double booking
+    const visitDate = bookingData?.visit_date || null;
+    const { data: pendingBooking, error: bookingError } = await supabase
+      .from("bookings")
+      .insert([{
+        user_id: bookingData?.user_id || null,
+        item_id: bookingData?.item_id,
+        booking_type: bookingData?.booking_type,
+        total_amount: Number(bookingData?.total_amount || amount),
+        status: "pending",
+        payment_status: "pending",
+        payment_method: "card",
+        is_guest_booking: bookingData?.is_guest_booking || false,
+        guest_name: bookingData?.guest_name,
+        guest_email: bookingData?.guest_email,
+        guest_phone: bookingData?.guest_phone || null,
+        slots_booked: bookingData?.slots_booked || 1,
+        visit_date: visitDate,
+        booking_details: bookingData?.booking_details || {},
+        referral_tracking_id: bookingData?.referral_tracking_id || null,
+      }])
+      .select()
+      .single();
+
+    if (bookingError) {
+      console.error("Error creating pending booking:", bookingError);
+      // If capacity error, return user-friendly message
+      if (bookingError.message?.includes('Sold out') || bookingError.message?.includes('not available')) {
+        throw new Error(bookingError.message);
+      }
+      throw new Error("Failed to reserve your booking slot. Please try again.");
+    }
+
+    console.log("Pending booking created:", pendingBooking?.id);
 
     // Initialize Paystack transaction
     const paystackResponse = await fetch("https://api.paystack.co/transaction/initialize", {
@@ -55,6 +83,7 @@ serve(async (req) => {
         currency: "KES",
         callback_url: callbackUrl || `${supabaseUrl}/functions/v1/paystack-callback`,
         metadata: {
+          booking_id: pendingBooking?.id,
           booking_data: bookingData,
           custom_fields: [
             {
@@ -75,18 +104,24 @@ serve(async (req) => {
     const paystackData = await paystackResponse.json();
 
     if (!paystackData.status) {
+      // Payment init failed - cancel the pending booking
+      await supabase
+        .from("bookings")
+        .update({ status: 'cancelled', payment_status: 'failed', updated_at: new Date().toISOString() })
+        .eq("id", pendingBooking?.id);
+      
       console.error("Paystack error:", paystackData);
       throw new Error(paystackData.message || "Failed to initialize payment");
     }
 
-    // Store payment record
+    // Store payment record with booking_id reference
     const { error: paymentError } = await supabase.from("payments").insert([{
       checkout_request_id: reference,
-      phone_number: email, // Using email for card payments
+      phone_number: email,
       amount: amount,
       account_reference: reference,
       payment_status: "pending",
-      booking_data: bookingData,
+      booking_data: { ...bookingData, pending_booking_id: pendingBooking?.id },
       host_id: bookingData?.host_id || null,
       user_id: bookingData?.user_id || null,
     }]);
@@ -102,6 +137,7 @@ serve(async (req) => {
           authorization_url: paystackData.data.authorization_url,
           access_code: paystackData.data.access_code,
           reference: paystackData.data.reference,
+          pending_booking_id: pendingBooking?.id,
         },
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
