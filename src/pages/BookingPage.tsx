@@ -339,41 +339,20 @@ const BookingPage = () => {
 
       {/* Verifying / Processing Payment Screen */}
       {isVerifying && !isCompleted && (
-        <div className="min-h-screen bg-[#F8F9FA]">
-          {/* Header with back arrow */}
-          <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-slate-100">
-            <div className="container max-w-2xl mx-auto px-4 py-4 flex items-center gap-4">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => { setIsVerifying(false); setIsProcessing(false); }}
-                className="rounded-full bg-slate-100 hover:bg-slate-200"
-              >
-                <ArrowLeft className="h-5 w-5" />
-              </Button>
-              <div className="flex-1 min-w-0">
-                <h1 className="text-lg font-black uppercase tracking-tight text-primary truncate">
-                  Checkout
-                </h1>
-                <p className="text-xs text-muted-foreground">Processing payment...</p>
-              </div>
-            </div>
+        <div className="flex flex-col items-center justify-center min-h-[70vh] px-6">
+          <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-6 animate-pulse">
+            <Loader2 className="h-10 w-10 animate-spin text-primary" />
           </div>
-          <div className="flex flex-col items-center justify-center min-h-[70vh] px-6">
-            <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-6 animate-pulse">
-              <Loader2 className="h-10 w-10 animate-spin text-primary" />
-            </div>
-            <h2 className="text-xl font-black uppercase tracking-tight text-foreground mb-2 text-center">
-              Processing Your Booking
-            </h2>
-            <p className="text-sm text-muted-foreground text-center max-w-xs">
-              Please wait while we verify your payment and confirm your booking...
-            </p>
-            <div className="mt-6 flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0ms' }} />
-              <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '150ms' }} />
-              <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '300ms' }} />
-            </div>
+          <h2 className="text-xl font-black uppercase tracking-tight text-foreground mb-2 text-center">
+            Processing Your Booking
+          </h2>
+          <p className="text-sm text-muted-foreground text-center max-w-xs">
+            Please wait while we verify your payment and confirm your booking...
+          </p>
+          <div className="mt-6 flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0ms' }} />
+            <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '150ms' }} />
+            <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '300ms' }} />
           </div>
         </div>
       )}
