@@ -591,7 +591,7 @@ const Index = () => {
                       decoding="async"
                       className="absolute inset-0 w-full h-full object-cover object-center pointer-events-none select-none rounded-lg"
                     />
-                    <div className="absolute inset-0 rounded-lg bg-black/10" />
+                    <div className="absolute inset-0 rounded-lg bg-black/40" />
                     <cat.icon className="relative z-10 h-3 w-3 md:h-6 md:w-6 text-white shrink-0" />
                     <span className="relative z-10 text-white text-[10px] md:text-sm font-bold leading-none whitespace-nowrap">
                       {cat.title}

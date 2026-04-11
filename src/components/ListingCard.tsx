@@ -194,6 +194,13 @@ const ListingCardComponent = ({
                   src={optimizeSupabaseImage(img, { width: 500, height: 375, quality: 80 })}
                   alt={`${name} - ${idx + 1}`}
                   onLoad={() => setImageLoadStates(prev => ({ ...prev, [idx]: true }))}
+                  onError={(e) => {
+                    // Fallback: try original URL if optimized fails
+                    const target = e.target as HTMLImageElement;
+                    if (target.src !== img) {
+                      target.src = img;
+                    }
+                  }}
                   className={cn(
                     "w-full h-full object-cover",
                     imageLoadStates[idx] ? "opacity-100" : "opacity-0",
