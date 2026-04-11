@@ -196,7 +196,9 @@ const AdventurePlaceDetail = () => {
     .flatMap((f: any) => (Array.isArray(f.images) ? f.images : []));
   const activityImages = (Array.isArray(place.activities) ? place.activities : [])
     .flatMap((a: any) => (Array.isArray(a.images) ? a.images : []));
-  const allImages = [place.image_url, ...(place.gallery_images || []), ...facilityImages, ...activityImages].filter(Boolean);
+  const allImagesRaw = [place.image_url, ...(place.gallery_images || []), ...facilityImages, ...activityImages].filter(Boolean);
+  // Limit gallery to 5 images initially on page load
+  const allImages = allImagesRaw.slice(0, 5);
   const is24Hours = place.opening_hours === "00:00" && place.closing_hours === "23:59";
 
   // Use the resolved place.id for navigation/links (not rawSlug)
