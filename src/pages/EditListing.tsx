@@ -104,6 +104,10 @@ const EditListing = () => {
   const [generalFacilities, setGeneralFacilities] = useState<string[]>([]);
   const [facilities, setFacilities] = useState<FacilityWithImages[]>([]);
   const [activities, setActivities] = useState<ActivityWithImages[]>([]);
+  const [inclusions, setInclusions] = useState<string[]>([]);
+  const [exclusions, setExclusions] = useState<string[]>([]);
+  const [newInclusion, setNewInclusion] = useState("");
+  const [newExclusion, setNewExclusion] = useState("");
 
   useEffect(() => {
     if (!user || !id || !type) {
@@ -201,6 +205,8 @@ const EditListing = () => {
         setAvailableSlots((data as any).available_tickets || 0);
         setPrice((data as any).price || 0);
         setPriceChild((data as any).price_child || 0);
+        setInclusions((data as any).inclusions || []);
+        setExclusions((data as any).exclusions || []);
       }
 
       if (type === 'hotel' || type === 'adventure') {
