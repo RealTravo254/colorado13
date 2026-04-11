@@ -262,6 +262,12 @@ const VerificationDetail = () => {
                     label="Address" 
                     value={`${verification.street_address}, ${verification.city}`} 
                 />
+                {verification.hosting_category && (
+                  <InfoItem icon={<ShieldCheck />} label="Hosting Category" value={verification.hosting_category} />
+                )}
+                {verification.registration_number && (
+                  <InfoItem icon={<FileText />} label="Registration Number" value={verification.registration_number} />
+                )}
               </div>
 
               {verification.status === "pending" && (

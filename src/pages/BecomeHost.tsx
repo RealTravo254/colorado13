@@ -347,7 +347,7 @@ const BecomeHost = () => {
             />
           )}
 
-          {/* Events - visible for all verified host types */}
+          {/* Events - visible for guides, campsites, companies, or legacy verified users */}
           {((hasCompany && companyStatus === 'approved') || 
             (hostingCategory === 'guide' && verificationStatus === 'approved') || 
             hostingCategory === 'campsite' ||

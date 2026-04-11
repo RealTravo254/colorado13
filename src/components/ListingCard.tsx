@@ -191,11 +191,10 @@ const ListingCardComponent = ({
               )}
               {shouldLoad && (
                 <img
-                  src={optimizeSupabaseImage(img, { width: 500, height: 375, quality: 80 })}
+                  src={img.includes('supabase.co/storage') ? optimizeSupabaseImage(img, { width: 500, height: 375, quality: 80 }) : img}
                   alt={`${name} - ${idx + 1}`}
                   onLoad={() => setImageLoadStates(prev => ({ ...prev, [idx]: true }))}
                   onError={(e) => {
-                    // Fallback: try original URL if optimized fails
                     const target = e.target as HTMLImageElement;
                     if (target.src !== img) {
                       target.src = img;

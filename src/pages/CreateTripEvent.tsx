@@ -532,7 +532,13 @@ const CreateTripEvent = () => {
                   <div className="space-y-3">
                     <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">✓ Inclusions</Label>
                     <div className="flex gap-2">
-                      <StyledInput value={newInclusion} onChange={(e) => setNewInclusion(e.target.value)} placeholder="e.g. Transport, Meals, Guide" onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); if (newInclusion.trim()) { setInclusions([...inclusions, newInclusion.trim()]); setNewInclusion(""); } } }} />
+                      <StyledInput value={newInclusion} onChange={(e) => {
+                        const val = e.target.value;
+                        if (val.endsWith(',') || val.endsWith('.')) {
+                          const item = val.slice(0, -1).trim();
+                          if (item) { setInclusions([...inclusions, item]); setNewInclusion(""); }
+                        } else { setNewInclusion(val); }
+                      }} placeholder="Type & press comma or fullstop to add" onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); if (newInclusion.trim()) { setInclusions([...inclusions, newInclusion.trim()]); setNewInclusion(""); } } }} />
                       <Button type="button" onClick={() => { if (newInclusion.trim()) { setInclusions([...inclusions, newInclusion.trim()]); setNewInclusion(""); } }} className="rounded-xl shrink-0" style={{ background: COLORS.TEAL }}>Add</Button>
                     </div>
                     <div className="flex flex-wrap gap-2">
@@ -548,7 +554,13 @@ const CreateTripEvent = () => {
                   <div className="space-y-3">
                     <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">✗ Exclusions</Label>
                     <div className="flex gap-2">
-                      <StyledInput value={newExclusion} onChange={(e) => setNewExclusion(e.target.value)} placeholder="e.g. Personal expenses, Insurance" onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); if (newExclusion.trim()) { setExclusions([...exclusions, newExclusion.trim()]); setNewExclusion(""); } } }} />
+                      <StyledInput value={newExclusion} onChange={(e) => {
+                        const val = e.target.value;
+                        if (val.endsWith(',') || val.endsWith('.')) {
+                          const item = val.slice(0, -1).trim();
+                          if (item) { setExclusions([...exclusions, item]); setNewExclusion(""); }
+                        } else { setNewExclusion(val); }
+                      }} placeholder="Type & press comma or fullstop to add" onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); if (newExclusion.trim()) { setExclusions([...exclusions, newExclusion.trim()]); setNewExclusion(""); } } }} />
                       <Button type="button" onClick={() => { if (newExclusion.trim()) { setExclusions([...exclusions, newExclusion.trim()]); setNewExclusion(""); } }} className="rounded-xl shrink-0 bg-slate-600 hover:bg-slate-700">Add</Button>
                     </div>
                     <div className="flex flex-wrap gap-2">

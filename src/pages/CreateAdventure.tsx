@@ -104,7 +104,7 @@ interface AmenityTagInputProps {
 
 const AmenityTagInput = ({ tags, input, onInputChange, onAdd, onRemove, hasError }: AmenityTagInputProps) => {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "," || e.key === "Enter") {
+    if (e.key === "," || e.key === "Enter" || e.key === ".") {
       e.preventDefault();
       onAdd();
     }

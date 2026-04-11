@@ -104,6 +104,10 @@ const EditListing = () => {
   const [generalFacilities, setGeneralFacilities] = useState<string[]>([]);
   const [facilities, setFacilities] = useState<FacilityWithImages[]>([]);
   const [activities, setActivities] = useState<ActivityWithImages[]>([]);
+  const [inclusions, setInclusions] = useState<string[]>([]);
+  const [exclusions, setExclusions] = useState<string[]>([]);
+  const [newInclusion, setNewInclusion] = useState("");
+  const [newExclusion, setNewExclusion] = useState("");
 
   useEffect(() => {
     if (!user || !id || !type) {
@@ -201,6 +205,8 @@ const EditListing = () => {
         setAvailableSlots((data as any).available_tickets || 0);
         setPrice((data as any).price || 0);
         setPriceChild((data as any).price_child || 0);
+        setInclusions((data as any).inclusions || []);
+        setExclusions((data as any).exclusions || []);
       }
 
       if (type === 'hotel' || type === 'adventure') {
@@ -485,6 +491,16 @@ const EditListing = () => {
           break;
         case "activities":
           updateData.activities = activities;
+          break;
+        case "inclusions":
+          if (type === "trip") {
+            updateData.inclusions = inclusions.filter(Boolean);
+          }
+          break;
+        case "exclusions":
+          if (type === "trip") {
+            updateData.exclusions = exclusions.filter(Boolean);
+          }
           break;
         case "entranceFee":
           if (type === "adventure") {
@@ -1071,6 +1087,103 @@ const EditListing = () => {
             <p className="text-sm text-muted-foreground">{description || "No description"}</p>
           )}
         </div>
+
+        {/* Inclusions & Exclusions for trips */}
+        {type === "trip" && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+            <div className="bg-white rounded-xl border border-slate-100 p-4 shadow-sm">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4 text-emerald-500" />
+                  <span className="text-sm font-bold text-slate-500 uppercase tracking-tight">Inclusions</span>
+                </div>
+                <EditButton field="inclusions" onSave={() => handleSaveField("inclusions")} />
+              </div>
+              {editMode.inclusions ? (
+                <div className="space-y-2">
+                  <div className="flex gap-2">
+                    <Input
+                      value={newInclusion}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (val.endsWith(',') || val.endsWith('.')) {
+                          const item = val.slice(0, -1).trim();
+                          if (item) { setInclusions(prev => [...prev, item]); setNewInclusion(""); }
+                        } else { setNewInclusion(val); }
+                      }}
+                      onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); if (newInclusion.trim()) { setInclusions(prev => [...prev, newInclusion.trim()]); setNewInclusion(""); } } }}
+                      placeholder="Type & press comma to add"
+                      className="border-[#008080]/30 focus:border-[#008080] h-8"
+                    />
+                    <Button size="sm" onClick={() => { if (newInclusion.trim()) { setInclusions(prev => [...prev, newInclusion.trim()]); setNewInclusion(""); } }} className="bg-[#008080] h-8">
+                      <Plus className="h-3 w-3" />
+                    </Button>
+                  </div>
+                  <div className="flex flex-wrap gap-1">
+                    {inclusions.map((item, i) => (
+                      <span key={i} className="flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200">
+                        ✓ {item}
+                        <button onClick={() => setInclusions(prev => prev.filter((_, idx) => idx !== i))} className="hover:text-red-500"><X className="h-3 w-3" /></button>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-wrap gap-1">
+                  {inclusions.length > 0 ? inclusions.map((item, i) => (
+                    <Badge key={i} variant="secondary" className="text-xs bg-emerald-50 text-emerald-700">✓ {item}</Badge>
+                  )) : <p className="text-sm text-muted-foreground">None</p>}
+                </div>
+              )}
+            </div>
+
+            <div className="bg-white rounded-xl border border-slate-100 p-4 shadow-sm">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <X className="h-4 w-4 text-red-500" />
+                  <span className="text-sm font-bold text-slate-500 uppercase tracking-tight">Exclusions</span>
+                </div>
+                <EditButton field="exclusions" onSave={() => handleSaveField("exclusions")} />
+              </div>
+              {editMode.exclusions ? (
+                <div className="space-y-2">
+                  <div className="flex gap-2">
+                    <Input
+                      value={newExclusion}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (val.endsWith(',') || val.endsWith('.')) {
+                          const item = val.slice(0, -1).trim();
+                          if (item) { setExclusions(prev => [...prev, item]); setNewExclusion(""); }
+                        } else { setNewExclusion(val); }
+                      }}
+                      onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); if (newExclusion.trim()) { setExclusions(prev => [...prev, newExclusion.trim()]); setNewExclusion(""); } } }}
+                      placeholder="Type & press comma to add"
+                      className="border-[#008080]/30 focus:border-[#008080] h-8"
+                    />
+                    <Button size="sm" onClick={() => { if (newExclusion.trim()) { setExclusions(prev => [...prev, newExclusion.trim()]); setNewExclusion(""); } }} className="bg-slate-600 h-8">
+                      <Plus className="h-3 w-3" />
+                    </Button>
+                  </div>
+                  <div className="flex flex-wrap gap-1">
+                    {exclusions.map((item, i) => (
+                      <span key={i} className="flex items-center gap-1 px-2 py-1 rounded-full bg-red-50 text-red-600 text-xs font-bold border border-red-200">
+                        ✗ {item}
+                        <button onClick={() => setExclusions(prev => prev.filter((_, idx) => idx !== i))} className="hover:text-red-800"><X className="h-3 w-3" /></button>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-wrap gap-1">
+                  {exclusions.length > 0 ? exclusions.map((item, i) => (
+                    <Badge key={i} variant="secondary" className="text-xs bg-red-50 text-red-600">✗ {item}</Badge>
+                  )) : <p className="text-sm text-muted-foreground">None</p>}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Amenities, Facilities, Activities - Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
