@@ -492,6 +492,16 @@ const EditListing = () => {
         case "activities":
           updateData.activities = activities;
           break;
+        case "inclusions":
+          if (type === "trip") {
+            updateData.inclusions = inclusions.filter(Boolean);
+          }
+          break;
+        case "exclusions":
+          if (type === "trip") {
+            updateData.exclusions = exclusions.filter(Boolean);
+          }
+          break;
         case "entranceFee":
           if (type === "adventure") {
             updateData.entry_fee_type = entranceFeeType;
