@@ -210,13 +210,6 @@ export const Footer = ({ className = "" }: { className?: string }) => {
 
         {/* --- BOTTOM SECTION: Disclosure & Copyright --- */}
         <div className="mt-12 space-y-8">
-          <div className="bg-white border border-slate-200 rounded-2xl p-5 flex items-start gap-4 shadow-sm">
-            <Info className="h-5 w-5 text-teal-600 shrink-0 mt-0.5" />
-            <p className="text-xs leading-relaxed text-slate-500">
-              <strong>{t('footer.transparency')}</strong> {t('footer.transparencyText')} <strong>{t('footer.transparencyHighlight')}</strong>. {t('footer.transparencyEnd')}
-            </p>
-          </div>
-
           <div className="border-t border-slate-200 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] font-black uppercase tracking-widest text-slate-400">
             <p>{t('footer.allRights')}</p>
             <div className="flex gap-4 items-center">
