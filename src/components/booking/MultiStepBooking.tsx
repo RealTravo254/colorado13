@@ -1,4 +1,4 @@
- import { useState, useEffect } from "react";
+ import { useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
  import { Button } from "@/components/ui/button";
  import { Input } from "@/components/ui/input";
@@ -6,7 +6,7 @@ import { useSearchParams } from "react-router-dom";
  import { Calendar } from "@/components/ui/calendar";
  import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
  import { format, addDays, isBefore, isAfter, parseISO } from "date-fns";
- import { CalendarIcon, Users, Check, Loader2, Minus, Plus, Ticket } from "lucide-react";
+ import { CalendarIcon, Users, Check, Loader2, Minus, Plus, Ticket, AlertCircle } from "lucide-react";
  import { cn } from "@/lib/utils";
  import { useAuth } from "@/contexts/AuthContext";
  import { supabase } from "@/integrations/supabase/client";
