@@ -619,7 +619,8 @@ const Index = () => {
                   const isVisible = idx < 4;
                   const counts = countyCounts[county] || { adventures: 0, guidedTrips: 0 };
                   const total = counts.adventures + counts.guidedTrips;
-                  const displayCount = total > 1000 ? "1000+" : String(total);
+                  const countsLoaded = Object.keys(countyCounts).length > 0;
+                  const displayCount = !countsLoaded ? null : total > 999 ? "999+" : String(total);
                   return (
                     <div
                       key={county}
@@ -637,7 +638,13 @@ const Index = () => {
                         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
                         <div className="absolute bottom-0 left-0 right-0 p-2">
                           <h3 className="text-white font-extrabold text-[10px] sm:text-xs leading-tight">{county}</h3>
-                          <p className="text-white/70 text-[8px] font-bold mt-0.5">{displayCount} listings</p>
+                          <p className="text-white/70 text-[8px] font-bold mt-0.5 flex items-center gap-1">
+                            {displayCount === null ? (
+                              <Loader2 className="h-2.5 w-2.5 animate-spin" />
+                            ) : (
+                              <>{displayCount} listings</>
+                            )}
+                          </p>
                         </div>
                       </div>
                     </div>
