@@ -13,7 +13,7 @@ import { useRatings, sortByRating } from "@/hooks/useRatings";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-const TABS = ["All", "Adventure Places", "Guided Trips"] as const;
+const TABS = ["All", "Adventure Places", "Guided Trips", "Events", "Fixed Trips"] as const;
 type Tab = typeof TABS[number];
 const ITEMS_PER_PAGE = 12;
 
@@ -40,7 +40,7 @@ const CountyDetail = () => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      const [adventuresRes, guidedRes] = await Promise.all([
+      const [adventuresRes, guidedRes, eventsRes, fixedTripsRes] = await Promise.all([
         supabase.from("adventure_places")
           .select("id,name,location,place,country,image_url,gallery_images,images,entry_fee,activities,latitude,longitude,created_at,description,opening_hours,closing_hours")
           .eq("approval_status", "approved").eq("is_hidden", false).eq("place", decodedCounty),
@@ -48,10 +48,19 @@ const CountyDetail = () => {
           .select("id,name,location,place,country,image_url,gallery_images,images,date,is_custom_date,is_flexible_date,available_tickets,activities,type,created_at,price,price_child,description,opening_hours,closing_hours")
           .eq("approval_status", "approved").eq("is_hidden", false).eq("type", "trip")
           .or("is_flexible_date.eq.true,is_custom_date.eq.true").eq("place", decodedCounty),
+        supabase.from("trips")
+          .select("id,name,location,place,country,image_url,gallery_images,images,date,is_custom_date,is_flexible_date,available_tickets,activities,type,created_at,price,price_child,description,opening_hours,closing_hours")
+          .eq("approval_status", "approved").eq("is_hidden", false).eq("type", "event").eq("place", decodedCounty),
+        supabase.from("trips")
+          .select("id,name,location,place,country,image_url,gallery_images,images,date,is_custom_date,is_flexible_date,available_tickets,activities,type,created_at,price,price_child,description,opening_hours,closing_hours")
+          .eq("approval_status", "approved").eq("is_hidden", false).eq("type", "trip")
+          .eq("is_flexible_date", false).eq("is_custom_date", false).eq("place", decodedCounty),
       ]);
       const combined = [
         ...(adventuresRes.data || []).map((i: any) => ({ ...i, itemType: "ADVENTURE PLACE" })),
         ...(guidedRes.data || []).map((i: any) => ({ ...i, itemType: "TRIP" })),
+        ...(eventsRes.data || []).map((i: any) => ({ ...i, itemType: "EVENT" })),
+        ...(fixedTripsRes.data || []).map((i: any) => ({ ...i, itemType: "FIXED TRIP" })),
       ];
       setItems(combined);
       setLoading(false);
@@ -67,6 +76,8 @@ const CountyDetail = () => {
     let result = sorted;
     if (activeTab === "Adventure Places") result = result.filter(i => i.itemType === "ADVENTURE PLACE");
     else if (activeTab === "Guided Trips") result = result.filter(i => i.itemType === "TRIP");
+    else if (activeTab === "Events") result = result.filter(i => i.itemType === "EVENT");
+    else if (activeTab === "Fixed Trips") result = result.filter(i => i.itemType === "FIXED TRIP");
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       result = result.filter(i => i.name?.toLowerCase().includes(q) || i.location?.toLowerCase().includes(q));
