@@ -2,6 +2,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 const EAST_AFRICAN_COUNTRIES = [
   { name: "Kenya", code: "KE", flag: "🇰🇪" },
+  { name: "Other", code: "OTHER", flag: "🌍" },
 ];
 
 interface CountrySelectorProps {
