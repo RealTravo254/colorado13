@@ -152,8 +152,52 @@ const CORAL = "#FF7F50";
         }]);
       }
     }
-  }, [searchParams, facilities]);
- 
+   }, [searchParams, facilities]);
+
+   // Fetch booked date ranges for all facilities
+   const fetchFacilityBookedDates = useCallback(async () => {
+     if (!itemId || facilities.length === 0) return;
+     try {
+       const { data } = await supabase
+         .from("bookings")
+         .select("booking_details")
+         .eq("item_id", itemId)
+         .in("status", ["confirmed", "pending"])
+         .neq("payment_status", "failed");
+
+       const rangesMap: Record<string, { startDate: string; endDate: string }[]> = {};
+       data?.forEach((booking: any) => {
+         const details = booking.booking_details;
+         if (!details?.facilities) return;
+         const bFacilities = Array.isArray(details.facilities) ? details.facilities : [];
+         bFacilities.forEach((f: any) => {
+           if (f.name && f.startDate && f.endDate) {
+             if (!rangesMap[f.name]) rangesMap[f.name] = [];
+             rangesMap[f.name].push({ startDate: f.startDate, endDate: f.endDate });
+           }
+         });
+       });
+       setFacilityBookedRanges(rangesMap);
+     } catch (err) {
+       console.error("Error fetching facility booked dates:", err);
+     }
+   }, [itemId, facilities]);
+
+   useEffect(() => {
+     fetchFacilityBookedDates();
+   }, [fetchFacilityBookedDates]);
+
+   const isFacilityDateBooked = useCallback((facilityName: string, date: Date): boolean => {
+     const ranges = facilityBookedRanges[facilityName] || [];
+     const dateStr = format(date, "yyyy-MM-dd");
+     return ranges.some(r => dateStr >= r.startDate && dateStr < r.endDate);
+   }, [facilityBookedRanges]);
+
+   const isFacilityRangeAvailable = useCallback((facilityName: string, startDate: string, endDate: string): boolean => {
+     const ranges = facilityBookedRanges[facilityName] || [];
+     return !ranges.some(r => startDate < r.endDate && endDate > r.startDate);
+   }, [facilityBookedRanges]);
+
    const steps = [];
 
   if (isFacilityOnlyMode) {
