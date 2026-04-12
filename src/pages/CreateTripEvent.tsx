@@ -346,15 +346,19 @@ const CreateTripEvent = () => {
                   </div>
                   <div className="space-y-2">
                     <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Country *</Label>
-                    <div className={validationErrors.includes("country") ? "rounded-xl ring-1 ring-red-500" : ""}><CountrySelector value={formData.country} onChange={(val) => { setFormData({...formData, country: val}); setValidationErrors(prev => prev.filter(err => err !== "country")); }} /></div>
+                    <div className={validationErrors.includes("country") ? "rounded-xl ring-1 ring-red-500" : ""}><CountrySelector value={formData.country} onChange={(val) => { setFormData({...formData, country: val, place: val === "Other" ? "" : formData.place}); setValidationErrors(prev => prev.filter(err => err !== "country")); }} /></div>
                     {validationErrors.includes("country") && <p className="text-red-500 text-[10px] font-bold">⚠ Country is required</p>}
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">County *</Label>
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">{formData.country === "Other" ? "Region / City *" : "County *"}</Label>
                     <div className={validationErrors.includes("place") ? "rounded-xl ring-1 ring-red-500" : ""}>
-                      <CountySelector value={formData.place} onChange={(val) => { setFormData({...formData, place: val}); setValidationErrors(prev => prev.filter(err => err !== "place")); }} />
+                      {formData.country === "Other" ? (
+                        <StyledInput value={formData.place} onChange={(e) => { setFormData({...formData, place: e.target.value}); setValidationErrors(prev => prev.filter(err => err !== "place")); }} placeholder="e.g. Dar es Salaam" />
+                      ) : (
+                        <CountySelector value={formData.place} onChange={(val) => { setFormData({...formData, place: val}); setValidationErrors(prev => prev.filter(err => err !== "place")); }} />
+                      )}
                     </div>
-                    {validationErrors.includes("place") && <p className="text-red-500 text-[10px] font-bold">⚠ County is required</p>}
+                    {validationErrors.includes("place") && <p className="text-red-500 text-[10px] font-bold">⚠ {formData.country === "Other" ? "Region/City" : "County"} is required</p>}
                   </div>
                   <div className="space-y-2 md:col-span-2">
                     <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Specific Location *</Label>

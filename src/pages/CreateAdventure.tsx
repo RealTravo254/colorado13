@@ -738,7 +738,7 @@ const CreateAdventure = () => {
                 <div className="space-y-2">
                   <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Country *</Label>
                   <div className={cn("rounded-xl", isMissing(formData.country) && "border-2 border-red-500 overflow-hidden")}>
-                    <CountrySelector value={formData.country} onChange={(v) => setFormData({ ...formData, country: v })} />
+                    <CountrySelector value={formData.country} onChange={(v) => setFormData({ ...formData, country: v, place: v === "Other" ? "" : formData.place })} />
                   </div>
                 </div>
               </div>
@@ -762,9 +762,15 @@ const CreateAdventure = () => {
                     className={cn("rounded-xl h-12 font-bold", isMissing(formData.locationName) && "border-red-500 bg-red-50")} />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">County *</Label>
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">{formData.country === "Other" ? "Region / City *" : "County *"}</Label>
                   <div className={cn("rounded-xl", isMissing(formData.place) && "border-2 border-red-500 overflow-hidden")}>
-                    <CountySelector value={formData.place} onChange={(v) => setFormData({ ...formData, place: v })} />
+                    {formData.country === "Other" ? (
+                      <Input value={formData.place} onChange={(e) => setFormData({ ...formData, place: e.target.value })}
+                        placeholder="e.g. Dar es Salaam"
+                        className={cn("rounded-xl h-12 font-bold", isMissing(formData.place) && "border-red-500 bg-red-50")} />
+                    ) : (
+                      <CountySelector value={formData.place} onChange={(v) => setFormData({ ...formData, place: v })} />
+                    )}
                   </div>
                 </div>
               </div>
