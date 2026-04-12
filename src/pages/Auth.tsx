@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { SignupForm } from "@/components/auth/SignupForm";
@@ -10,12 +10,14 @@ const Auth = () => {
   const [activeTab, setActiveTab] = useState<"login" | "signup">("login");
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const returnTo = (location.state as any)?.returnTo || "/";
 
   useEffect(() => {
     if (!loading && user) {
-      navigate("/");
+      navigate(returnTo);
     }
-  }, [user, loading, navigate]);
+  }, [user, loading, navigate, returnTo]);
 
   if (loading) {
     return <div className="min-h-screen bg-background animate-pulse" />;
@@ -84,13 +86,13 @@ const Auth = () => {
         <div className="flex items-center justify-between p-4 lg:p-8 lg:pb-0">
           <button
             onClick={() => navigate("/")}
-            className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+            className="hidden lg:flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             <span className="text-sm font-medium">Back</span>
           </button>
           <img src="/fulllogo.png" alt="Realtravo" className="h-7 lg:hidden" />
-          <div className="w-16" />
+          <div className="w-16 lg:hidden" />
         </div>
 
         {/* Form area */}

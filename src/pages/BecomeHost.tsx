@@ -333,8 +333,10 @@ const BecomeHost = () => {
             />
           )}
 
-          {/* Flexible/Guided Trips - visible for guides or legacy verified users */}
-          {((hostingCategory === 'guide' && verificationStatus === 'approved') || (verificationStatus === 'approved' && !hostingCategory)) && (
+          {/* Flexible/Guided Trips - visible for guides, companies, or legacy verified users */}
+          {((hostingCategory === 'guide' && verificationStatus === 'approved') || 
+            (hasCompany && companyStatus === 'approved') ||
+            (verificationStatus === 'approved' && !hostingCategory)) && (
             <HostCategoryCard 
               title="Guided Tours"
               subtitle="Flexible & Custom-Date Trips"
@@ -361,6 +363,20 @@ const BecomeHost = () => {
               onManage={() => navigate("/host/trips")}
               onAdd={() => navigate("/create-event")}
               accentColor={COLORS.KHAKI_DARK}
+            />
+          )}
+
+          {/* Adventure Places - visible for campsite hosts or legacy verified users */}
+          {(hostingCategory === 'campsite' || (verificationStatus === 'approved' && !hostingCategory)) && (
+            <HostCategoryCard 
+              title="Adventure Places"
+              subtitle="Campsites & Nature"
+              image="/images/category-campsite.webp"
+              icon={<Tent className="h-8 w-8" />}
+              count={myContent.filter(i => i.contentType === 'adventure').length}
+              onManage={() => navigate("/host/experiences")}
+              onAdd={() => navigate("/create-adventure")}
+              accentColor={COLORS.CORAL}
             />
           )}
         </div>

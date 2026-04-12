@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSafeBack } from "@/hooks/useSafeBack";
+import { useBookingNavigate } from "@/hooks/useBookingNavigate";
 
 import { Button } from "@/components/ui/button";
 import { MapPin, Share2, Heart, Calendar, Copy, CheckCircle2, ArrowLeft, Star, Phone, Mail, Clock, Users } from "lucide-react";
@@ -57,6 +58,7 @@ const EventDetail = () => {
   const { slug: rawSlug } = useParams();
   const navigate = useNavigate();
   const goBack = useSafeBack();
+  const navigateToBooking = useBookingNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
   const { formatPrice } = useCurrency();
@@ -415,7 +417,7 @@ const EventDetail = () => {
               </div>
 
               <Button
-                onClick={() => navigate(`/booking/event/${event.id}`)}
+                onClick={() => navigateToBooking(`/booking/event/${event.id}`)}
                 disabled={!canBook}
                 className="w-full py-8 rounded-2xl text-md font-black uppercase tracking-[0.2em] text-white shadow-xl transition-all active:scale-95 border-none"
                 style={{ background: !canBook ? "#cbd5e1" : `linear-gradient(135deg, ${COLORS.CORAL_LIGHT} 0%, ${COLORS.CORAL} 100%)`, boxShadow: !canBook ? "none" : `0 12px 24px -8px ${COLORS.CORAL}88` }}
@@ -510,7 +512,7 @@ const EventDetail = () => {
             )}
           </div>
           <Button
-            onClick={() => navigate(`/booking/event/${event.id}`)}
+            onClick={() => navigateToBooking(`/booking/event/${event.id}`)}
             disabled={!canBook}
             className="px-6 py-5 rounded-xl text-xs font-black uppercase tracking-widest text-white border-none"
             style={{ background: !canBook ? "#cbd5e1" : `linear-gradient(135deg, ${COLORS.CORAL_LIGHT} 0%, ${COLORS.CORAL} 100%)` }}

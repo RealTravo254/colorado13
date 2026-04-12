@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSafeBack } from "@/hooks/useSafeBack";
+import { useBookingNavigate } from "@/hooks/useBookingNavigate";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -33,6 +34,7 @@ const AdventurePlaceDetail = () => {
   const id = rawSlug ? extractIdFromSlug(rawSlug) : null;
   const navigate = useNavigate();
   const goBack = useSafeBack();
+  const navigateToBooking = useBookingNavigate();
   const { toast } = useToast();
   const { position, requestLocation } = useGeolocation();
   const { formatPrice } = useCurrency();
@@ -466,7 +468,7 @@ const AdventurePlaceDetail = () => {
               </div>
 
               <Button
-                onClick={() => navigate(`/booking/adventure_place/${resolvedId}`)}
+                onClick={() => navigateToBooking(`/booking/adventure_place/${resolvedId}`)}
                 className="w-full py-6 rounded-xl text-sm font-bold bg-emerald-600 hover:bg-emerald-700 border-none shadow-md"
               >
                 Check availability
@@ -564,7 +566,7 @@ const AdventurePlaceDetail = () => {
               </div>
 
               <Button
-                onClick={() => navigate(`/booking/adventure_place/${resolvedId}`)}
+                onClick={() => navigateToBooking(`/booking/adventure_place/${resolvedId}`)}
                 className="w-full py-6 rounded-xl text-sm font-bold bg-emerald-600 hover:bg-emerald-700 border-none shadow-md"
               >
                 Check availability
@@ -672,7 +674,7 @@ const AdventurePlaceDetail = () => {
             )}
           </div>
           <Button
-            onClick={() => navigate(`/booking/adventure_place/${resolvedId}`)}
+            onClick={() => navigateToBooking(`/booking/adventure_place/${resolvedId}`)}
             className="px-6 py-5 rounded-xl text-sm font-bold text-white border-none bg-emerald-600 hover:bg-emerald-700"
           >
             Check availability

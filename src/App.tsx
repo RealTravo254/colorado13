@@ -8,6 +8,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { CurrencyProvider } from "@/contexts/CurrencyContext";
 import { PageLayout } from "@/components/PageLayout";
 import { ScrollToTop } from "@/components/ScrollToTop";
+import { AuthGate } from "@/components/AuthGate";
 
  
 import { TealLoader } from "@/components/ui/teal-loader";
@@ -121,6 +122,7 @@ const App = () => {
           <AuthProvider>
             <CurrencyProvider>
             <ScrollToTop />
+            <AuthGate>
             <PageLayout>
               <Suspense fallback={<SuspenseFallback />}>
                 <div className="w-full">
@@ -194,6 +196,7 @@ const App = () => {
                 </div>
               </Suspense>
             </PageLayout>
+            </AuthGate>
             </CurrencyProvider>
           </AuthProvider>
         </BrowserRouter>

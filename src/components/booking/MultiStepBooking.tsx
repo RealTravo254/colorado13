@@ -1,4 +1,4 @@
- import { useState, useEffect } from "react";
+ import { useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
  import { Button } from "@/components/ui/button";
  import { Input } from "@/components/ui/input";
@@ -6,7 +6,7 @@ import { useSearchParams } from "react-router-dom";
  import { Calendar } from "@/components/ui/calendar";
  import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
  import { format, addDays, isBefore, isAfter, parseISO } from "date-fns";
- import { CalendarIcon, Users, Check, Loader2, Minus, Plus, Ticket } from "lucide-react";
+ import { CalendarIcon, Users, Check, Loader2, Minus, Plus, Ticket, AlertCircle } from "lucide-react";
  import { cn } from "@/lib/utils";
  import { useAuth } from "@/contexts/AuthContext";
  import { supabase } from "@/integrations/supabase/client";
@@ -77,6 +77,7 @@ const CORAL = "#FF7F50";
    isProcessing,
    isCompleted,
    itemName,
+   itemId,
    priceAdult = 0,
    priceChild = 0,
    activities = [],
@@ -111,8 +112,10 @@ const CORAL = "#FF7F50";
    >([]);
   const [isFacilityOnlyMode, setIsFacilityOnlyMode] = useState(false);
   const [ticketSelections, setTicketSelections] = useState<{ name: string; price: number; quantity: number }[]>(
-    ticketTypes.map(t => ({ name: t.name, price: t.price, quantity: 0 }))
-  );
+     ticketTypes.map(t => ({ name: t.name, price: t.price, quantity: 0 }))
+   );
+   const [facilityBookedRanges, setFacilityBookedRanges] = useState<Record<string, { startDate: string; endDate: string }[]>>({});
+   const [dateConflictWarning, setDateConflictWarning] = useState<string | null>(null);
 
   const hasTicketTypes = ticketTypes.length > 0;
  
@@ -150,8 +153,52 @@ const CORAL = "#FF7F50";
         }]);
       }
     }
-  }, [searchParams, facilities]);
- 
+   }, [searchParams, facilities]);
+
+   // Fetch booked date ranges for all facilities
+   const fetchFacilityBookedDates = useCallback(async () => {
+     if (!itemId || facilities.length === 0) return;
+     try {
+       const { data } = await supabase
+         .from("bookings")
+         .select("booking_details")
+         .eq("item_id", itemId)
+         .in("status", ["confirmed", "pending"])
+         .neq("payment_status", "failed");
+
+       const rangesMap: Record<string, { startDate: string; endDate: string }[]> = {};
+       data?.forEach((booking: any) => {
+         const details = booking.booking_details;
+         if (!details?.facilities) return;
+         const bFacilities = Array.isArray(details.facilities) ? details.facilities : [];
+         bFacilities.forEach((f: any) => {
+           if (f.name && f.startDate && f.endDate) {
+             if (!rangesMap[f.name]) rangesMap[f.name] = [];
+             rangesMap[f.name].push({ startDate: f.startDate, endDate: f.endDate });
+           }
+         });
+       });
+       setFacilityBookedRanges(rangesMap);
+     } catch (err) {
+       console.error("Error fetching facility booked dates:", err);
+     }
+   }, [itemId, facilities]);
+
+   useEffect(() => {
+     fetchFacilityBookedDates();
+   }, [fetchFacilityBookedDates]);
+
+   const isFacilityDateBooked = useCallback((facilityName: string, date: Date): boolean => {
+     const ranges = facilityBookedRanges[facilityName] || [];
+     const dateStr = format(date, "yyyy-MM-dd");
+     return ranges.some(r => dateStr >= r.startDate && dateStr < r.endDate);
+   }, [facilityBookedRanges]);
+
+   const isFacilityRangeAvailable = useCallback((facilityName: string, startDate: string, endDate: string): boolean => {
+     const ranges = facilityBookedRanges[facilityName] || [];
+     return !ranges.some(r => startDate < r.endDate && endDate > r.startDate);
+   }, [facilityBookedRanges]);
+
    const steps = [];
 
   if (isFacilityOnlyMode) {
@@ -253,9 +300,17 @@ const CORAL = "#FF7F50";
     }
   };
 
-  const updateFacilityDates = (name: string, startDate?: string, endDate?: string) => {
-    setSelectedFacilities(selectedFacilities.map((f) => f.name === name ? { ...f, startDate, endDate } : f));
-  };
+   const updateFacilityDates = (name: string, startDate?: string, endDate?: string) => {
+     // Validate no overlap with booked dates
+     if (startDate && endDate) {
+       if (!isFacilityRangeAvailable(name, startDate, endDate)) {
+         setDateConflictWarning(`Selected dates for ${name} overlap with an existing booking. Please choose different dates.`);
+         return;
+       }
+       setDateConflictWarning(null);
+     }
+     setSelectedFacilities(selectedFacilities.map((f) => f.name === name ? { ...f, startDate, endDate } : f));
+   };
 
   const updateTicketQuantity = (name: string, quantity: number) => {
     setTicketSelections(ticketSelections.map(t => t.name === name ? { ...t, quantity: Math.max(0, Math.min(quantity, totalCapacity)) } : t));
@@ -335,17 +390,53 @@ const CORAL = "#FF7F50";
                   </div>
                 </div>
                 {isSelected && (
-                  <div className="mt-4 grid grid-cols-2 gap-3">
-                    <div>
-                      <Label className="text-[10px] font-black uppercase text-slate-400">Check-in</Label>
-                      <Input type="date" className="rounded-xl" value={selected?.startDate || ""} min={format(new Date(), "yyyy-MM-dd")} onChange={(e) => updateFacilityDates(facility.name, e.target.value, selected?.endDate)} />
+                  <div className="mt-4 space-y-3">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label className="text-[10px] font-black uppercase text-slate-400">Check-in</Label>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button variant="outline" className={cn("w-full justify-start text-left font-bold rounded-xl h-10 text-xs", !selected?.startDate && "text-muted-foreground")}>
+                              <CalendarIcon className="mr-2 h-3 w-3" style={{ color: TEAL }} />
+                              {selected?.startDate ? format(parseISO(selected.startDate), "MMM d, yyyy") : "Select"}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar mode="single" selected={selected?.startDate ? parseISO(selected.startDate) : undefined} onSelect={(date) => { if (date) updateFacilityDates(facility.name, format(date, "yyyy-MM-dd"), selected?.endDate); }}
+                              disabled={(date) => isBefore(date, new Date()) || isFacilityDateBooked(facility.name, date)}
+                              modifiers={{ booked: (date) => isFacilityDateBooked(facility.name, date) }}
+                              modifiersStyles={{ booked: { backgroundColor: '#fee2e2', color: '#ef4444', textDecoration: 'line-through' } }}
+                              initialFocus />
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+                      <div>
+                        <Label className="text-[10px] font-black uppercase text-slate-400">Check-out</Label>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button variant="outline" className={cn("w-full justify-start text-left font-bold rounded-xl h-10 text-xs", !selected?.endDate && "text-muted-foreground")}>
+                              <CalendarIcon className="mr-2 h-3 w-3" style={{ color: TEAL }} />
+                              {selected?.endDate ? format(parseISO(selected.endDate), "MMM d, yyyy") : "Select"}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar mode="single" selected={selected?.endDate ? parseISO(selected.endDate) : undefined} onSelect={(date) => { if (date) updateFacilityDates(facility.name, selected?.startDate, format(date, "yyyy-MM-dd")); }}
+                              disabled={(date) => isBefore(date, selected?.startDate ? parseISO(selected.startDate) : new Date()) || isFacilityDateBooked(facility.name, date)}
+                              modifiers={{ booked: (date) => isFacilityDateBooked(facility.name, date) }}
+                              modifiersStyles={{ booked: { backgroundColor: '#fee2e2', color: '#ef4444', textDecoration: 'line-through' } }}
+                              initialFocus />
+                          </PopoverContent>
+                        </Popover>
+                      </div>
                     </div>
-                    <div>
-                      <Label className="text-[10px] font-black uppercase text-slate-400">Check-out</Label>
-                      <Input type="date" className="rounded-xl" value={selected?.endDate || ""} min={selected?.startDate || format(new Date(), "yyyy-MM-dd")} onChange={(e) => updateFacilityDates(facility.name, selected?.startDate, e.target.value)} />
-                    </div>
+                    {dateConflictWarning && (
+                      <div className="flex items-center gap-2 text-xs text-red-500 bg-red-50 p-2 rounded-xl">
+                        <AlertCircle className="h-3 w-3 flex-shrink-0" />
+                        <span>{dateConflictWarning}</span>
+                      </div>
+                    )}
                     {selected?.startDate && selected?.endDate && (
-                      <div className="col-span-2 text-sm font-bold" style={{ color: TEAL }}>
+                      <div className="text-sm font-bold" style={{ color: TEAL }}>
                         {Math.max(1, Math.ceil((new Date(selected.endDate).getTime() - new Date(selected.startDate).getTime()) / (1000 * 60 * 60 * 24)))} nights — {formatPrice(facility.price * Math.max(1, Math.ceil((new Date(selected.endDate).getTime() - new Date(selected.startDate).getTime()) / (1000 * 60 * 60 * 24))))}
                       </div>
                     )}
@@ -565,13 +656,47 @@ const CORAL = "#FF7F50";
                             <div className="grid grid-cols-2 gap-2">
                               <div>
                                 <Label className="text-[10px] font-black uppercase text-slate-400">Start Date</Label>
-                                <Input type="date" className="rounded-xl" value={selected?.startDate || ""} min={format(new Date(), "yyyy-MM-dd")} onChange={(e) => updateFacilityDates(facility.name, e.target.value, selected?.endDate)} />
+                                <Popover>
+                                  <PopoverTrigger asChild>
+                                    <Button variant="outline" className={cn("w-full justify-start text-left font-bold rounded-xl h-10 text-xs", !selected?.startDate && "text-muted-foreground")}>
+                                      <CalendarIcon className="mr-2 h-3 w-3" style={{ color: TEAL }} />
+                                      {selected?.startDate ? format(parseISO(selected.startDate), "MMM d") : "Select"}
+                                    </Button>
+                                  </PopoverTrigger>
+                                  <PopoverContent className="w-auto p-0" align="start">
+                                    <Calendar mode="single" selected={selected?.startDate ? parseISO(selected.startDate) : undefined} onSelect={(date) => { if (date) updateFacilityDates(facility.name, format(date, "yyyy-MM-dd"), selected?.endDate); }}
+                                      disabled={(date) => isBefore(date, new Date()) || isFacilityDateBooked(facility.name, date)}
+                                      modifiers={{ booked: (date) => isFacilityDateBooked(facility.name, date) }}
+                                      modifiersStyles={{ booked: { backgroundColor: '#fee2e2', color: '#ef4444', textDecoration: 'line-through' } }}
+                                      initialFocus />
+                                  </PopoverContent>
+                                </Popover>
                               </div>
                               <div>
                                 <Label className="text-[10px] font-black uppercase text-slate-400">End Date</Label>
-                                <Input type="date" className="rounded-xl" value={selected?.endDate || ""} min={selected?.startDate || format(new Date(), "yyyy-MM-dd")} onChange={(e) => updateFacilityDates(facility.name, selected?.startDate, e.target.value)} />
+                                <Popover>
+                                  <PopoverTrigger asChild>
+                                    <Button variant="outline" className={cn("w-full justify-start text-left font-bold rounded-xl h-10 text-xs", !selected?.endDate && "text-muted-foreground")}>
+                                      <CalendarIcon className="mr-2 h-3 w-3" style={{ color: TEAL }} />
+                                      {selected?.endDate ? format(parseISO(selected.endDate), "MMM d") : "Select"}
+                                    </Button>
+                                  </PopoverTrigger>
+                                  <PopoverContent className="w-auto p-0" align="start">
+                                    <Calendar mode="single" selected={selected?.endDate ? parseISO(selected.endDate) : undefined} onSelect={(date) => { if (date) updateFacilityDates(facility.name, selected?.startDate, format(date, "yyyy-MM-dd")); }}
+                                      disabled={(date) => isBefore(date, selected?.startDate ? parseISO(selected.startDate) : new Date()) || isFacilityDateBooked(facility.name, date)}
+                                      modifiers={{ booked: (date) => isFacilityDateBooked(facility.name, date) }}
+                                      modifiersStyles={{ booked: { backgroundColor: '#fee2e2', color: '#ef4444', textDecoration: 'line-through' } }}
+                                      initialFocus />
+                                  </PopoverContent>
+                                </Popover>
                               </div>
                             </div>
+                            {dateConflictWarning && (
+                              <div className="flex items-center gap-2 text-xs text-red-500 bg-red-50 p-2 rounded-xl">
+                                <AlertCircle className="h-3 w-3 flex-shrink-0" />
+                                <span>{dateConflictWarning}</span>
+                              </div>
+                            )}
                             {selected?.startDate && selected?.endDate && (
                               <div className="text-sm font-bold" style={{ color: TEAL }}>
                                 {Math.max(1, Math.ceil((new Date(selected.endDate).getTime() - new Date(selected.startDate).getTime()) / (1000 * 60 * 60 * 24)))} nights — {formatPrice(facility.price * Math.max(1, Math.ceil((new Date(selected.endDate).getTime() - new Date(selected.startDate).getTime()) / (1000 * 60 * 60 * 24))))}
