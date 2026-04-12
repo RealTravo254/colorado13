@@ -34,6 +34,7 @@ const AdventurePlaceDetail = () => {
   const id = rawSlug ? extractIdFromSlug(rawSlug) : null;
   const navigate = useNavigate();
   const goBack = useSafeBack();
+  const navigateToBooking = useBookingNavigate();
   const { toast } = useToast();
   const { position, requestLocation } = useGeolocation();
   const { formatPrice } = useCurrency();

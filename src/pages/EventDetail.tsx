@@ -58,6 +58,7 @@ const EventDetail = () => {
   const { slug: rawSlug } = useParams();
   const navigate = useNavigate();
   const goBack = useSafeBack();
+  const navigateToBooking = useBookingNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
   const { formatPrice } = useCurrency();
