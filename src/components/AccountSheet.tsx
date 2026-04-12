@@ -83,7 +83,7 @@ export const AccountSheet = ({ children }: AccountSheetProps) => {
     return (
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetTrigger asChild>{children}</SheetTrigger>
-        <SheetContent className="w-[85vw] max-w-sm sm:max-w-md p-0 border-none flex flex-col bg-primary">
+        <SheetContent className="w-[85vw] max-w-sm sm:max-w-md p-0 border-none flex flex-col bg-primary" style={{ paddingTop: 'env(safe-area-inset-top, 0px)', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
           <div className="px-6 pt-6 pb-4">
             <SheetHeader>
               <SheetTitle className="text-xl font-bold tracking-tight text-primary-foreground">
@@ -115,7 +115,7 @@ export const AccountSheet = ({ children }: AccountSheetProps) => {
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>{children}</SheetTrigger>
-      <SheetContent className="w-[85vw] max-w-sm sm:max-w-md p-0 border-none flex flex-col bg-primary">
+      <SheetContent className="w-[85vw] max-w-sm sm:max-w-md p-0 border-none flex flex-col bg-primary" style={{ paddingTop: 'env(safe-area-inset-top, 0px)', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
         {/* Header */}
         <div className="px-6 pt-6 pb-4">
           <SheetHeader>
