@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSafeBack } from "@/hooks/useSafeBack";
+import { useBookingNavigate } from "@/hooks/useBookingNavigate";
 
 import { Button } from "@/components/ui/button";
 import { MapPin, Share2, Heart, Calendar, Copy, CheckCircle2, ArrowLeft, Star, Phone, Mail, Clock, Users } from "lucide-react";
@@ -56,6 +57,7 @@ const TripDetail = () => {
   const { slug: rawSlug } = useParams();
   const navigate = useNavigate();
   const goBack = useSafeBack();
+  const navigateToBooking = useBookingNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
   const { formatPrice } = useCurrency();
