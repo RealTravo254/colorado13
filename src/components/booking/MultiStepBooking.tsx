@@ -656,13 +656,47 @@ const CORAL = "#FF7F50";
                             <div className="grid grid-cols-2 gap-2">
                               <div>
                                 <Label className="text-[10px] font-black uppercase text-slate-400">Start Date</Label>
-                                <Input type="date" className="rounded-xl" value={selected?.startDate || ""} min={format(new Date(), "yyyy-MM-dd")} onChange={(e) => updateFacilityDates(facility.name, e.target.value, selected?.endDate)} />
+                                <Popover>
+                                  <PopoverTrigger asChild>
+                                    <Button variant="outline" className={cn("w-full justify-start text-left font-bold rounded-xl h-10 text-xs", !selected?.startDate && "text-muted-foreground")}>
+                                      <CalendarIcon className="mr-2 h-3 w-3" style={{ color: TEAL }} />
+                                      {selected?.startDate ? format(parseISO(selected.startDate), "MMM d") : "Select"}
+                                    </Button>
+                                  </PopoverTrigger>
+                                  <PopoverContent className="w-auto p-0" align="start">
+                                    <Calendar mode="single" selected={selected?.startDate ? parseISO(selected.startDate) : undefined} onSelect={(date) => { if (date) updateFacilityDates(facility.name, format(date, "yyyy-MM-dd"), selected?.endDate); }}
+                                      disabled={(date) => isBefore(date, new Date()) || isFacilityDateBooked(facility.name, date)}
+                                      modifiers={{ booked: (date) => isFacilityDateBooked(facility.name, date) }}
+                                      modifiersStyles={{ booked: { backgroundColor: '#fee2e2', color: '#ef4444', textDecoration: 'line-through' } }}
+                                      initialFocus />
+                                  </PopoverContent>
+                                </Popover>
                               </div>
                               <div>
                                 <Label className="text-[10px] font-black uppercase text-slate-400">End Date</Label>
-                                <Input type="date" className="rounded-xl" value={selected?.endDate || ""} min={selected?.startDate || format(new Date(), "yyyy-MM-dd")} onChange={(e) => updateFacilityDates(facility.name, selected?.startDate, e.target.value)} />
+                                <Popover>
+                                  <PopoverTrigger asChild>
+                                    <Button variant="outline" className={cn("w-full justify-start text-left font-bold rounded-xl h-10 text-xs", !selected?.endDate && "text-muted-foreground")}>
+                                      <CalendarIcon className="mr-2 h-3 w-3" style={{ color: TEAL }} />
+                                      {selected?.endDate ? format(parseISO(selected.endDate), "MMM d") : "Select"}
+                                    </Button>
+                                  </PopoverTrigger>
+                                  <PopoverContent className="w-auto p-0" align="start">
+                                    <Calendar mode="single" selected={selected?.endDate ? parseISO(selected.endDate) : undefined} onSelect={(date) => { if (date) updateFacilityDates(facility.name, selected?.startDate, format(date, "yyyy-MM-dd")); }}
+                                      disabled={(date) => isBefore(date, selected?.startDate ? parseISO(selected.startDate) : new Date()) || isFacilityDateBooked(facility.name, date)}
+                                      modifiers={{ booked: (date) => isFacilityDateBooked(facility.name, date) }}
+                                      modifiersStyles={{ booked: { backgroundColor: '#fee2e2', color: '#ef4444', textDecoration: 'line-through' } }}
+                                      initialFocus />
+                                  </PopoverContent>
+                                </Popover>
                               </div>
                             </div>
+                            {dateConflictWarning && (
+                              <div className="flex items-center gap-2 text-xs text-red-500 bg-red-50 p-2 rounded-xl">
+                                <AlertCircle className="h-3 w-3 flex-shrink-0" />
+                                <span>{dateConflictWarning}</span>
+                              </div>
+                            )}
                             {selected?.startDate && selected?.endDate && (
                               <div className="text-sm font-bold" style={{ color: TEAL }}>
                                 {Math.max(1, Math.ceil((new Date(selected.endDate).getTime() - new Date(selected.startDate).getTime()) / (1000 * 60 * 60 * 24)))} nights — {formatPrice(facility.price * Math.max(1, Math.ceil((new Date(selected.endDate).getTime() - new Date(selected.startDate).getTime()) / (1000 * 60 * 60 * 24))))}
