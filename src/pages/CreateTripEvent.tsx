@@ -147,6 +147,11 @@ const CreateTripEvent = () => {
   };
 
   const handleNext = () => {
+    // Auto-save any pending text in inclusion/exclusion/activity inputs
+    if (newInclusion.trim()) { setInclusions(prev => [...prev, newInclusion.trim()]); setNewInclusion(""); }
+    if (newExclusion.trim()) { setExclusions(prev => [...prev, newExclusion.trim()]); setNewExclusion(""); }
+    if (newActivityName.trim()) { setActivityNames(prev => [...prev, newActivityName.trim()]); setNewActivityName(""); }
+
     const errors = validateCurrentStep();
     setValidationErrors(errors);
     if (errors.length > 0) {
