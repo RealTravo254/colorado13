@@ -366,8 +366,8 @@ const BecomeHost = () => {
             />
           )}
 
-          {/* Adventure Places - visible for campsite hosts or legacy verified users */}
-          {(hostingCategory === 'campsite' || (verificationStatus === 'approved' && !hostingCategory)) && (
+          {/* Adventure Places - visible for campsite hosts or legacy verified users (NOT companies) */}
+          {(hostingCategory === 'campsite' || (verificationStatus === 'approved' && !hostingCategory)) && !(hasCompany && companyStatus === 'approved' && hostingCategory !== 'campsite') && (
             <HostCategoryCard 
               title="Adventure Places"
               subtitle="Campsites & Nature"
