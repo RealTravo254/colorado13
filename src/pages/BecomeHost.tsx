@@ -366,8 +366,10 @@ const BecomeHost = () => {
             />
           )}
 
-          {/* Adventure Places - visible for campsite hosts or legacy verified users (NOT companies) */}
-          {(hostingCategory === 'campsite' || (verificationStatus === 'approved' && !hostingCategory)) && !(hasCompany && companyStatus === 'approved' && hostingCategory !== 'campsite') && (
+          {/* Adventure Places - only for campsite hosts who haven't created one yet, or legacy users */}
+          {(hostingCategory === 'campsite' || (verificationStatus === 'approved' && !hostingCategory)) && 
+           !(hasCompany && companyStatus === 'approved') && 
+           myContent.filter(i => i.contentType === 'adventure').length === 0 && (
             <HostCategoryCard 
               title="Adventure Places"
               subtitle="Campsites & Nature"

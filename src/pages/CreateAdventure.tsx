@@ -568,6 +568,15 @@ const CreateAdventure = () => {
   };
 
   const handleNext = () => {
+    // Auto-save any pending amenity input in unsaved facilities
+    setFacilities(prev => prev.map(f => {
+      if (!f.saved && f.amenityInput.trim()) {
+        const val = f.amenityInput.replace(/,/g, "").trim();
+        return { ...f, amenities: [...f.amenities, val], amenityInput: "" };
+      }
+      return f;
+    }));
+
     if (!validateCurrentStep()) return;
     setShowErrors(false);
     setCurrentStep(prev => Math.min(prev + 1, 7));

@@ -5,12 +5,16 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2, Mail, ArrowLeft } from "lucide-react";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 
 type FormErrors = {
   email?: string;
   password?: string;
+  otp?: string;
 };
+
+type LoginMode = "password" | "otp-send" | "otp-verify";
 
 interface LoginFormProps {
   onSwitchToSignup?: () => void;
@@ -22,6 +26,10 @@ export const LoginForm = ({ onSwitchToSignup }: LoginFormProps) => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
+  const [mode, setMode] = useState<LoginMode>("password");
+  const [otp, setOtp] = useState("");
+  const [otpSending, setOtpSending] = useState(false);
+  const [otpVerifying, setOtpVerifying] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -76,6 +84,186 @@ export const LoginForm = ({ onSwitchToSignup }: LoginFormProps) => {
     }
   };
 
+  const handleSendOtp = async () => {
+    if (!email.trim()) {
+      setErrors({ email: "Please enter your email address" });
+      return;
+    }
+    setOtpSending(true);
+    setErrors({});
+
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: { shouldCreateUser: false },
+      });
+
+      if (error) {
+        // If user doesn't exist
+        if (error.message.toLowerCase().includes("user") || error.message.toLowerCase().includes("not found") || error.message.toLowerCase().includes("signup")) {
+          toast({
+            title: "No account found",
+            description: "This email isn't registered. Please create an account first.",
+            variant: "destructive",
+          });
+          setErrors({ email: "No account found with this email. Please sign up." });
+        } else {
+          throw error;
+        }
+        return;
+      }
+
+      setMode("otp-verify");
+      setOtp("");
+      toast({ title: "Code sent!", description: "Check your email for the 6-digit login code." });
+    } catch (error: any) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } finally {
+      setOtpSending(false);
+    }
+  };
+
+  const handleVerifyOtp = async (codeToVerify?: string) => {
+    const code = codeToVerify || otp;
+    if (code.length !== 6) {
+      setErrors({ otp: "Please enter the complete 6-digit code" });
+      return;
+    }
+
+    setOtpVerifying(true);
+    setErrors({});
+
+    try {
+      const { error } = await supabase.auth.verifyOtp({
+        email,
+        token: code,
+        type: "email",
+      });
+      if (error) throw error;
+      navigate("/");
+    } catch (error: any) {
+      setErrors({ otp: error.message || "Invalid verification code" });
+      toast({ title: "Verification failed", description: error.message || "Invalid code", variant: "destructive" });
+    } finally {
+      setOtpVerifying(false);
+    }
+  };
+
+  // OTP Verify step
+  if (mode === "otp-verify") {
+    return (
+      <div className="space-y-8">
+        <div className="text-center space-y-3">
+          <div className="mx-auto w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center">
+            <Mail className="h-7 w-7 text-primary" />
+          </div>
+          <h3 className="text-lg font-bold text-foreground">Check your email</h3>
+          <p className="text-sm text-muted-foreground">
+            We sent a 6-digit code to <strong className="text-foreground">{email}</strong>
+          </p>
+        </div>
+
+        <div className="space-y-5">
+          <div className="flex justify-center">
+            <InputOTP
+              maxLength={6}
+              value={otp}
+              onChange={(value) => {
+                setOtp(value);
+                if (value.length === 6) {
+                  setTimeout(() => handleVerifyOtp(value), 100);
+                }
+              }}
+            >
+              <InputOTPGroup>
+                <InputOTPSlot index={0} />
+                <InputOTPSlot index={1} />
+                <InputOTPSlot index={2} />
+                <InputOTPSlot index={3} />
+                <InputOTPSlot index={4} />
+                <InputOTPSlot index={5} />
+              </InputOTPGroup>
+            </InputOTP>
+          </div>
+
+          {errors.otp && (
+            <p className="text-xs text-destructive text-center">{errors.otp}</p>
+          )}
+
+          {otpVerifying && (
+            <div className="flex items-center justify-center gap-2 text-muted-foreground text-sm">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Verifying...
+            </div>
+          )}
+
+          <div className="text-center">
+            <p className="text-sm text-muted-foreground mb-1">Didn't receive the code?</p>
+            <Button variant="link" onClick={handleSendOtp} disabled={otpSending} className="text-sm p-0 h-auto">
+              {otpSending ? "Sending..." : "Resend code"}
+            </Button>
+          </div>
+
+          <button
+            onClick={() => { setMode("otp-send"); setOtp(""); }}
+            className="flex items-center justify-center gap-2 w-full text-sm text-muted-foreground hover:text-foreground transition-colors py-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // OTP Send step (enter email)
+  if (mode === "otp-send") {
+    return (
+      <div className="space-y-6">
+        <div className="text-center space-y-2">
+          <h3 className="text-lg font-bold text-foreground">Login with code</h3>
+          <p className="text-sm text-muted-foreground">Enter your registered email and we'll send you a login code</p>
+        </div>
+
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="otp-email" className="text-sm font-medium text-foreground">Email address</Label>
+            <Input
+              id="otp-email"
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className={`h-11 rounded-xl ${errors.email ? "border-destructive" : ""}`}
+              required
+            />
+            {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
+          </div>
+
+          <Button
+            onClick={handleSendOtp}
+            className="w-full h-11 rounded-xl text-sm font-semibold"
+            disabled={otpSending}
+          >
+            {otpSending ? (
+              <><Loader2 className="h-4 w-4 animate-spin mr-2" /> Sending code...</>
+            ) : (
+              "Send Login Code"
+            )}
+          </Button>
+
+          <button
+            onClick={() => setMode("password")}
+            className="flex items-center justify-center gap-2 w-full text-sm text-muted-foreground hover:text-foreground transition-colors py-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to password login
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Google Button first */}
@@ -92,6 +280,16 @@ export const LoginForm = ({ onSwitchToSignup }: LoginFormProps) => {
           <path d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
         </svg>
         Continue with Google
+      </button>
+
+      {/* Login with Code button */}
+      <button
+        type="button"
+        onClick={() => setMode("otp-send")}
+        className="group relative flex w-full items-center justify-center gap-3 rounded-xl border border-border bg-background px-4 py-3 text-sm font-semibold text-foreground transition-all hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+      >
+        <Mail className="h-5 w-5 text-primary" />
+        Login with Code
       </button>
 
       {/* Divider */}

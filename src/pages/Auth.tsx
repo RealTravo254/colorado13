@@ -31,11 +31,10 @@ const Auth = () => {
       />
 
       {/* Left Panel - Branding */}
-      <div className="hidden lg:flex lg:w-[48%] relative overflow-hidden bg-primary">
-        {/* Decorative circles */}
-        <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-primary-foreground/5" />
-        <div className="absolute -bottom-32 -right-32 w-[500px] h-[500px] rounded-full bg-primary-foreground/5" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 rounded-full bg-primary-foreground/[0.03]" />
+      <div className="hidden lg:flex lg:w-[48%] relative overflow-hidden">
+        {/* Background image */}
+        <img src="/images/category-campsite.webp" alt="" className="absolute inset-0 w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-primary/80" />
 
         <div className="relative z-10 flex flex-col justify-between p-12 w-full">
           {/* Logo */}
