@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { 
   Home, Ticket, Heart, Phone, Info, LogIn, LogOut, User, 
-  FileText, Shield, ChevronRight, Trophy, Map, Mountain, Bed, Building2, Globe, Briefcase, Languages, DollarSign
+  FileText, Shield, ChevronRight, Trophy, Map, Mountain, Bed, Building2, Globe, Briefcase, Languages, DollarSign, X
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -57,147 +57,189 @@ export const NavigationDrawer = ({ onClose }: NavigationDrawerProps) => {
     onClose();
   };
 
+  const initials = userName
+    ? userName.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)
+    : "U";
+
   const NavItem = ({ icon: Icon, label, path, isProtected = false }: any) => (
     <button
       onClick={() => isProtected ? handleProtectedNavigation(path) : (window.location.href = path, onClose())}
-      className="w-full flex items-center justify-between px-4 py-3 hover:bg-muted/50 transition-all group"
+      className="w-full flex items-center justify-between px-3 py-2 hover:bg-muted/60 transition-colors group"
     >
-      <div className="flex items-center gap-3">
-        <div className="p-2 rounded-xl bg-primary/10">
-          <Icon className="h-4 w-4 text-primary" />
+      <div className="flex items-center gap-2.5">
+        <div className="h-6 w-6 rounded-md bg-primary/10 flex items-center justify-center flex-shrink-0">
+          <Icon className="h-3 w-3 text-primary" />
         </div>
-        <span className="text-sm font-medium text-foreground group-hover:text-foreground">
-          {label}
-        </span>
+        <span className="text-xs font-medium text-foreground">{label}</span>
       </div>
-      <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-transform group-hover:translate-x-0.5" />
+      <ChevronRight className="h-3 w-3 text-muted-foreground group-hover:translate-x-0.5 transition-transform" />
     </button>
   );
 
   return (
     <div className="flex flex-col h-full bg-primary" style={{ paddingTop: 'env(safe-area-inset-top, 0px)', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
       {/* Brand Header */}
-      <div className="px-6 pt-6 pb-4">
-        <div className="flex items-center justify-between">
-          <span className="font-bold text-xl tracking-tight italic text-primary-foreground">
-            RealTravo
-          </span>
-          <button onClick={onClose} className="text-xs font-medium text-primary-foreground/60 hover:text-primary-foreground/90 transition-colors">
-            Cancel
-          </button>
-        </div>
-      </div>
+      <div className="px-4 pt-4 pb-4 relative flex-shrink-0">
+        <button
+          onClick={onClose}
+          className="absolute top-3.5 right-3.5 h-6 w-6 rounded-full bg-primary-foreground/15 flex items-center justify-center hover:bg-primary-foreground/25 transition-colors"
+        >
+          <X className="h-3 w-3 text-primary-foreground" />
+        </button>
+        <p className="text-[9px] font-black uppercase tracking-[0.3em] text-primary-foreground/40 mb-0.5">Realtravo</p>
 
-      {/* Login / User Section */}
-      <div className="px-6 pb-4">
+        {/* User info */}
         {user ? (
-          <div className="flex items-center gap-3 p-3 rounded-2xl bg-primary-foreground/10 backdrop-blur-sm">
-            <div className="h-10 w-10 rounded-full bg-primary-foreground/20 flex items-center justify-center overflow-hidden">
-              {userAvatar ? (
-                <img src={userAvatar} alt={userName} className="h-full w-full object-cover" referrerPolicy="no-referrer" />
-              ) : (
-                <User className="h-4 w-4 text-primary-foreground" />
-              )}
+          <div className="flex items-center gap-2.5 mt-2">
+            <div className="relative flex-shrink-0">
+              <div className="h-10 w-10 rounded-xl bg-primary-foreground/20 flex items-center justify-center overflow-hidden border border-primary-foreground/20">
+                {userAvatar ? (
+                  <img src={userAvatar} alt={userName} className="h-full w-full object-cover" referrerPolicy="no-referrer" />
+                ) : (
+                  <span className="text-xs font-black text-primary-foreground">{initials}</span>
+                )}
+              </div>
+              <div className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-green-400 border-[1.5px] border-primary" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-primary-foreground truncate">{userName || t('drawer.traveler')}</p>
-              <span className="text-[10px] text-primary-foreground/50 uppercase tracking-wider">{t('nav.account')}</span>
+              <p className="text-sm font-extrabold text-primary-foreground truncate leading-tight">{userName || t('drawer.traveler')}</p>
+              <span className="inline-block mt-0.5 px-1.5 py-px rounded-full text-[9px] font-black uppercase tracking-wider bg-primary-foreground/15 text-primary-foreground/55">
+                Member
+              </span>
             </div>
-            <button 
-              onClick={() => { signOut(); onClose(); }}
-              className="p-2 rounded-lg hover:bg-primary-foreground/10 text-primary-foreground/50 hover:text-primary-foreground transition-colors"
-            >
-              <LogOut className="h-4 w-4" />
-            </button>
           </div>
         ) : (
-          <Link
-            to="/auth" onClick={onClose}
-            className="flex items-center justify-center w-full py-3 rounded-2xl bg-primary-foreground text-primary font-semibold text-sm hover:bg-primary-foreground/90 transition-all"
-          >
-            <LogIn className="h-4 w-4 mr-2" />
-            {t('nav.loginRegister')}
-          </Link>
+          <h2 className="text-lg font-extrabold text-primary-foreground mt-0.5">Welcome</h2>
         )}
       </div>
 
       {/* Scrollable Content */}
       <div className="flex-1 overflow-y-auto bg-background rounded-t-3xl">
-        <div className="py-4">
-          {/* Quick Links */}
-          <p className="px-6 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-1 mt-2">
-            {t('drawer.mainMenu')}
-          </p>
-          <div className="mx-4 bg-card rounded-2xl overflow-hidden border border-border shadow-sm divide-y divide-border/50">
-            <NavItem icon={Heart} label={t('nav.wishlist')} path="/saved" isProtected />
-            <NavItem icon={Ticket} label={t('nav.myBookings')} path="/bookings" isProtected />
-            <NavItem icon={Briefcase} label="Host" path="/become-host" isProtected />
+        <div className="py-2.5 px-2.5 space-y-2.5">
+
+          {/* Not logged in CTA */}
+          {!user && (
+            <div className="flex flex-col items-center py-6 px-4">
+              <div className="relative mb-4">
+                <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center">
+                  <User className="h-6 w-6 text-primary" />
+                </div>
+                <div className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full bg-primary flex items-center justify-center shadow">
+                  <LogIn className="h-2.5 w-2.5 text-primary-foreground" />
+                </div>
+              </div>
+              <h3 className="text-sm font-extrabold text-foreground mb-1 text-center">Join Realtravo</h3>
+              <p className="text-xs text-muted-foreground text-center mb-5 max-w-[200px] leading-relaxed">
+                Log in to manage bookings, save favourites, and become a host.
+              </p>
+              <Link
+                to="/auth"
+                onClick={onClose}
+                className="w-full py-2.5 rounded-xl text-xs font-bold text-primary-foreground bg-primary hover:opacity-90 active:scale-95 transition-all text-center"
+              >
+                Login / Register
+              </Link>
+            </div>
+          )}
+
+          {/* Main Menu */}
+          <div>
+            <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.22em] px-1 mb-1">
+              {t('drawer.mainMenu')}
+            </p>
+            <div className="rounded-xl overflow-hidden border border-border bg-card divide-y divide-border/50">
+              <NavItem icon={Heart} label={t('nav.wishlist')} path="/saved" isProtected />
+              <NavItem icon={Ticket} label={t('nav.myBookings')} path="/bookings" isProtected />
+              <NavItem icon={Briefcase} label="Host" path="/become-host" isProtected />
+            </div>
           </div>
 
           {/* Support & Legal */}
-          <p className="px-6 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-1 mt-5">
-            {t('drawer.supportLegal')}
-          </p>
-          <div className="mx-4 bg-card rounded-2xl overflow-hidden border border-border shadow-sm divide-y divide-border/50">
-            <NavItem icon={Phone} label={t('drawer.contact')} path="/contact" />
-            <NavItem icon={Info} label={t('drawer.about')} path="/about" />
-            <NavItem icon={FileText} label={t('drawer.terms')} path="/terms-of-service" />
-            <NavItem icon={Shield} label={t('drawer.privacy')} path="/privacy-policy" />
+          <div>
+            <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.22em] px-1 mb-1">
+              {t('drawer.supportLegal')}
+            </p>
+            <div className="rounded-xl overflow-hidden border border-border bg-card divide-y divide-border/50">
+              <NavItem icon={Phone} label={t('drawer.contact')} path="/contact" />
+              <NavItem icon={Info} label={t('drawer.about')} path="/about" />
+              <NavItem icon={FileText} label={t('drawer.terms')} path="/terms-of-service" />
+              <NavItem icon={Shield} label={t('drawer.privacy')} path="/privacy-policy" />
+            </div>
           </div>
 
           {/* Preferences */}
-          <p className="px-6 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-1 mt-5">
-            Preferences
-          </p>
-          <div className="mx-4 bg-card rounded-2xl overflow-hidden border border-border shadow-sm divide-y divide-border/50">
-            <div className="px-4 py-3 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-primary/10">
-                  <Languages className="h-4 w-4 text-primary" />
+          <div>
+            <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.22em] px-1 mb-1">
+              Preferences
+            </p>
+            <div className="rounded-xl overflow-hidden border border-border bg-card divide-y divide-border/50">
+              {/* Language */}
+              <div className="flex items-center justify-between px-3 py-2">
+                <div className="flex items-center gap-2.5">
+                  <div className="h-6 w-6 rounded-md bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <Languages className="h-3 w-3 text-primary" />
+                  </div>
+                  <span className="text-xs font-medium text-foreground">
+                    {LANGUAGES.find(l => l.code === language)?.name || "English"}
+                  </span>
                 </div>
-                <span className="text-sm font-medium text-foreground">
-                  Language: {LANGUAGES.find(l => l.code === language)?.name || "English"}
-                </span>
+                <select
+                  value={language}
+                  onChange={(e) => handleLanguageChange(e.target.value)}
+                  className="text-[10px] font-medium text-muted-foreground bg-transparent focus:outline-none cursor-pointer"
+                >
+                  {LANGUAGES.map((l) => (
+                    <option key={l.code} value={l.code}>{l.name}</option>
+                  ))}
+                </select>
               </div>
-              <select
-                value={language}
-                onChange={(e) => handleLanguageChange(e.target.value)}
-                className="text-xs font-medium text-muted-foreground bg-transparent focus:outline-none cursor-pointer"
-              >
-                {LANGUAGES.map((l) => (
-                  <option key={l.code} value={l.code}>{l.name}</option>
-                ))}
-              </select>
-            </div>
-            <div className="px-4 py-3 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-primary/10">
-                  <DollarSign className="h-4 w-4 text-primary" />
+
+              {/* Currency */}
+              <div className="flex items-center justify-between px-3 py-2">
+                <div className="flex items-center gap-2.5">
+                  <div className="h-6 w-6 rounded-md bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <DollarSign className="h-3 w-3 text-primary" />
+                  </div>
+                  <span className="text-xs font-medium text-foreground">
+                    {currency}
+                  </span>
                 </div>
-                <span className="text-sm font-medium text-foreground">
-                  Currency: {currency}
-                </span>
-              </div>
-              <div className="flex gap-1">
-                <button
-                  onClick={() => setCurrency("KES")}
-                  className={`px-2 py-1 rounded-lg text-[10px] font-bold transition-all ${
-                    currency === "KES" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
-                  }`}
-                >
-                  KES
-                </button>
-                <button
-                  onClick={() => setCurrency("USD")}
-                  className={`px-2 py-1 rounded-lg text-[10px] font-bold transition-all ${
-                    currency === "USD" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
-                  }`}
-                >
-                  USD
-                </button>
+                <div className="flex gap-1">
+                  <button
+                    onClick={() => setCurrency("KES")}
+                    className={`px-2 py-1 rounded-lg text-[10px] font-bold transition-all ${
+                      currency === "KES" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                    }`}
+                  >
+                    KES
+                  </button>
+                  <button
+                    onClick={() => setCurrency("USD")}
+                    className={`px-2 py-1 rounded-lg text-[10px] font-bold transition-all ${
+                      currency === "USD" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                    }`}
+                  >
+                    USD
+                  </button>
+                </div>
               </div>
             </div>
           </div>
+
+          {/* Log Out */}
+          {user && (
+            <button
+              onClick={() => { signOut(); onClose(); }}
+              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl border border-destructive/20 bg-destructive/5 hover:bg-destructive/10 transition-colors group"
+            >
+              <div className="h-6 w-6 rounded-md bg-destructive/10 group-hover:bg-destructive flex items-center justify-center flex-shrink-0 transition-colors">
+                <LogOut className="h-3 w-3 text-destructive group-hover:text-destructive-foreground transition-colors" />
+              </div>
+              <span className="text-xs font-semibold text-destructive">Log Out</span>
+            </button>
+          )}
+
+          <div className="h-1" />
         </div>
       </div>
     </div>

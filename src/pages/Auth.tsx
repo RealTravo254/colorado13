@@ -72,43 +72,34 @@ const Auth = () => {
         </div>
       </div>
 
-      {/* Right Panel - Auth Forms with background image */}
-      <div
-        className="flex-1 flex flex-col min-h-screen relative"
-        style={{
-          backgroundImage: "url('/images/category-campsite.webp')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      >
-        {/* Dark overlay */}
-        <div className="absolute inset-0 bg-black/60 z-0" />
+      {/* Right Panel - Auth Forms */}
+      <div className="flex-1 flex flex-col min-h-screen bg-background">
 
         {/* Mobile top bar */}
-        <div className="relative z-10 flex items-center justify-between p-4 lg:p-8 lg:pb-0">
+        <div className="flex items-center justify-between p-4 lg:p-8 lg:pb-0">
           <button
             onClick={() => navigate("/")}
-            className="hidden lg:flex items-center gap-2 text-white/70 hover:text-white transition-colors"
+            className="hidden lg:flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             <span className="text-sm font-medium">Back</span>
           </button>
-          <img src="/fulllogo.png" alt="Realtravo" className="h-7 lg:hidden brightness-0 invert" />
+          <img src="/fulllogo.png" alt="Realtravo" className="h-7 lg:hidden" />
           <div className="w-16 lg:hidden" />
         </div>
 
         {/* Form area */}
-        <div className="relative z-10 flex-1 flex items-center justify-center px-4 py-8 lg:px-12">
+        <div className="flex-1 flex items-center justify-center px-4 py-8 lg:px-12">
           <div className="w-full max-w-[420px]">
-            {/* Glass card */}
-            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-8 space-y-6 shadow-xl">
+            {/* Card */}
+            <div className="bg-card border border-border rounded-2xl p-8 space-y-6 shadow-sm">
 
               {/* Header */}
               <div>
-                <h2 className="text-2xl font-bold text-white tracking-tight">
+                <h2 className="text-2xl font-bold text-foreground tracking-tight">
                   {activeTab === "login" ? "Welcome back" : "Create your account"}
                 </h2>
-                <p className="mt-1 text-white/60 text-sm">
+                <p className="mt-1 text-muted-foreground text-sm">
                   {activeTab === "login"
                     ? "Sign in to continue your journey"
                     : "Join Realtravo and start exploring"}
@@ -116,13 +107,13 @@ const Auth = () => {
               </div>
 
               {/* Tab switcher */}
-              <div className="flex bg-white/10 rounded-xl p-1 gap-1">
+              <div className="flex bg-muted rounded-xl p-1 gap-1">
                 <button
                   onClick={() => setActiveTab("login")}
                   className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all ${
                     activeTab === "login"
-                      ? "bg-white text-gray-900 shadow-sm"
-                      : "text-white/60 hover:text-white"
+                      ? "bg-background text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   Sign In
@@ -131,8 +122,8 @@ const Auth = () => {
                   onClick={() => setActiveTab("signup")}
                   className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all ${
                     activeTab === "signup"
-                      ? "bg-white text-gray-900 shadow-sm"
-                      : "text-white/60 hover:text-white"
+                      ? "bg-background text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   Sign Up
@@ -152,8 +143,8 @@ const Auth = () => {
         </div>
 
         {/* Mobile footer */}
-        <div className="relative z-10 p-4 text-center lg:hidden">
-          <p className="text-xs text-white/40">
+        <div className="p-4 text-center lg:hidden">
+          <p className="text-xs text-muted-foreground">
             © {new Date().getFullYear()} Realtravo. All rights reserved.
           </p>
         </div>
