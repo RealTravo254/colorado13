@@ -440,7 +440,8 @@ const Index = () => {
           isCustomDate={item.is_custom_date} isFlexibleDate={item.is_flexible_date}
           isOutdated={isOutdated}
           isSaved={savedItems.has(item.id)}
-          hideSave={true}
+          onSave={handleSave}
+          hideSave={false}
           hidePrice={opts.hidePrice ?? false}
           showBadge={true} priority={index === 0}
           activities={item.activities} distance={itemDistance}
@@ -718,7 +719,7 @@ const Index = () => {
                           id={item.id} type={a.type || 'ADVENTURE PLACE'}
                           name={item.name} imageUrl={a.image_url} location={a.location} country={a.country}
                           price={a.entry_fee || 0} date=""
-                          isSaved={savedItems.has(item.id)} hideSave={true} hidePrice={true} showBadge={true}
+                          isSaved={savedItems.has(item.id)} onSave={handleSave} hideSave={false} hidePrice={true} showBadge={true}
                           priority={index === 0} activities={a.activities} distance={dist}
                           avgRating={rd?.avgRating} reviewCount={rd?.reviewCount} place={a.place}
                           description={a.description}
